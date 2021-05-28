@@ -1,8 +1,8 @@
 {
-    "name": "icinga/reactbundle",
-    "type": "library",
-    "description": "Icinga Web 2 - ReactPHP-based 3rd party libraries",
-    "homepage": "https://github.com/Icinga/icingaweb2-module-reactbundle",
+    "name": "icinga/icinga-php-thirdparty",
+    "type": "project",
+    "description": "Icinga Web 2 - Bundle for all 3rd party PHP libraries",
+    "homepage": "https://github.com/Icinga/icinga-php-thirdparty",
     "license": "MIT",
     "config": {
         "sort-packages": true,
@@ -11,7 +11,7 @@
         }
     },
     "support": {
-        "issues": "https://github.com/Icinga/icingaweb2-module-reactbundle/issues"
+        "issues": "https://github.com/Icinga/icinga-php-thirdparty/issues"
     },
     "require": {
         "php": ">=5.6.3",
