@@ -25,7 +25,7 @@ Download or clone this repository there (e.g. `/usr/share/icinga-php/vendor`) an
 ```sh
 INSTALL_PATH="/usr/share/icinga-php/vendor"
 INSTALL_VERSION="v0.10.0"
-mkdir "$INSTALL_PATH"
+mkdir "$INSTALL_PATH" \
 && wget -q "https://github.com/Icinga/icinga-php-thirdparty/archive/$INSTALL_VERSION.tar.gz" -O - \
    | tar xfz - -C "$INSTALL_PATH" --strip-components 1
 ```
