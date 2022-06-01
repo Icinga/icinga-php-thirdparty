@@ -1,0 +1,10 @@
+--- a/vendor/ramsey/uuid/src/Uuid.php
++++ b/vendor/ramsey/uuid/src/Uuid.php
+@@ -212,6 +212,7 @@ class Uuid implements UuidInterface
+      * @return string
+      * @link http://php.net/manual/en/class.jsonserializable.php
+      */
++    #[\ReturnTypeWillChange]
+     public function jsonSerialize()
+     {
+         return $this->toString();
