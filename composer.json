@@ -41,8 +41,17 @@
         "react/stream": "^1",
         "guzzlehttp/psr7": "^1",
         "guzzlehttp/guzzle": "^6.5",
-        "jfcherng/php-diff": "^6.10"
+        "jfcherng/php-diff": "^6.10",
+        "components/jquery": "3.6.*"
     },
     "require-dev": {
+    },
+    "autoload": {
+        "psr-0": { "AssetLoader": "" }
+    },
+    "scripts": {
+        "post-update-cmd": [
+            "AssetLoader::update"
+        ]
     }
 }
