@@ -42,6 +42,7 @@ find vendor/ -type f -name "*.php" \
  | xargs -L1 git add -f
 find vendor/ -type f -name LICENSE | xargs -L1 git add -f
 find vendor/ -type f -name '*.json' | xargs -L1 git add -f
+find asset/ -type f | xargs -L1 git add -f
 echo "v$VERSION" > VERSION
 git add VERSION
 git add composer.lock -f
