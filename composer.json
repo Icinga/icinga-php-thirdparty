@@ -29,7 +29,7 @@
         "clue/socks-react": "^1",
         "clue/stdio-react": "^2",
         "cweagans/composer-patches": "~1.0",
-        "evenement/evenement": "^2",
+        "evenement/evenement": "^3",
         "predis/predis": "^1",
         "psr/http-message": "^1",
         "ramsey/uuid": "^3",
