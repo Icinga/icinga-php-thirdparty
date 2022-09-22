@@ -29,6 +29,7 @@
         "clue/socks-react": "^1",
         "clue/stdio-react": "^2",
         "cweagans/composer-patches": "~1.0",
+        "dragonmantank/cron-expression": "^3",
         "evenement/evenement": "^3",
         "predis/predis": "^1",
         "psr/http-message": "^1",
