@@ -8,9 +8,6 @@
         "sort-packages": true,
         "platform": {
             "php": "7.2"
-        },
-        "allow-plugins": {
-            "cweagans/composer-patches": true
         }
     },
     "support": {
@@ -28,7 +25,6 @@
         "clue/socket-raw": "^1",
         "clue/socks-react": "^1",
         "clue/stdio-react": "^2",
-        "cweagans/composer-patches": "~1.0",
         "evenement/evenement": "^3",
         "predis/predis": "^1",
         "psr/http-message": "^1",
@@ -57,13 +53,5 @@
         "post-update-cmd": [
             "AssetLoader::update"
         ]
-    },
-    "extra": {
-        "composer-exit-on-patch-failure": true,
-        "patches": {
-            "ramsey/uuid": {
-                "Uuid: Add PHP 8.1 support": "patches/ramsey-uuid.patch"
-            }
-        }
     }
 }
