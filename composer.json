@@ -39,8 +39,8 @@
         "react/promise-timer": "^1",
         "react/socket": "^1",
         "react/stream": "^1",
-        "guzzlehttp/psr7": "^1",
-        "guzzlehttp/guzzle": "^6.5",
+        "guzzlehttp/psr7": "^2.4",
+        "guzzlehttp/guzzle": "^7.5",
         "jfcherng/php-diff": "^6.10",
         "components/jquery": "3.6.*"
     },
