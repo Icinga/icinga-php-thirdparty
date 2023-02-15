@@ -7,14 +7,14 @@
     "config": {
         "sort-packages": true,
         "platform": {
-            "php": "7.2"
+            "php": "7.2.9"
         }
     },
     "support": {
         "issues": "https://github.com/Icinga/icinga-php-thirdparty/issues"
     },
     "require": {
-        "php": ">=7.2 <=8.1",
+        "php": ">=7.2.9 <=8.2",
         "ext-curl": "*",
         "clue/block-react": "^1",
         "clue/connection-manager-extra": "^1",
@@ -25,7 +25,14 @@
         "clue/socket-raw": "^1",
         "clue/socks-react": "^1",
         "clue/stdio-react": "^2",
+        "components/jquery": "3.6.*",
+        "dompdf/dompdf": "^2.0",
+        "erusev/parsedown": "^1.7",
         "evenement/evenement": "^3",
+        "ezyang/htmlpurifier": "^4.16",
+        "guzzlehttp/guzzle": "^7.5",
+        "guzzlehttp/psr7": "^2.4",
+        "jfcherng/php-diff": "^6.10",
         "predis/predis": "^1",
         "psr/http-message": "^1",
         "ramsey/uuid": "^3",
@@ -39,10 +46,8 @@
         "react/promise-timer": "^1",
         "react/socket": "^1",
         "react/stream": "^1",
-        "guzzlehttp/psr7": "^1",
-        "guzzlehttp/guzzle": "^6.5",
-        "jfcherng/php-diff": "^6.10",
-        "components/jquery": "3.6.*"
+        "tedivm/jshrink": "^1.4",
+        "wikimedia/less.php": "^3.2"
     },
     "require-dev": {
     },
