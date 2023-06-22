@@ -7,14 +7,14 @@
     "config": {
         "sort-packages": true,
         "platform": {
-            "php": "7.2"
+            "php": "7.2.9"
         }
     },
     "support": {
         "issues": "https://github.com/Icinga/icinga-php-thirdparty/issues"
     },
     "require": {
-        "php": ">=7.2 <=8.1",
+        "php": ">=7.2.9 <=8.2",
         "ext-curl": "*",
         "clue/block-react": "^1",
         "clue/connection-manager-extra": "^1",
