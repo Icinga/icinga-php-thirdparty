@@ -42,7 +42,13 @@
         "guzzlehttp/psr7": "^1",
         "guzzlehttp/guzzle": "^6.5",
         "jfcherng/php-diff": "^6.10",
-        "components/jquery": "3.6.*"
+        "components/jquery": "3.6.*",
+        "dompdf/dompdf": "^2.0",
+        "erusev/parsedown": "^1.7",
+        "ezyang/htmlpurifier": "^4.16",
+        "shardj/zf1-future": "^1.22",
+        "tedivm/jshrink": "^1.6",
+        "wikimedia/less.php": "^3.2"
     },
     "require-dev": {
     },
