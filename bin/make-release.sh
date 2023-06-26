@@ -34,7 +34,11 @@ git rm -rf vendor
 rm -rf vendor
 rm -f composer.lock
 composer install || fail "composer install failed"
-find vendor/ -type f -name "*.php" \
+find vendor/ -type f -name "*" \
+ | grep -v '/docs/' \
+ | grep -v '/doc/' \
+ | grep -v '/\.[a-zA-Z0-9_]*' \
+ | grep -v 'phpunit*' \
  | grep -v '/examples/' \
  | grep -v '/example/' \
  | grep -v '/tests/' \
