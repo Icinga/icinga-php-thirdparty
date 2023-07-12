@@ -34,22 +34,13 @@ git rm -rf vendor
 rm -rf vendor
 rm -f composer.lock
 composer install || fail "composer install failed"
-find vendor/ -type f -name "*.php" \
- | grep -v '/examples/' \
- | grep -v '/example/' \
- | grep -v '/tests/' \
- | grep -v '/test/' \
- | xargs -L1 git add -f
-find vendor/ -type f -name LICENSE | xargs -L1 git add -f
-find vendor/ -type f -name '*.json' | xargs -L1 git add -f
+git add vendor
 find asset/ -type f | xargs -L1 git add -f
 echo "v$VERSION" > VERSION
 git add VERSION
 git add composer.lock -f
 git commit -m "Version v$VERSION"
 
-rm -rf vendor
-git checkout vendor
 composer validate --no-check-all --strict || fail "Composer validate failed"
 
 if [ -z "$NO_OPT" ]; then
