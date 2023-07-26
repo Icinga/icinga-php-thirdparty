@@ -1,0 +1,32 @@
+--- a/vendor/ramsey/collection/src/AbstractArray.php
++++ b/vendor/ramsey/collection/src/AbstractArray.php
+@@ -84,6 +84,7 @@ abstract class AbstractArray implements ArrayInterface
+      * @return T|null the value stored at the offset, or null if the offset
+      *     does not exist.
+      */
++    #[\ReturnTypeWillChange]
+     public function offsetGet($offset)
+     {
+         return $this->data[$offset] ?? null;
+--- a/vendor/ramsey/collection/src/AbstractCollection.php
++++ b/vendor/ramsey/collection/src/AbstractCollection.php
+@@ -51,6 +51,16 @@ abstract class AbstractCollection extends AbstractArray implements CollectionInt
+     use ValueToStringTrait;
+     use ValueExtractorTrait;
+ 
++    public function __serialize()
++    {
++        $this->serialize();
++    }
++
++    public function __unserialize(array $data)
++    {
++        $this->unserialize($data);
++    }
++
+     /**
+      * @inheritDoc
+      */
+--
+2.41.0
+
