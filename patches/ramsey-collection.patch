@@ -8,25 +8,30 @@
      public function offsetGet($offset)
      {
          return $this->data[$offset] ?? null;
---- a/vendor/ramsey/collection/src/AbstractCollection.php
-+++ b/vendor/ramsey/collection/src/AbstractCollection.php
-@@ -51,6 +51,16 @@ abstract class AbstractCollection extends AbstractArray implements CollectionInt
-     use ValueToStringTrait;
-     use ValueExtractorTrait;
- 
+@@ -132,6 +133,11 @@ abstract class AbstractArray implements ArrayInterface
+         return serialize($this->data);
+     }
+
 +    public function __serialize()
 +    {
-+        $this->serialize();
++        return $this->serialize();
 +    }
 +
+     /**
+      * Converts a serialized string representation into an instance object.
+      *
+@@ -149,6 +155,11 @@ abstract class AbstractArray implements ArrayInterface
+         $this->data = $data;
+     }
+
 +    public function __unserialize(array $data)
 +    {
 +        $this->unserialize($data);
 +    }
 +
      /**
-      * @inheritDoc
-      */
+      * Returns the number of items in this array.
+      *
 --
 2.41.0
 
