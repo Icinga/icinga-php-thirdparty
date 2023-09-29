@@ -69,9 +69,6 @@
         "patches": {
             "ramsey/collection": {
                 "Collection: Add PHP 8.1 support": "patches/ramsey-collection.patch"
-            },
-            "shardj/zf1-future": {
-                "ZF1-Future: ZF backward compatibility": "patches/shardj-zf1-future.patch"
             }
         }
     }
