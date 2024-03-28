@@ -78,19 +78,19 @@ final class Differ
 
     /**
      * @var int the end index for the old if the old has no EOL at EOF
-     *          -1 means the old has an EOL at EOF
+     *          `-1` means the old has an EOL at EOF
      */
     private $oldNoEolAtEofIdx = -1;
 
     /**
      * @var int the end index for the new if the new has no EOL at EOF
-     *          -1 means the new has an EOL at EOF
+     *          `-1` means the new has an EOL at EOF
      */
     private $newNoEolAtEofIdx = -1;
 
     /**
      * @var int the result of comparing the old and the new with the spaceship operator
-     *          -1 means old < new, 0 means old == new, 1 means old > new
+     *          `-1` means `old < new`, `0` means `old == new`, `1` means `old > new`
      */
     private $oldNewComparison = 0;
 
@@ -119,13 +119,15 @@ final class Differ
         'ignoreWhitespace' => false,
         // if the input sequence is too long, it will just gives up (especially for char-level diff)
         'lengthLimit' => 2000,
+        // if truthy, when inputs are identical, the whole inputs will be rendered in the output
+        'fullContextIfIdentical' => false,
     ];
 
     /**
      * The constructor.
      *
      * @param string[] $old     array containing the lines of the old string to compare
-     * @param string[] $new     array containing the lines for the new string to compare
+     * @param string[] $new     array containing the lines of the new string to compare
      * @param array    $options the options
      */
     public function __construct(array $old, array $new, array $options = [])
@@ -183,7 +185,7 @@ final class Differ
      */
     public function setOptions(array $options): self
     {
-        $mergedOptions = $options + static::$defaultOptions;
+        $mergedOptions = $options + self::$defaultOptions;
 
         if ($this->options !== $mergedOptions) {
             $this->options = $mergedOptions;
@@ -266,7 +268,7 @@ final class Differ
     {
         static $singleton;
 
-        return $singleton = $singleton ?? new static([], []);
+        return $singleton = $singleton ?? new self([], []);
     }
 
     /**
@@ -318,11 +320,21 @@ final class Differ
 
         $old = $this->old;
         $new = $this->new;
+
         $this->getGroupedOpcodesPre($old, $new);
 
-        $opcodes = $this->sequenceMatcher
-            ->setSequences($old, $new)
-            ->getGroupedOpcodes($this->options['context']);
+        if ($this->oldNewComparison === 0 && $this->options['fullContextIfIdentical']) {
+            $opcodes = [
+                [
+                    [SequenceMatcher::OP_EQ, 0, \count($old), 0, \count($new)],
+                ],
+            ];
+        } else {
+            $opcodes = $this->sequenceMatcher
+                ->setSequences($old, $new)
+                ->getGroupedOpcodes($this->options['context'])
+            ;
+        }
 
         $this->getGroupedOpcodesPost($opcodes);
 
@@ -344,11 +356,21 @@ final class Differ
 
         $old = $this->old;
         $new = $this->new;
+
         $this->getGroupedOpcodesGnuPre($old, $new);
 
-        $opcodes = $this->sequenceMatcher
-            ->setSequences($old, $new)
-            ->getGroupedOpcodes($this->options['context']);
+        if ($this->oldNewComparison === 0 && $this->options['fullContextIfIdentical']) {
+            $opcodes = [
+                [
+                    [SequenceMatcher::OP_EQ, 0, \count($old), 0, \count($new)],
+                ],
+            ];
+        } else {
+            $opcodes = $this->sequenceMatcher
+                ->setSequences($old, $new)
+                ->getGroupedOpcodes($this->options['context'])
+            ;
+        }
 
         $this->getGroupedOpcodesGnuPost($opcodes);
 
@@ -372,10 +394,10 @@ final class Differ
         ];
 
         $this->oldSrcLength = \count($old);
-        \array_push($old, ...$eolAtEofHelperLines);
+        array_push($old, ...$eolAtEofHelperLines);
 
         $this->newSrcLength = \count($new);
-        \array_push($new, ...$eolAtEofHelperLines);
+        array_push($new, ...$eolAtEofHelperLines);
     }
 
     /**
@@ -495,7 +517,7 @@ final class Differ
      */
     private function resetCachedResults(): self
     {
-        foreach (static::CACHED_PROPERTIES as $property => $value) {
+        foreach (self::CACHED_PROPERTIES as $property => $value) {
             $this->{$property} = $value;
         }
 

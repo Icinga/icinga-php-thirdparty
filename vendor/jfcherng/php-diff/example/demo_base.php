@@ -8,8 +8,8 @@ use Jfcherng\Diff\Renderer\RendererConstant;
 // the two sample files for comparison
 $oldFile = __DIR__ . '/old_file.txt';
 $newFile = __DIR__ . '/new_file.txt';
-$oldString = \file_get_contents($oldFile);
-$newString = \file_get_contents($newFile);
+$oldString = file_get_contents($oldFile);
+$newString = file_get_contents($newFile);
 
 // options for Diff class
 $diffOptions = [
@@ -24,6 +24,8 @@ $diffOptions = [
     'ignoreWhitespace' => false,
     // if the input sequence is too long, it will just gives up (especially for char-level diff)
     'lengthLimit' => 2000,
+    // if truthy, when inputs are identical, the whole inputs will be rendered in the output
+    'fullContextIfIdentical' => false,
 ];
 
 // options for renderer class

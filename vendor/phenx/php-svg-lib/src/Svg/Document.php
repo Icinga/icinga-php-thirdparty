@@ -23,6 +23,7 @@ use Svg\Tag\Polygon;
 use Svg\Tag\Polyline;
 use Svg\Tag\Rect;
 use Svg\Tag\Stop;
+use Svg\Tag\Symbol;
 use Svg\Tag\Text;
 use Svg\Tag\StyleTag;
 use Svg\Tag\UseTag;
@@ -52,6 +53,8 @@ class Document extends AbstractTag
 
     /** @var \Sabberworm\CSS\CSSList\Document[] */
     protected $styleSheets = array();
+
+    public $allowExternalReferences = true;
 
     public function loadFile($filename)
     {
@@ -131,6 +134,7 @@ class Document extends AbstractTag
                 break;
             }
         }
+        xml_parse($parser, "", true);
 
         xml_parser_free($parser);
 
@@ -200,7 +204,7 @@ class Document extends AbstractTag
     {
         $surface = $this->getSurface();
 
-        $style = new DefaultStyle();
+        $style = new DefaultStyle($this);
         $style->inherit($this);
         $style->fromAttributes($attributes);
 
@@ -320,10 +324,14 @@ class Document extends AbstractTag
                 break;
 
             case 'g':
-            case 'symbol':
                 $tag = new Group($this, $name);
                 break;
 
+            case 'symbol':
+                $this->inDefs = true;
+                $tag = new Symbol($this, $name);
+                break;
+    
             case 'clippath':
                 $tag = new ClipPath($this, $name);
                 break;
@@ -376,6 +384,11 @@ class Document extends AbstractTag
                 $this->inDefs = false;
                 return;
 
+            case 'symbol':
+                $this->inDefs = false;
+                $tag = array_pop($this->stack);
+                break;
+    
             case 'svg':
             case 'path':
             case 'rect':
@@ -391,7 +404,6 @@ class Document extends AbstractTag
             case 'style':
             case 'text':
             case 'g':
-            case 'symbol':
             case 'clippath':
             case 'use':
             case 'a':
@@ -399,7 +411,7 @@ class Document extends AbstractTag
                 break;
         }
 
-        if (!$this->inDefs && $tag) {
+        if ((!$this->inDefs && $tag) || $tag instanceof StyleTag) {
             $tag->handleEnd();
         }
     }

@@ -251,10 +251,10 @@ class Zend_Controller_Router_Route_Module extends Zend_Controller_Router_Route_A
         }
         unset($params[$this->_moduleKey]);
 
-        $controller = $params[$this->_controllerKey];
+        $controller = $params[$this->_controllerKey] ?? null;
         unset($params[$this->_controllerKey]);
 
-        $action = $params[$this->_actionKey];
+        $action = $params[$this->_actionKey] ?? null;
         unset($params[$this->_actionKey]);
 
         foreach ($params as $key => $value) {
