@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.9.0 (2024-04-10)
+
+*   Feature / Fix: Forward compatibility with Promise v3.
+    (#56 by @SimonFrings)
+
+*   Feature: Full PHP 8.3 compatibility.
+    (#54 by @yadaiio)
+
+*   Minor documentation improvements.
+    (#53 and #55 by @yadaiio)
+
+*   Update test suite to use new reactphp/async package instead of clue/reactphp-block.
+    (#50 and #57 by @dinooo13 and @SimonFrings)
+
 ## 1.8.0 (2022-09-01)
 
 *   Feature: Full support for PHP 8.1 and PHP 8.2.
@@ -120,7 +134,7 @@
 
     ```php
     $promise = $proxy->connect('imap.example.com:143');
-    $promise->then(null, function (Exeption $e) {
+    $promise->then(null, function (Exception $e) {
         if ($e->getCode() === SOCKET_EACCES) {
             echo 'Failed to authenticate with proxy!';
         }
