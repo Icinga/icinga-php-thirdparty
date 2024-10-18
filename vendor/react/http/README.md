@@ -79,6 +79,7 @@ multiple concurrent HTTP requests without blocking.
             * [xml()](#xml)
         * [Request](#request-1)
         * [ServerRequest](#serverrequest)
+        * [Uri](#uri)
         * [ResponseException](#responseexception)
     * [React\Http\Middleware](#reacthttpmiddleware)
         * [StreamingRequestMiddleware](#streamingrequestmiddleware)
@@ -2448,8 +2449,7 @@ constants with the `STATUS_*` prefix. For instance, the `200 OK` and
 `404 Not Found` status codes can used as `Response::STATUS_OK` and
 `Response::STATUS_NOT_FOUND` respectively.
 
-> Internally, this implementation builds on top of an existing incoming
-  response message and only adds required streaming support. This base class is
+> Internally, this implementation builds on top of a base class which is
   considered an implementation detail that may change in the future.
 
 ##### html()
@@ -2643,8 +2643,7 @@ This is mostly used internally to represent each outgoing HTTP request
 message for the HTTP client implementation. Likewise, you can also use this
 class with other HTTP client implementations and for tests.
 
-> Internally, this implementation builds on top of an existing outgoing
-  request message and only adds support for streaming. This base class is
+> Internally, this implementation builds on top of a base class which is
   considered an implementation detail that may change in the future.
 
 #### ServerRequest
@@ -2663,9 +2662,20 @@ This is mostly used internally to represent each incoming request message.
 Likewise, you can also use this class in test cases to test how your web
 application reacts to certain HTTP requests.
 
-> Internally, this implementation builds on top of an existing outgoing
-  request message and only adds required server methods. This base class is
+> Internally, this implementation builds on top of a base class which is
   considered an implementation detail that may change in the future.
+
+#### Uri
+
+The `React\Http\Message\Uri` class can be used to
+respresent a URI (or URL).
+
+This class implements the
+[PSR-7 `UriInterface`](https://www.php-fig.org/psr/psr-7/#35-psrhttpmessageuriinterface).
+
+This is mostly used internally to represent the URI of each HTTP request
+message for our HTTP client and server implementations. Likewise, you may
+also use this class with other HTTP implementations and for tests.
 
 #### ResponseException
 
@@ -2976,7 +2986,7 @@ This project follows [SemVer](https://semver.org/).
 This will install the latest supported version:
 
 ```bash
-composer require react/http:^1.9
+composer require react/http:^1.10
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.

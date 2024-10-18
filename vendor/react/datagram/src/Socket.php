@@ -15,8 +15,17 @@ class Socket extends EventEmitter implements SocketInterface
 
     public $bufferSize = 65536;
 
-    public function __construct(LoopInterface $loop, $socket, Buffer $buffer = null)
+    /**
+     * @param LoopInterface $loop
+     * @param resource $socket
+     * @param ?Buffer $buffer
+     */
+    public function __construct(LoopInterface $loop, $socket, $buffer = null)
     {
+        if ($buffer !== null && !$buffer instanceof Buffer) { // manual type check to support legacy PHP < 7.1
+            throw new \InvalidArgumentException('Argument #3 ($buffer) expected null|React\Datagram\Buffer');
+        }
+
         $this->loop = $loop;
         $this->socket = $socket;
 
