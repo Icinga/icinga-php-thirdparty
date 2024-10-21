@@ -29,8 +29,15 @@ class Factory
      *     try to load the system default DNS config or fall back to using
      *     Google's public DNS 8.8.8.8
      */
-    public function __construct(LoopInterface $loop = null, ResolverInterface $resolver = null)
+    public function __construct($loop = null, $resolver = null)
     {
+        if ($loop !== null && !$loop instanceof LoopInterface) { // manual type check to support legacy PHP < 7.1
+            throw new \InvalidArgumentException('Argument #1 ($loop) expected null|React\EventLoop\LoopInterface');
+        }
+        if ($resolver !== null && !$resolver instanceof ResolverInterface) { // manual type check to support legacy PHP < 7.1
+            throw new \InvalidArgumentException('Argument #2 ($resolver) expected null|React\Dns\Resolver\ResolverInterface');
+        }
+
         $loop = $loop ?: Loop::get();
         if ($resolver === null) {
             // try to load nameservers from system config or default to Google's public DNS

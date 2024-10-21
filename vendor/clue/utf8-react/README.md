@@ -1,4 +1,7 @@
-# clue/reactphp-utf8 [![Build Status](https://travis-ci.org/clue/reactphp-utf8.svg?branch=master)](https://travis-ci.org/clue/reactphp-utf8)
+# clue/reactphp-utf8
+
+[![CI status](https://github.com/clue/reactphp-utf8/actions/workflows/ci.yml/badge.svg)](https://github.com/clue/reactphp-utf8/actions)
+[![installs on Packagist](https://img.shields.io/packagist/dt/clue/utf8-react?color=blue&label=installs%20on%20Packagist)](https://packagist.org/packages/clue/utf8-react)
 
 Streaming UTF-8 parser, built on top of [ReactPHP](https://reactphp.org/).
 
@@ -32,7 +35,11 @@ It wraps a given `ReadableStreamInterface` and exposes its data through the same
 interface.
 
 ```php
-$stdin = new ReadableResourceStream(STDIN, $loop);
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+$stdin = new ReadableResourceStream(STDIN);
 
 $stream = new Sequencer($stdin);
 
@@ -49,7 +56,7 @@ This class reassembles these sequences by buffering incomplete ones.
 Also, if you're merely consuming a stream and you're not in control of producing and
 ensuring valid UTF-8 data, it may as well include invalid UTF-8 byte sequences.
 This class replaces any invalid bytes in the sequence with a `?`.
-This replacement character can be given as a second paramter to the constructor:
+This replacement character can be given as a second parameter to the constructor:
 
 ```php
 $stream = new Sequencer($stdin, 'X');
@@ -64,36 +71,36 @@ This binary data will be left as-is, unless you filter this at a later stage.
 
 ## Install
 
-The recommended way to install this library is [through Composer](https://getcomposer.org).
+The recommended way to install this library is [through Composer](https://getcomposer.org/).
 [New to Composer?](https://getcomposer.org/doc/00-intro.md)
 
 This project follows [SemVer](https://semver.org/).
 This will install the latest supported version:
 
 ```bash
-$ composer require clue/utf8-react:^1.2
+composer require clue/utf8-react:^1.3
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
 
 This project aims to run on any platform and thus does not require any PHP
-extensions and supports running on legacy PHP 5.3 through current PHP 7+ and
+extensions and supports running on legacy PHP 5.3 through current PHP 8+ and
 HHVM.
-It's *highly recommended to use PHP 7+* for this project.
+It's *highly recommended to use the latest supported PHP version* for this project.
 
 ## Tests
 
 To run the test suite, you first need to clone this repo and then install all
-dependencies [through Composer](https://getcomposer.org):
+dependencies [through Composer](https://getcomposer.org/):
 
 ```bash
-$ composer install
+composer install
 ```
 
 To run the test suite, go to the project root and run:
 
 ```bash
-$ php vendor/bin/phpunit
+vendor/bin/phpunit
 ```
 
 ## License

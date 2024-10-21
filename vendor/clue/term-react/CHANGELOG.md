@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.4.0 (2024-01-30)
+
+*   Feature: Full PHP 8.3 compatibility.
+    (#38 by @yadaiio and #36 by @clue)
+
+*   Improve documentation and examples.
+    (#37 by @yadaiio, #34 by @SimonFrings and #33 by @PaulRotmann)
+
+*   Improve test suite and use GitHub actions for continuous integration (CI).
+    (#32 by @SimonFrings)
+
 ## 1.3.0 (2020-11-06)
 
 *   Improve test suite and add `.gitattributes` to exclude dev files from export.
@@ -8,7 +19,7 @@
 
 ## 1.2.0 (2018-07-09)
 
-*   Feature: Forward compatiblity with EventLoop v0.5 and upcoming v1.0.
+*   Feature: Forward compatibility with EventLoop v0.5 and upcoming v1.0.
     (#28 by @clue)
 
 *   Improve test suite by updating Travis config to test against legacy PHP 5.3 through PHP 7.2.
