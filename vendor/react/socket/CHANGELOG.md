@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.16.0 (2024-07-26)
+
+*   Feature: Improve PHP 8.4+ support by avoiding implicitly nullable type declarations.
+    (#318 by @clue)
+
+## 1.15.0 (2023-12-15)
+
+*   Feature: Full PHP 8.3 compatibility.
+    (#310 by @clue)
+
+*   Fix: Fix cancelling during the 50ms resolution delay when DNS is still pending.
+    (#311 by @clue)
+
 ## 1.14.0 (2023-08-25)
 
 *   Feature: Improve Promise v3 support and use template types.

@@ -3,13 +3,14 @@
 namespace React\Http;
 
 use Psr\Http\Message\ResponseInterface;
-use RingCentral\Psr7\Uri;
 use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use React\Http\Io\Sender;
 use React\Http\Io\Transaction;
 use React\Http\Message\Request;
+use React\Http\Message\Uri;
 use React\Promise\PromiseInterface;
+use React\Socket\Connector;
 use React\Socket\ConnectorInterface;
 use React\Stream\ReadableStreamInterface;
 use InvalidArgumentException;
@@ -88,7 +89,7 @@ class Browser
 
         $loop = $loop ?: Loop::get();
         $this->transaction = new Transaction(
-            Sender::createFromLoop($loop, $connector),
+            Sender::createFromLoop($loop, $connector ?: new Connector(array(), $loop)),
             $loop
         );
     }
@@ -834,7 +835,7 @@ class Browser
     {
         if ($this->baseUrl !== null) {
             // ensure we're actually below the base URL
-            $url = Uri::resolve($this->baseUrl, $url);
+            $url = Uri::resolve($this->baseUrl, new Uri($url));
         }
 
         foreach ($this->defaultHeaders as $key => $value) {
