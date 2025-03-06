@@ -32,13 +32,11 @@ fi
 
 git rm -rf vendor
 rm -rf vendor
-rm -f composer.lock
 composer install || fail "composer install failed"
 git add vendor
 find asset/ -type f | xargs -L1 git add -f
 echo "v$VERSION" > VERSION
 git add VERSION
-git add composer.lock -f
 git commit -m "Version v$VERSION"
 
 composer validate --no-check-all --strict || fail "Composer validate failed"
