@@ -63,6 +63,9 @@
         "psr-0": { "AssetLoader": "" }
     },
     "scripts": {
+        "post-install-cmd": [
+            "AssetLoader::update"
+        ],
         "post-update-cmd": [
             "AssetLoader::update"
         ]
