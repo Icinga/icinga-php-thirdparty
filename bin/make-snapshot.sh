@@ -18,7 +18,4 @@ if [[ -n $(git branch | grep $BRANCH) ]]; then
 fi
 
 git checkout -b $BRANCH
-git merge --no-ff -m "Merge latest tag, to make it reachable for git-describe" $LATEST_TAG
-
-git commit -a -m "Require dev-master everywhere"
 bin/make-release.sh "$NEXT_VERSION-dev" --no-checkout
