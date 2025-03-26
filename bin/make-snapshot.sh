@@ -18,4 +18,11 @@ if [[ -n $(git branch | grep $BRANCH) ]]; then
 fi
 
 git checkout -b $BRANCH
+
+git mv composer.lock composer.lock.bak
+git commit -am "Backup composer.lock"
+git merge --no-ff -m "Merge latest tag, package pipelines require it" $LATEST_TAG
+git mv -f composer.lock.bak composer.lock
+git commit -am "Restore composer.lock"
+
 bin/make-release.sh "$NEXT_VERSION-dev" --no-checkout
