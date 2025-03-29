@@ -8,7 +8,6 @@ use React\EventLoop\LoopInterface;
 use React\Http\Client\Client as HttpClient;
 use React\Promise\PromiseInterface;
 use React\Promise\Deferred;
-use React\Socket\Connector;
 use React\Socket\ConnectorInterface;
 use React\Stream\ReadableStreamInterface;
 
@@ -48,12 +47,8 @@ class Sender
      * @param ConnectorInterface|null $connector
      * @return self
      */
-    public static function createFromLoop(LoopInterface $loop, ConnectorInterface $connector = null)
+    public static function createFromLoop(LoopInterface $loop, ConnectorInterface $connector)
     {
-        if ($connector === null) {
-            $connector = new Connector(array(), $loop);
-        }
-
         return new self(new HttpClient(new ClientConnectionManager($connector, $loop)));
     }
 
@@ -90,7 +85,7 @@ class Sender
         } elseif ($size === 0 && \in_array($request->getMethod(), array('POST', 'PUT', 'PATCH'))) {
             // only assign a "Content-Length: 0" request header if the body is expected for certain methods
             $request = $request->withHeader('Content-Length', '0');
-        } elseif ($body instanceof ReadableStreamInterface && $body->isReadable() && !$request->hasHeader('Content-Length')) {
+        } elseif ($body instanceof ReadableStreamInterface && $size !== 0 && $body->isReadable() && !$request->hasHeader('Content-Length')) {
             // use "Transfer-Encoding: chunked" when this is a streaming body and body size is unknown
             $request = $request->withHeader('Transfer-Encoding', 'chunked');
         } else {

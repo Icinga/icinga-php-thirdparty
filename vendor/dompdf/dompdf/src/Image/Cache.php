@@ -32,6 +32,14 @@ class Cache
     protected static $tempImages = [];
 
     /**
+     * Array of image references from an SVG document.
+     * Used to detect circular references across SVG documents.
+     *
+     * @var array
+     */
+    protected static $svgRefs = [];
+
+    /**
      * The url to the "broken image" used when images can't be loaded
      *
      * @var string
@@ -60,7 +68,7 @@ class Cache
         $message = null;
         
         try {
-            $full_url = Helpers::build_url($protocol, $host, $base_path, $url);
+            $full_url = Helpers::build_url($protocol, $host, $base_path, $url, $options->getChroot());
 
             if ($full_url === null) {
                 throw new ImageException("Unable to parse image URL $url.", E_WARNING);
@@ -69,17 +77,15 @@ class Cache
             $parsed_url = Helpers::explode_url($full_url);
             $protocol = strtolower($parsed_url["protocol"]);
             $is_data_uri = strpos($protocol, "data:") === 0;
-            
-            if (!$is_data_uri) {
-                $allowed_protocols = $options->getAllowedProtocols();
-                if (!array_key_exists($protocol, $allowed_protocols)) {
-                    throw new ImageException("Permission denied on $url. The communication protocol is not supported.", E_WARNING);
-                }
-                foreach ($allowed_protocols[$protocol]["rules"] as $rule) {
-                    [$result, $message] = $rule($full_url);
-                    if (!$result) {
-                        throw new ImageException("Error loading $url: $message", E_WARNING);
-                    }
+
+            $allowed_protocols = $options->getAllowedProtocols();
+            if (!array_key_exists($protocol, $allowed_protocols)) {
+                throw new ImageException("Permission denied on $url. The communication protocol is not supported.", E_WARNING);
+            }
+            foreach ($allowed_protocols[$protocol]["rules"] as $rule) {
+                [$result, $message] = $rule($full_url);
+                if (!$result) {
+                    throw new ImageException("Error loading $url: $message", E_WARNING);
                 }
             }
 
@@ -134,25 +140,33 @@ class Cache
                     $parser,
                     function ($parser, $name, $attributes) use ($options, $parsed_url, $full_url) {
                         if (strtolower($name) === "image") {
+                            if (!\array_key_exists($full_url, self::$svgRefs)) {
+                                self::$svgRefs[$full_url] = [];
+                            }
                             $attributes = array_change_key_case($attributes, CASE_LOWER);
                             $urls = [];
                             $urls[] = $attributes["xlink:href"] ?? "";
                             $urls[] = $attributes["href"] ?? "";
                             foreach ($urls as $url) {
-                                if (!empty($url)) {
-                                    $inner_full_url = Helpers::build_url($parsed_url["protocol"], $parsed_url["host"], $parsed_url["path"], $url);
-                                    if ($inner_full_url === $full_url) {
-                                        throw new ImageException("SVG self-reference is not allowed", E_WARNING);
-                                    }
-                                    [$resolved_url, $type, $message] = self::resolve_url($url, $parsed_url["protocol"], $parsed_url["host"], $parsed_url["path"], $options);
-                                    if (!empty($message)) {
-                                        throw new ImageException("This SVG document references a restricted resource. $message", E_WARNING);
-                                    }
+                                if (empty($url)) {
+                                    continue;
+                                }
+
+                                $inner_full_url = Helpers::build_url($parsed_url["protocol"], $parsed_url["host"], $parsed_url["path"], $url, $options->getChroot());
+                                if (empty($inner_full_url)) {
+                                    continue;
+                                }
+                                
+                                self::detectCircularRef($full_url, $inner_full_url);
+                                self::$svgRefs[$full_url][] = $inner_full_url;
+                                [$resolved_url, $type, $message] = self::resolve_url($url, $parsed_url["protocol"], $parsed_url["host"], $parsed_url["path"], $options);
+                                if (!empty($message)) {
+                                    throw new ImageException("This SVG document references a restricted resource. $message", E_WARNING);
                                 }
                             }
                         }
                     },
-                    false
+                    null
                 );
         
                 if (($fp = fopen($resolved_url, "r")) !== false) {
@@ -176,6 +190,19 @@ class Cache
         }
 
         return [$resolved_url, $type, $message];
+    }
+
+    static function detectCircularRef(string $src, string $target)
+    {
+        if (!\array_key_exists($target, self::$svgRefs)) {
+            return;
+        }
+        foreach (self::$svgRefs[$target] as $ref) {
+            if ($ref === $src) {
+                throw new ImageException("Circular external SVG image reference detected.", E_WARNING);
+            }
+            self::detectCircularRef($src, $ref);
+        }
     }
 
     /**
@@ -239,6 +266,7 @@ class Cache
 
         self::$_cache = [];
         self::$tempImages = [];
+        self::$svgRefs = [];
     }
 
     static function detect_type($file, $context = null)
