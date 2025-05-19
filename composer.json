@@ -37,7 +37,7 @@
         "guzzlehttp/guzzle": "^7.7",
         "guzzlehttp/psr7": "^2.5",
         "jfcherng/php-diff": "^6.10.14",
-        "predis/predis": "^2.2",
+        "predis/predis": "^3.0",
         "psr/http-message": "^1.1",
         "ramsey/uuid": "^4.2.3",
         "react/child-process": "^0.6.5",
