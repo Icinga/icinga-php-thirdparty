@@ -3,6 +3,7 @@
 # Zend Framework 1 now for PHP 8.1!
 ### Classic ZF1 Reborn
 Zend may have abandoned the original Zend Framework, but the global Zend Framework Community has not! Since Zend sentenced ZF1 to EOL, the Zend Framework community around the globe has continued to work and build on what we consider to be one of the best PHP frameworks of all time.
+Framework is tested by users up to PHP version 8.1. Note, that with 8.2+ you can experience some incompatibilities.
 
 # ZF1-Future Sponsors
 ### Products and Projects built with ZF1-Future:
@@ -13,7 +14,7 @@ Creators of the [Tiger Development Platform](https://webtigers.com) featuring ZF
 
 <a href="https://seidengroup.com"><img src="https://www.seidengroup.com/wp-content/uploads/2017/03/SeidenLogo-180.png" alt="Seiden Group: IBM i modernization, PHP, Python, Node.js, and modern RPG" /></a>
 
-Creators of [CommunityPlus+ PHP for IBM i](https://www.seidengroup.com/communityplus-php-for-ibm-i/) featuring ZF1-Future
+Creators of [Seiden PHP+ for IBM i](https://www.seidengroup.com/seiden-php-for-ibm-i/) featuring ZF1-Future
 
 # ZF1 is Now Version 1.21!
 ### Over 200 updates and bug fixes since 1.12!

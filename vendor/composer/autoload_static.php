@@ -4,19 +4,20 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c
+class ComposerStaticInit1e59d68267568f10ef3157e2ab17a1fa
 {
     public static $files = array (
         'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
         '972fda704d680a3a53c68e34e193cb22' => __DIR__ . '/..' . '/react/promise-timer/src/functions_include.php',
-        'ebf8799635f67b5d7248946fe2154f4a' => __DIR__ . '/..' . '/ringcentral/psr7/src/functions_include.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '45b89995831374eefdfc4161161938f6' => __DIR__ . '/..' . '/jfcherng/php-color-output/src/helpers.php',
+        'ebf8799635f67b5d7248946fe2154f4a' => __DIR__ . '/..' . '/ringcentral/psr7/src/functions_include.php',
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '23c18046f52bef3eea034657bafda50f' => __DIR__ . '/..' . '/symfony/polyfill-php81/bootstrap.php',
+        '662a729f963d39afe703c9d9b7ab4a8c' => __DIR__ . '/..' . '/symfony/polyfill-php83/bootstrap.php',
         'f67ee1ef46ff5893b59dcf4c4e98a0e8' => __DIR__ . '/..' . '/clue/block-react/src/functions_include.php',
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
@@ -35,6 +36,7 @@ class ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c
         ),
         'S' => 
         array (
+            'Symfony\\Polyfill\\Php83\\' => 23,
             'Symfony\\Polyfill\\Php81\\' => 23,
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
@@ -102,6 +104,7 @@ class ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c
         array (
             'Cron\\' => 5,
             'ConnectionManager\\Extra\\' => 24,
+            'Clue\\Redis\\Protocol\\' => 20,
             'Clue\\React\\Utf8\\' => 16,
             'Clue\\React\\Term\\' => 16,
             'Clue\\React\\Stdio\\' => 17,
@@ -126,6 +129,10 @@ class ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c
         array (
             0 => __DIR__ . '/..' . '/webmozart/assert/src',
         ),
+        'Symfony\\Polyfill\\Php83\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php83',
+        ),
         'Symfony\\Polyfill\\Php81\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php81',
@@ -144,7 +151,7 @@ class ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c
         ),
         'Svg\\' => 
         array (
-            0 => __DIR__ . '/..' . '/phenx/php-svg-lib/src/Svg',
+            0 => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg',
         ),
         'Socket\\Raw\\' => 
         array (
@@ -259,7 +266,7 @@ class ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c
         ),
         'FontLib\\' => 
         array (
-            0 => __DIR__ . '/..' . '/phenx/php-font-lib/src/FontLib',
+            0 => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib',
         ),
         'Fig\\Http\\Message\\' => 
         array (
@@ -275,7 +282,7 @@ class ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c
         ),
         'Doctrine\\Deprecations\\' => 
         array (
-            0 => __DIR__ . '/..' . '/doctrine/deprecations/lib/Doctrine/Deprecations',
+            0 => __DIR__ . '/..' . '/doctrine/deprecations/src',
         ),
         'Doctrine\\Common\\Collections\\' => 
         array (
@@ -288,6 +295,10 @@ class ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c
         'ConnectionManager\\Extra\\' => 
         array (
             0 => __DIR__ . '/..' . '/clue/connection-manager-extra/src',
+        ),
+        'Clue\\Redis\\Protocol\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/clue/redis-protocol/src',
         ),
         'Clue\\React\\Utf8\\' => 
         array (
@@ -363,13 +374,6 @@ class ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c
                 0 => __DIR__ . '/..' . '/ezyang/htmlpurifier/library',
             ),
         ),
-        'C' => 
-        array (
-            'Clue\\Redis\\Protocol' => 
-            array (
-                0 => __DIR__ . '/..' . '/clue/redis-protocol/src',
-            ),
-        ),
         'A' => 
         array (
             'AssetLoader' => 
@@ -383,9 +387,20 @@ class ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'CURLStringFile' => __DIR__ . '/..' . '/symfony/polyfill-php81/Resources/stubs/CURLStringFile.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'DateError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateError.php',
+        'DateException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateException.php',
+        'DateInvalidOperationException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateInvalidOperationException.php',
+        'DateInvalidTimeZoneException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateInvalidTimeZoneException.php',
+        'DateMalformedIntervalStringException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateMalformedIntervalStringException.php',
+        'DateMalformedPeriodStringException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateMalformedPeriodStringException.php',
+        'DateMalformedStringException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateMalformedStringException.php',
+        'DateObjectError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateObjectError.php',
+        'DateRangeError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateRangeError.php',
         'Dompdf\\Cpdf' => __DIR__ . '/..' . '/dompdf/dompdf/lib/Cpdf.php',
+        'Override' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/Override.php',
         'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
         'ReturnTypeWillChange' => __DIR__ . '/..' . '/symfony/polyfill-php81/Resources/stubs/ReturnTypeWillChange.php',
+        'SQLite3Exception' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/SQLite3Exception.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
@@ -395,10 +410,10 @@ class ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit412d4c2afc15769a0fac36e82d8e412c::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit1e59d68267568f10ef3157e2ab17a1fa::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit1e59d68267568f10ef3157e2ab17a1fa::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit1e59d68267568f10ef3157e2ab17a1fa::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit1e59d68267568f10ef3157e2ab17a1fa::$classMap;
 
         }, null, ClassLoader::class);
     }
