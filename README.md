@@ -6,7 +6,7 @@ which can be integrated as library into Icinga Web 2.
 ## Requirements
 
 * [Icinga Web 2](https://github.com/Icinga/icingaweb2) (>= 2.9)
-* PHP (>= 7.2.9)
+* PHP (>= 8.2)
 
 ## Installation
 

@@ -6,9 +6,6 @@
     "license": "MIT",
     "config": {
         "sort-packages": true,
-        "platform": {
-            "php": "7.2.9"
-        },
         "allow-plugins": {
             "cweagans/composer-patches": true
         }
@@ -17,7 +14,7 @@
         "issues": "https://github.com/Icinga/icinga-php-thirdparty/issues"
     },
     "require": {
-        "php": ">=7.2.9 <=8.2",
+        "php": ">=8.2",
         "ext-curl": "*",
         "clue/block-react": "^1.5",
         "clue/connection-manager-extra": "^1.3",
@@ -73,9 +70,6 @@
     "extra": {
         "composer-exit-on-patch-failure": true,
         "patches": {
-            "ramsey/collection": {
-                "Collection: Add PHP 8.1 support": "patches/ramsey-collection.patch"
-            },
             "shardj/zf1-future": {
                 "ZF1-Future: ZF backward compatibility": "patches/shardj-zf1-future.patch"
             }
