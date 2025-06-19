@@ -52,7 +52,7 @@
         "wikimedia/less.php": "^3.2.1",
         "simshaun/recurr": "^5",
         "dragonmantank/cron-expression": "^3",
-        "psr/log": "^1"
+        "psr/log": "^3"
     },
     "require-dev": {
     },
