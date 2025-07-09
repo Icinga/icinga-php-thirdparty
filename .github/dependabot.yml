@@ -2,5 +2,8 @@ version: 2
 updates:
   - package-ecosystem: "composer"
     directory: "/"
+    open-pull-requests-limit: 20 # Roughly half the number of dependencies
+    groups:
+      update-types: patch
     schedule:
       interval: "daily"
