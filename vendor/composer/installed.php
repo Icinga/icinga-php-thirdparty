@@ -3,7 +3,7 @@
         'name' => 'icinga/icinga-php-thirdparty',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '70f4107f011cee414ff43f4113436b500376eced',
+        'reference' => 'f52ea974e9c6b6b3d02cd465b1d37cf416351398',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -265,7 +265,7 @@
         'icinga/icinga-php-thirdparty' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '70f4107f011cee414ff43f4113436b500376eced',
+            'reference' => 'f52ea974e9c6b6b3d02cd465b1d37cf416351398',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -404,9 +404,9 @@
             'dev_requirement' => false,
         ),
         'ramsey/uuid' => array(
-            'pretty_version' => '4.8.1',
-            'version' => '4.8.1.0',
-            'reference' => 'fdf4dd4e2ff1813111bd0ad58d7a1ddbb5b56c28',
+            'pretty_version' => '4.9.0',
+            'version' => '4.9.0.0',
+            'reference' => '4e0e23cc785f0724a0e838279a9eb03f28b092a0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../ramsey/uuid',
             'aliases' => array(),
@@ -514,7 +514,7 @@
         'rhumsaa/uuid' => array(
             'dev_requirement' => false,
             'replaced' => array(
-                0 => '4.8.1',
+                0 => '4.9.0',
             ),
         ),
         'ringcentral/psr7' => array(
@@ -536,9 +536,9 @@
             'dev_requirement' => false,
         ),
         'shardj/zf1-future' => array(
-            'pretty_version' => '1.24.3',
-            'version' => '1.24.3.0',
-            'reference' => '2c5f8bc5333aebb45b200e1f76afd6f951c3cd0f',
+            'pretty_version' => '1.24.4',
+            'version' => '1.24.4.0',
+            'reference' => '3582cce4bcf2c820191be56cf17fdef0addf0771',
             'type' => 'library',
             'install_path' => __DIR__ . '/../shardj/zf1-future',
             'aliases' => array(),
