@@ -52,7 +52,9 @@
         "wikimedia/less.php": "^3.2.1",
         "simshaun/recurr": "^5",
         "dragonmantank/cron-expression": "^3",
-        "psr/log": "^1"
+        "psr/log": "^1",
+        "spomky-labs/otphp": "^11.3.0",
+        "chillerlan/php-qrcode": "^5.0.3"
     },
     "require-dev": {
     },
