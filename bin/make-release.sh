@@ -23,7 +23,9 @@ if [[ "$TAG" -ne "0" ]]; then
   exit 1
 fi
 
+OPTIMIZE_AUTOLOAD=""
 if [ "$NO_OPT" != "--no-checkout" ]; then
+  OPTIMIZE_AUTOLOAD=" --classmap-authoritative"
   BRANCH="stable/$VERSION"
   git checkout -b "$BRANCH" || fail "Version branch $BRANCH already exists"
 else
@@ -32,7 +34,7 @@ fi
 
 git rm -rf vendor
 rm -rf vendor
-composer install || fail "composer install failed"
+composer install$OPTIMIZE_AUTOLOAD || fail "composer install failed"
 git add vendor
 find asset/ -type f | xargs -L1 git add -f
 echo "v$VERSION" > VERSION
