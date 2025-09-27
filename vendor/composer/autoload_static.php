@@ -226,8 +226,8 @@ class ComposerStaticInit5d5db0943532ec3ad2d064ba31305947
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -248,8 +248,8 @@ class ComposerStaticInit5d5db0943532ec3ad2d064ba31305947
         ),
         'Jfcherng\\Diff\\' => 
         array (
-            0 => __DIR__ . '/..' . '/jfcherng/php-sequence-matcher/src',
-            1 => __DIR__ . '/..' . '/jfcherng/php-diff/src',
+            0 => __DIR__ . '/..' . '/jfcherng/php-diff/src',
+            1 => __DIR__ . '/..' . '/jfcherng/php-sequence-matcher/src',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (
