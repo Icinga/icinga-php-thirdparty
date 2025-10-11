@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit5d5db0943532ec3ad2d064ba31305947
+class ComposerStaticInit8d201b7daa15938fccb10b53f1fa6257
 {
     public static $files = array (
         'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
@@ -222,12 +222,12 @@ class ComposerStaticInit5d5db0943532ec3ad2d064ba31305947
         ),
         'Psr\\Log\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+            0 => __DIR__ . '/..' . '/psr/log/src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -248,8 +248,8 @@ class ComposerStaticInit5d5db0943532ec3ad2d064ba31305947
         ),
         'Jfcherng\\Diff\\' => 
         array (
-            0 => __DIR__ . '/..' . '/jfcherng/php-sequence-matcher/src',
-            1 => __DIR__ . '/..' . '/jfcherng/php-diff/src',
+            0 => __DIR__ . '/..' . '/jfcherng/php-diff/src',
+            1 => __DIR__ . '/..' . '/jfcherng/php-sequence-matcher/src',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (
@@ -405,10 +405,10 @@ class ComposerStaticInit5d5db0943532ec3ad2d064ba31305947
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit5d5db0943532ec3ad2d064ba31305947::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit5d5db0943532ec3ad2d064ba31305947::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit5d5db0943532ec3ad2d064ba31305947::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit5d5db0943532ec3ad2d064ba31305947::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit8d201b7daa15938fccb10b53f1fa6257::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit8d201b7daa15938fccb10b53f1fa6257::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit8d201b7daa15938fccb10b53f1fa6257::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit8d201b7daa15938fccb10b53f1fa6257::$classMap;
 
         }, null, ClassLoader::class);
     }
