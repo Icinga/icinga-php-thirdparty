@@ -54,7 +54,8 @@
         "shardj/zf1-future": "^1.23.5",
         "simshaun/recurr": "^5",
         "tedivm/jshrink": "^1.6.8",
-        "wikimedia/less.php": "^3.2.1"
+        "wikimedia/less.php": "^3.2.1",
+        "zircote/swagger-php": "^5.5"
     },
     "autoload": {
         "psr-0": { "AssetLoader": "" }
