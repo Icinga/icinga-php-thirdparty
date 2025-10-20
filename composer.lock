@@ -4108,7 +4108,7 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.32.0",
+            "version": "v1.33.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
@@ -4167,7 +4167,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.32.0"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.33.0"
             },
             "funding": [
                 {
@@ -4176,6 +4176,10 @@
                 },
                 {
                     "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
                     "type": "github"
                 },
                 {
@@ -4769,16 +4773,16 @@
         },
         {
             "name": "zircote/swagger-php",
-            "version": "5.5.0",
+            "version": "5.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "436ba3cf0f168498653dd2ba1cbdb004ca46bf37"
+                "reference": "a1b6fba7695bed5ba8a0052f615fe828912e3f5a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/436ba3cf0f168498653dd2ba1cbdb004ca46bf37",
-                "reference": "436ba3cf0f168498653dd2ba1cbdb004ca46bf37",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/a1b6fba7695bed5ba8a0052f615fe828912e3f5a",
+                "reference": "a1b6fba7695bed5ba8a0052f615fe828912e3f5a",
                 "shasum": ""
             },
             "require": {
@@ -4851,9 +4855,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zircote/swagger-php/issues",
-                "source": "https://github.com/zircote/swagger-php/tree/5.5.0"
+                "source": "https://github.com/zircote/swagger-php/tree/5.5.1"
             },
-            "time": "2025-10-16T03:15:37+00:00"
+            "time": "2025-10-17T21:07:41+00:00"
         }
     ],
     "packages-dev": [],
