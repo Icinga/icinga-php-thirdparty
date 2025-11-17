@@ -10,7 +10,7 @@ if [ -z $BRANCH ]; then
   exit 1
 fi
 
-LATEST_TAG=$(git for-each-ref refs/tags --sort=-taggerdate --format='%(refname)' --count=1 | awk -F/ '{print $3}')
+LATEST_TAG=$(git for-each-ref refs/tags --sort=-v:refname --format='%(refname)' --count=1 | awk -F/ '{print $3}')
 NEXT_VERSION=$(echo "${LATEST_TAG:1}" | awk -F. -v OFS=. '{$3=0}; {++$2}; {print}')
 
 if [[ -n $(git branch | grep $BRANCH) ]]; then
