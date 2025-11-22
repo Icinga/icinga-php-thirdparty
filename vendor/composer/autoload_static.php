@@ -25,11 +25,11 @@ class ComposerStaticInitb3fa15f1701819998685ac0876c5ce53
     );
 
     public static $prefixLengthsPsr4 = array (
-        'c' => 
+        'c' =>
         array (
             'cweagans\\Composer\\' => 18,
         ),
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Polyfill\\Php84\\' => 23,
             'Symfony\\Polyfill\\Php83\\' => 23,
@@ -42,7 +42,7 @@ class ComposerStaticInitb3fa15f1701819998685ac0876c5ce53
             'Socket\\Raw\\' => 11,
             'Sabberworm\\CSS\\' => 15,
         ),
-        'R' => 
+        'R' =>
         array (
             'RingCentral\\Psr7\\' => 17,
             'Recurr\\' => 7,
@@ -60,7 +60,7 @@ class ComposerStaticInitb3fa15f1701819998685ac0876c5ce53
             'Ramsey\\Uuid\\' => 12,
             'Ramsey\\Collection\\' => 18,
         ),
-        'P' => 
+        'P' =>
         array (
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Server\\' => 16,
@@ -70,41 +70,41 @@ class ComposerStaticInitb3fa15f1701819998685ac0876c5ce53
             'PhpParser\\' => 10,
             'PHPStan\\PhpDocParser\\' => 21,
         ),
-        'O' => 
+        'O' =>
         array (
             'OpenApi\\' => 8,
         ),
-        'M' => 
+        'M' =>
         array (
             'Masterminds\\' => 12,
         ),
-        'J' => 
+        'J' =>
         array (
             'Jfcherng\\Utility\\' => 17,
             'Jfcherng\\Diff\\' => 14,
         ),
-        'G' => 
+        'G' =>
         array (
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
         ),
-        'F' => 
+        'F' =>
         array (
             'FontLib\\' => 8,
             'Fig\\Http\\Message\\' => 17,
         ),
-        'E' => 
+        'E' =>
         array (
             'Evenement\\' => 10,
         ),
-        'D' => 
+        'D' =>
         array (
             'Dompdf\\' => 7,
             'Doctrine\\Deprecations\\' => 22,
             'Doctrine\\Common\\Collections\\' => 28,
         ),
-        'C' => 
+        'C' =>
         array (
             'Cron\\' => 5,
             'ConnectionManager\\Extra\\' => 24,
@@ -118,290 +118,290 @@ class ComposerStaticInitb3fa15f1701819998685ac0876c5ce53
             'Clue\\React\\Mq\\' => 14,
             'Clue\\React\\HttpProxy\\' => 21,
         ),
-        'B' => 
+        'B' =>
         array (
             'Brick\\Math\\' => 11,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'cweagans\\Composer\\' => 
+        'cweagans\\Composer\\' =>
         array (
             0 => __DIR__ . '/..' . '/cweagans/composer-patches/src',
         ),
-        'Symfony\\Polyfill\\Php84\\' => 
+        'Symfony\\Polyfill\\Php84\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php84',
         ),
-        'Symfony\\Polyfill\\Php83\\' => 
+        'Symfony\\Polyfill\\Php83\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php83',
         ),
-        'Symfony\\Polyfill\\Php81\\' => 
+        'Symfony\\Polyfill\\Php81\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php81',
         ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
+        'Symfony\\Polyfill\\Mbstring\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
-        'Symfony\\Polyfill\\Ctype\\' => 
+        'Symfony\\Polyfill\\Ctype\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
-        'Symfony\\Component\\Yaml\\' => 
+        'Symfony\\Component\\Yaml\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/yaml',
         ),
-        'Symfony\\Component\\Finder\\' => 
+        'Symfony\\Component\\Finder\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/finder',
         ),
-        'Svg\\' => 
+        'Svg\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg',
         ),
-        'Socket\\Raw\\' => 
+        'Socket\\Raw\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/socket-raw/src',
         ),
-        'Sabberworm\\CSS\\' => 
+        'Sabberworm\\CSS\\' =>
         array (
             0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
         ),
-        'RingCentral\\Psr7\\' => 
+        'RingCentral\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/ringcentral/psr7/src',
         ),
-        'Recurr\\' => 
+        'Recurr\\' =>
         array (
             0 => __DIR__ . '/..' . '/simshaun/recurr/src/Recurr',
         ),
-        'React\\Stream\\' => 
+        'React\\Stream\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/stream/src',
         ),
-        'React\\Socket\\' => 
+        'React\\Socket\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/socket/src',
         ),
-        'React\\Promise\\Timer\\' => 
+        'React\\Promise\\Timer\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/promise-timer/src',
         ),
-        'React\\Promise\\Stream\\' => 
+        'React\\Promise\\Stream\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/promise-stream/src',
         ),
-        'React\\Promise\\' => 
+        'React\\Promise\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/promise/src',
         ),
-        'React\\Http\\' => 
+        'React\\Http\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/http/src',
         ),
-        'React\\EventLoop\\' => 
+        'React\\EventLoop\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/event-loop/src',
         ),
-        'React\\Dns\\' => 
+        'React\\Dns\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/dns/src',
         ),
-        'React\\Datagram\\' => 
+        'React\\Datagram\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/datagram/src',
         ),
-        'React\\ChildProcess\\' => 
+        'React\\ChildProcess\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/child-process/src',
         ),
-        'React\\Cache\\' => 
+        'React\\Cache\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/cache/src',
         ),
-        'Ramsey\\Uuid\\' => 
+        'Ramsey\\Uuid\\' =>
         array (
             0 => __DIR__ . '/..' . '/ramsey/uuid/src',
         ),
-        'Ramsey\\Collection\\' => 
+        'Ramsey\\Collection\\' =>
         array (
             0 => __DIR__ . '/..' . '/ramsey/collection/src',
         ),
-        'Psr\\Log\\' => 
+        'Psr\\Log\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
         ),
-        'Psr\\Http\\Server\\' => 
+        'Psr\\Http\\Server\\' =>
         array (
-            0 => __DIR__ . '/..' . '/psr/http-server-handler/src',
-            1 => __DIR__ . '/..' . '/psr/http-server-middleware/src',
+            0 => __DIR__ . '/..' . '/psr/http-server-middleware/src',
+            1 => __DIR__ . '/..' . '/psr/http-server-handler/src',
         ),
-        'Psr\\Http\\Message\\' => 
+        'Psr\\Http\\Message\\' =>
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'Psr\\Http\\Client\\' => 
+        'Psr\\Http\\Client\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
-        'Predis\\' => 
+        'Predis\\' =>
         array (
             0 => __DIR__ . '/..' . '/predis/predis/src',
         ),
-        'PhpParser\\' => 
+        'PhpParser\\' =>
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
-        'PHPStan\\PhpDocParser\\' => 
+        'PHPStan\\PhpDocParser\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
         ),
-        'OpenApi\\' => 
+        'OpenApi\\' =>
         array (
             0 => __DIR__ . '/..' . '/zircote/swagger-php/src',
         ),
-        'Masterminds\\' => 
+        'Masterminds\\' =>
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
         ),
-        'Jfcherng\\Utility\\' => 
+        'Jfcherng\\Utility\\' =>
         array (
             0 => __DIR__ . '/..' . '/jfcherng/php-mb-string/src',
             1 => __DIR__ . '/..' . '/jfcherng/php-color-output/src',
         ),
-        'Jfcherng\\Diff\\' => 
+        'Jfcherng\\Diff\\' =>
         array (
-            0 => __DIR__ . '/..' . '/jfcherng/php-sequence-matcher/src',
-            1 => __DIR__ . '/..' . '/jfcherng/php-diff/src',
+            0 => __DIR__ . '/..' . '/jfcherng/php-diff/src',
+            1 => __DIR__ . '/..' . '/jfcherng/php-sequence-matcher/src',
         ),
-        'GuzzleHttp\\Psr7\\' => 
+        'GuzzleHttp\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'GuzzleHttp\\Promise\\' => 
+        'GuzzleHttp\\Promise\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
         ),
-        'GuzzleHttp\\' => 
+        'GuzzleHttp\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
-        'FontLib\\' => 
+        'FontLib\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib',
         ),
-        'Fig\\Http\\Message\\' => 
+        'Fig\\Http\\Message\\' =>
         array (
             0 => __DIR__ . '/..' . '/fig/http-message-util/src',
         ),
-        'Evenement\\' => 
+        'Evenement\\' =>
         array (
             0 => __DIR__ . '/..' . '/evenement/evenement/src',
         ),
-        'Dompdf\\' => 
+        'Dompdf\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/dompdf/src',
         ),
-        'Doctrine\\Deprecations\\' => 
+        'Doctrine\\Deprecations\\' =>
         array (
             0 => __DIR__ . '/..' . '/doctrine/deprecations/src',
         ),
-        'Doctrine\\Common\\Collections\\' => 
+        'Doctrine\\Common\\Collections\\' =>
         array (
             0 => __DIR__ . '/..' . '/doctrine/collections/src',
         ),
-        'Cron\\' => 
+        'Cron\\' =>
         array (
             0 => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron',
         ),
-        'ConnectionManager\\Extra\\' => 
+        'ConnectionManager\\Extra\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/connection-manager-extra/src',
         ),
-        'Clue\\Redis\\Protocol\\' => 
+        'Clue\\Redis\\Protocol\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/redis-protocol/src',
         ),
-        'Clue\\React\\Utf8\\' => 
+        'Clue\\React\\Utf8\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/utf8-react/src',
         ),
-        'Clue\\React\\Term\\' => 
+        'Clue\\React\\Term\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/term-react/src',
         ),
-        'Clue\\React\\Stdio\\' => 
+        'Clue\\React\\Stdio\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/stdio-react/src',
         ),
-        'Clue\\React\\Socks\\' => 
+        'Clue\\React\\Socks\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/socks-react/src',
         ),
-        'Clue\\React\\Soap\\' => 
+        'Clue\\React\\Soap\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/soap-react/src',
         ),
-        'Clue\\React\\Redis\\' => 
+        'Clue\\React\\Redis\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/redis-react/src',
         ),
-        'Clue\\React\\Mq\\' => 
+        'Clue\\React\\Mq\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/mq-react/src',
         ),
-        'Clue\\React\\HttpProxy\\' => 
+        'Clue\\React\\HttpProxy\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/http-proxy-react/src',
         ),
-        'Brick\\Math\\' => 
+        'Brick\\Math\\' =>
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
         ),
     );
 
     public static $prefixesPsr0 = array (
-        'Z' => 
+        'Z' =>
         array (
-            'Zend_' => 
+            'Zend_' =>
             array (
                 0 => __DIR__ . '/..' . '/shardj/zf1-future/library',
             ),
         ),
-        'P' => 
+        'P' =>
         array (
-            'Parsedown' => 
+            'Parsedown' =>
             array (
                 0 => __DIR__ . '/..' . '/erusev/parsedown',
             ),
         ),
-        'L' => 
+        'L' =>
         array (
-            'Less' => 
+            'Less' =>
             array (
                 0 => __DIR__ . '/..' . '/wikimedia/less.php/lib',
             ),
         ),
-        'J' => 
+        'J' =>
         array (
-            'JShrink' => 
+            'JShrink' =>
             array (
                 0 => __DIR__ . '/..' . '/tedivm/jshrink/src',
             ),
         ),
-        'H' => 
+        'H' =>
         array (
-            'HTMLPurifier' => 
+            'HTMLPurifier' =>
             array (
                 0 => __DIR__ . '/..' . '/ezyang/htmlpurifier/library',
             ),
         ),
-        'A' => 
+        'A' =>
         array (
-            'AssetLoader' => 
+            'AssetLoader' =>
             array (
                 0 => __DIR__ . '/../..' . '/',
             ),
