@@ -1,83 +1,16 @@
 {
-    "name": "icinga/icinga-php-thirdparty",
-    "type": "project",
-    "description": "Icinga Web 2 - Bundle for all 3rd party PHP libraries",
-    "homepage": "https://github.com/Icinga/icinga-php-thirdparty",
-    "license": "MIT",
-    "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "cweagans/composer-patches": true
-        }
-    },
-    "support": {
-        "issues": "https://github.com/Icinga/icinga-php-thirdparty/issues"
-    },
-    "require": {
-        "php": ">=8.2",
-        "ext-curl": "*",
-        "clue/block-react": "^1.5",
-        "clue/connection-manager-extra": "^1.3",
-        "clue/http-proxy-react": "^1.8",
-        "clue/mq-react": "^1.5",
-        "clue/redis-react": "^2.6",
-        "clue/soap-react": "^2",
-        "clue/socket-raw": "^1.6",
-        "clue/socks-react": "^1.4",
-        "clue/stdio-react": "^2.6",
-        "components/jquery": "3.7.*",
-        "cweagans/composer-patches": "~2.0",
-        "dompdf/dompdf": "^3.1.0",
-        "dragonmantank/cron-expression": "^3",
-        "erusev/parsedown": "^1.7.4",
-        "evenement/evenement": "^3.0.1",
-        "ezyang/htmlpurifier": "^4.16",
-        "guzzlehttp/guzzle": "^7.7",
-        "guzzlehttp/psr7": "^2.5",
-        "jfcherng/php-diff": "^6.10.14",
-        "predis/predis": "^3.0",
-        "psr/http-message": "^1.1",
-        "psr/http-server-handler": "^1.0",
-        "psr/http-server-middleware": "^1.0",
-        "psr/log": "^3",
-        "ramsey/uuid": "^4.2.3",
-        "react/child-process": "^0.6.5",
-        "react/datagram": "^1.9",
-        "react/dns": "^1.11",
-        "react/event-loop": "^1.4",
-        "react/http": "^1.9",
-        "react/promise": "^2.10",
-        "react/promise-stream": "^1.6",
-        "react/promise-timer": "^1.9",
-        "react/socket": "^1.13",
-        "react/stream": "^1.3",
-        "shardj/zf1-future": "^1.23.5",
-        "simshaun/recurr": "^5",
-        "tedivm/jshrink": "^1.6.8",
-        "wikimedia/less.php": "^3.2.1",
-        "zircote/swagger-php": "^5.5"
-    },
-    "autoload": {
-        "psr-0": { "AssetLoader": "" }
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "AssetLoader::update"
-        ],
-        "post-update-cmd": [
-            "AssetLoader::update"
-        ]
-    },
-    "extra": {
-        "composer-exit-on-patch-failure": true,
-        "patches": {
-            "shardj/zf1-future": [
-                {
-                    "description": "ZF1-Future: ZF backward compatibility",
-                    "url": "patches/shardj-zf1-future.patch",
-                    "depth": 1
-                }
-            ]
-        }
-    }
+  "name": "icinga/icinga-php-thirdparty",
+  "type": "project",
+  "description": "Icinga Web 2 - Bundle for all 3rd party PHP libraries",
+  "homepage": "https://github.com/Icinga/icinga-php-thirdparty",
+  "license": "MIT",
+  "support": {
+    "issues": "https://github.com/Icinga/icinga-php-thirdparty/issues"
+  },
+  "require": {
+    "php": ">=8.2"
+  },
+  "autoload": {
+    "psr-0": { "AssetLoader": "" }
+  }
 }
