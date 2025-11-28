@@ -1,0 +1,17 @@
+{
+    "_hash": "1713a694c4f5c9dd242a51c083b66c36b9b4c363ed31c195999e391455d68afc",
+    "patches": {
+        "shardj/zf1-future": [
+            {
+                "package": "shardj/zf1-future",
+                "description": "ZF1-Future: ZF backward compatibility",
+                "url": "patches/shardj-zf1-future.patch",
+                "sha256": "6abbcff07f33570cae8e022eee2859b28ac053e0574c32a7a45c5ee34680a034",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ]
+    }
+}

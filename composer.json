@@ -71,9 +71,13 @@
     "extra": {
         "composer-exit-on-patch-failure": true,
         "patches": {
-            "shardj/zf1-future": {
-                "ZF1-Future: ZF backward compatibility": "patches/shardj-zf1-future.patch"
-            }
+            "shardj/zf1-future": [
+                {
+                    "description": "ZF1-Future: ZF backward compatibility",
+                    "url": "patches/shardj-zf1-future.patch",
+                    "depth": 1
+                }
+            ]
         }
     }
 }
