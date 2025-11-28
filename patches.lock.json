@@ -1,0 +1,17 @@
+{
+    "_hash": "22ebfe49bc698d15de8cc057f5bd22a46a9dd7dacacf88da8cef76fdee83088c",
+    "patches": {
+        "shardj/zf1-future": [
+            {
+                "package": "shardj/zf1-future",
+                "description": "ZF1-Future: PHP8.5: Fix still missing non-canonical cast",
+                "url": "patches/PHP85-fix-missing-non-canonical-cast.patch",
+                "sha256": "c7d9fa815be077c3cd966c02b40ab1c7a06a8cf9d6ef289f7c25a6ea90277f7d",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ]
+    }
+}

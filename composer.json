@@ -33,7 +33,7 @@
     "ramsey/uuid": "^4.9",
     "react/async": "^4.3",
     "react/promise": "^3.3",
-    "shardj/zf1-future": "^1.24",
+    "shardj/zf1-future": "dev-master",
     "simshaun/recurr": "^5.0",
     "tedivm/jshrink": "^1.8",
     "wikimedia/less.php": "^5.4",
@@ -55,8 +55,8 @@
     "patches": {
       "shardj/zf1-future": [
         {
-          "description": "ZF1-Future: ZF backward compatibility",
-          "url": "patches/shardj-zf1-future.patch",
+          "description": "ZF1-Future: PHP8.5: Fix still missing non-canonical cast",
+          "url": "patches/PHP85-fix-missing-non-canonical-cast.patch",
           "depth": 1
         }
       ]
