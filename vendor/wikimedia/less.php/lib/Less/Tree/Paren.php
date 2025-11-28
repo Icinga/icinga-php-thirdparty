@@ -2,10 +2,11 @@
 /**
  * @private
  */
-class Less_Tree_Paren extends Less_Tree implements Less_Tree_HasValueProperty {
+class Less_Tree_Paren extends Less_Tree {
 
-	/** @var Less_Tree */
+	/** @var Less_Tree $value */
 	public $value;
+	public $type = 'Paren';
 
 	/**
 	 * @param Less_Tree $value
@@ -28,7 +29,7 @@ class Less_Tree_Paren extends Less_Tree implements Less_Tree_HasValueProperty {
 	}
 
 	public function compile( $env ) {
-		return new self( $this->value->compile( $env ) );
+		return new Less_Tree_Paren( $this->value->compile( $env ) );
 	}
 
 }

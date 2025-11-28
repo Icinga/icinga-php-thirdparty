@@ -4,11 +4,8 @@
  */
 class Less_Visitor_extendFinder extends Less_Visitor {
 
-	/** @var Less_Tree_Selector[] */
 	public $contexts = [];
-	/** @var Less_Tree_Extend[][] */
 	public $allExtendsStack;
-	/** @var bool */
 	public $foundExtends;
 
 	public function __construct() {
@@ -26,7 +23,7 @@ class Less_Visitor_extendFinder extends Less_Visitor {
 		return $root;
 	}
 
-	public function visitDeclaration( $declNode, &$visitDeeper ) {
+	public function visitRule( $ruleNode, &$visitDeeper ) {
 		$visitDeeper = false;
 	}
 
@@ -68,9 +65,9 @@ class Less_Visitor_extendFinder extends Less_Visitor {
 		$this->contexts[] = $rulesetNode->selectors;
 	}
 
-	public function allExtendsStackPush( $rulesetNode, $selectorPath, Less_Tree_Extend $extend, &$j ) {
+	public function allExtendsStackPush( $rulesetNode, $selectorPath, $extend, &$j ) {
 		$this->foundExtends = true;
-		$extend = $extend->clone();
+		$extend = clone $extend;
 		$extend->findSelfSelectors( $selectorPath );
 		$extend->ruleset = $rulesetNode;
 		if ( $j === 0 ) {
@@ -83,7 +80,7 @@ class Less_Visitor_extendFinder extends Less_Visitor {
 	}
 
 	public function visitRulesetOut( $rulesetNode ) {
-		if ( !$rulesetNode instanceof Less_Tree_Ruleset || !$rulesetNode->root ) {
+		if ( !is_object( $rulesetNode ) || !$rulesetNode->root ) {
 			array_pop( $this->contexts );
 		}
 	}
@@ -97,12 +94,12 @@ class Less_Visitor_extendFinder extends Less_Visitor {
 		array_pop( $this->allExtendsStack );
 	}
 
-	public function visitAtRule( $atRuleNode ) {
-		$atRuleNode->allExtends = [];
-		$this->allExtendsStack[] =& $atRuleNode->allExtends;
+	public function visitDirective( $directiveNode ) {
+		$directiveNode->allExtends = [];
+		$this->allExtendsStack[] =& $directiveNode->allExtends;
 	}
 
-	public function visitAtRuleOut() {
+	public function visitDirectiveOut() {
 		array_pop( $this->allExtendsStack );
 	}
 }

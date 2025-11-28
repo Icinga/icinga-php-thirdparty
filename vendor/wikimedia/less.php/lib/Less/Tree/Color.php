@@ -1,38 +1,34 @@
 <?php
 /**
  * @private
- * @see less-3.13.1.js#Color.prototype
  */
 class Less_Tree_Color extends Less_Tree {
-	/** @var array<int|float> */
 	public $rgb;
-	/** @var int */
 	public $alpha;
-	/** @var null|string */
-	public $value;
+	public $isTransparentKeyword;
+	public $type = 'Color';
 
-	public function __construct( $rgb, $a = null, ?string $originalForm = null ) {
+	public function __construct( $rgb, $a = 1, $isTransparentKeyword = null ) {
+		if ( $isTransparentKeyword ) {
+			$this->rgb = $rgb;
+			$this->alpha = $a;
+			$this->isTransparentKeyword = true;
+			return;
+		}
+
+		$this->rgb = [];
 		if ( is_array( $rgb ) ) {
 			$this->rgb = $rgb;
 		} elseif ( strlen( $rgb ) == 6 ) {
-			// TODO: Less.js 3.13 supports 8-digit rgba as #RRGGBBAA
-			$this->rgb = [];
 			foreach ( str_split( $rgb, 2 ) as $c ) {
 				$this->rgb[] = hexdec( $c );
 			}
 		} else {
-			$this->rgb = [];
-			// TODO: Less.js 3.13 supports 4-digit short rgba as #RGBA
 			foreach ( str_split( $rgb, 1 ) as $c ) {
 				$this->rgb[] = hexdec( $c . $c );
 			}
 		}
-
 		$this->alpha = is_numeric( $a ) ? $a : 1;
-
-		if ( $originalForm !== null ) {
-			$this->value = $originalForm;
-		}
 	}
 
 	public function luma() {
@@ -56,58 +52,60 @@ class Less_Tree_Color extends Less_Tree {
 
 	public function toCSS( $doNotCompress = false ) {
 		$compress = Less_Parser::$options['compress'] && !$doNotCompress;
-		$alpha = $this->fround( $this->alpha );
+		$alpha = Less_Functions::fround( $this->alpha );
 
-		// `value` is set if this color was originally
-		// converted from a named color string so we need
-		// to respect this and try to output named color too.
-		if ( $this->value ) {
-			return $this->value;
-		}
-
-		// If we have alpha transparency other than 1.0, the only way to represent it
-		// is via rgba(). Otherwise, we use the hex representation,
+		//
+		// If we have some transparency, the only way to represent it
+		// is via `rgba`. Otherwise, we use the hex representation,
 		// which has better compatibility with older browsers.
 		// Values are capped between `0` and `255`, rounded and zero-padded.
 		//
-		// TODO: Less.js 3.13 supports hsla() and hsl() as well
 		if ( $alpha < 1 ) {
+			if ( ( $alpha === 0 || $alpha === 0.0 ) && isset( $this->isTransparentKeyword ) && $this->isTransparentKeyword ) {
+				return 'transparent';
+			}
+
 			$values = [];
 			foreach ( $this->rgb as $c ) {
-				$values[] = $this->clamp( round( $c ), 255 );
+				$values[] = Less_Functions::clamp( round( $c ), 255 );
 			}
 			$values[] = $alpha;
 
 			$glue = ( $compress ? ',' : ', ' );
 			return "rgba(" . implode( $glue, $values ) . ")";
-		}
+		} else {
 
-		$color = $this->toRGB();
-		if ( $compress ) {
-			// Convert color to short format
-			if ( $color[1] === $color[2] && $color[3] === $color[4] && $color[5] === $color[6] ) {
-				$color = '#' . $color[1] . $color[3] . $color[5];
+			$color = $this->toRGB();
+
+			if ( $compress ) {
+
+				// Convert color to short format
+				if ( $color[1] === $color[2] && $color[3] === $color[4] && $color[5] === $color[6] ) {
+					$color = '#' . $color[1] . $color[3] . $color[5];
+				}
 			}
+
+			return $color;
 		}
-		return $color;
 	}
 
+	//
+	// Operations have to be done per-channel, if not,
+	// channels will spill onto each other. Once we have
+	// our result, in the form of an integer triplet,
+	// we create a new Color node to hold the result.
+	//
+
 	/**
-	 * Operations have to be done per-channel, if not,
-	 * channels will spill onto each other. Once we have
-	 * our result, in the form of an integer triplet,
-	 * we create a new Color node to hold the result.
-	 *
 	 * @param string $op
-	 * @param self $other
 	 */
 	public function operate( $op, $other ) {
 		$rgb = [];
 		$alpha = $this->alpha * ( 1 - $other->alpha ) + $other->alpha;
 		for ( $c = 0; $c < 3; $c++ ) {
-			$rgb[$c] = $this->_operate( $op, $this->rgb[$c], $other->rgb[$c] );
+			$rgb[$c] = Less_Functions::operate( $op, $this->rgb[$c], $other->rgb[$c] );
 		}
-		return new self( $rgb, $alpha );
+		return new Less_Tree_Color( $rgb, $alpha );
 	}
 
 	public function toRGB() {
@@ -125,9 +123,8 @@ class Less_Tree_Color extends Less_Tree {
 		$l = ( $max + $min ) / 2;
 		$d = $max - $min;
 
-		if ( $max === $min ) {
-			$h = $s = 0;
-		} else {
+		$h = $s = 0;
+		if ( $max !== $min ) {
 			$s = $l > 0.5 ? $d / ( 2 - $max - $min ) : $d / ( $max + $min );
 
 			switch ( $max ) {
@@ -165,9 +162,8 @@ class Less_Tree_Color extends Less_Tree {
 			$s = $d / $max;
 		}
 
-		if ( $max === $min ) {
-			$h = 0;
-		} else {
+		$h = 0;
+		if ( $max !== $min ) {
 			switch ( $max ) {
 				case $r:
 					$h = ( $g - $b ) / $d + ( $g < $b ? 6 : 0 );
@@ -189,38 +185,27 @@ class Less_Tree_Color extends Less_Tree {
 		return $this->toHex( $argb );
 	}
 
-	/**
-	 * @param mixed $x
-	 * @return int|null
-	 * @see less-3.13.1.js#Color.prototype.compare
-	 */
 	public function compare( $x ) {
-		return ( $x instanceof self &&
-			$x->rgb[0] === $this->rgb[0] &&
+		if ( !property_exists( $x, 'rgb' ) ) {
+			return -1;
+		}
+
+		return ( $x->rgb[0] === $this->rgb[0] &&
 			$x->rgb[1] === $this->rgb[1] &&
 			$x->rgb[2] === $this->rgb[2] &&
-			$x->alpha === $this->alpha ) ? 0 : null;
-	}
-
-	/**
-	 * @param int|float $val
-	 * @param int $max
-	 * @return int|float
-	 * @see less-3.13.1.js#Color.prototype
-	 */
-	private function clamp( $val, $max ) {
-		return min( max( $val, 0 ), $max );
+			$x->alpha === $this->alpha ) ? 0 : -1;
 	}
 
 	public function toHex( $v ) {
 		$ret = '#';
 		foreach ( $v as $c ) {
-			$c = $this->clamp( Less_Parser::round( $c ), 255 );
+			$c = Less_Functions::clamp( Less_Parser::round( $c ), 255 );
 			if ( $c < 16 ) {
 				$ret .= '0';
 			}
 			$ret .= dechex( $c );
 		}
+
 		return $ret;
 	}
 
@@ -228,19 +213,16 @@ class Less_Tree_Color extends Less_Tree {
 	 * @param string $keyword
 	 */
 	public static function fromKeyword( $keyword ) {
-		$c = null;
-		$key = strtolower( $keyword );
+		$keyword = strtolower( $keyword );
 
-		if ( Less_Colors::hasOwnProperty( $key ) ) {
+		if ( Less_Colors::hasOwnProperty( $keyword ) ) {
 			// detect named color
-			$c = new self( substr( Less_Colors::color( $key ), 1 ) );
-		} elseif ( $key === 'transparent' ) {
-			$c = new self( [ 0, 0, 0 ], 0 );
+			return new Less_Tree_Color( substr( Less_Colors::color( $keyword ), 1 ) );
 		}
 
-		if ( $c instanceof self ) {
-			$c->value = $keyword;
-			return $c;
+		if ( $keyword === 'transparent' ) {
+			return new Less_Tree_Color( [ 0, 0, 0 ], 0, true );
 		}
 	}
+
 }

@@ -19,7 +19,12 @@ abstract class Less_Configurable {
 	protected $defaultOptions = [];
 
 	/**
-	 * @param array $options
+	 * Set options
+	 *
+	 * If $options is an object it will be converted into an array by called
+	 * it's toArray method.
+	 *
+	 * @param array|object $options
 	 */
 	public function setOptions( $options ) {
 		$options = array_intersect_key( $options, $this->defaultOptions );

@@ -6,11 +6,8 @@
  */
 class Less_Mime {
 
-	/**
-	 * this map is intentionally incomplete
-	 * if you want more, install 'mime' dep
-	 * @var array<string,string>
-	 */
+	// this map is intentionally incomplete
+	// if you want more, install 'mime' dep
 	private static $types = [
 		'.htm' => 'text/html',
 		'.html' => 'text/html',

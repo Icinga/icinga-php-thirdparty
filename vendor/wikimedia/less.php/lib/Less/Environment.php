@@ -9,65 +9,37 @@ class Less_Environment {
 	 *
 	 * - rootpath: rootpath to append to URLs
 	 *
-	 * @var array|null
+	 * @var array|null $currentFileInfo;
 	 */
 	public $currentFileInfo;
 
-	/** @var bool Whether we are currently importing multiple copies */
+	/* Whether we are currently importing multiple copies */
 	public $importMultiple = false;
 
 	/**
 	 * @var array
 	 */
 	public $frames = [];
-	/** @var array */
-	public $importantScope = [];
-	/** @var bool */
-	public $inCalc = false;
-	/** @var bool */
-	public $mathOn = true;
-
-	/** @var true[] */
-	private $calcStack = [];
-
-	/** @var Less_Tree_Media[] */
-	public $mediaBlocks = [];
-	/** @var Less_Tree_Media[] */
-	public $mediaPath = [];
-
-	/** @var string[] */
-	public $imports = [];
 
 	/**
-	 * This is the equivalent of `importVisitor.onceFileDetectionMap`
-	 * as used by the dynamic `importNode.skip` function.
-	 *
-	 * @see less-2.5.3.js#ImportVisitor.prototype.onImported
-	 * @var array<string,true>
+	 * @var array
 	 */
-	public $importVisitorOnceMap = [];
+	public $mediaBlocks = [];
 
-	/** @var int */
+	/**
+	 * @var array
+	 */
+	public $mediaPath = [];
+
+	public static $parensStack = 0;
+
 	public static $tabLevel = 0;
 
-	/** @var bool */
 	public static $lastRule = false;
 
-	/** @var array<string,true> */
-	public static $_noSpaceCombinators;
+	public static $_outputMap;
 
-	/** @var int */
 	public static $mixin_stack = 0;
-
-	/** @var int */
-	public $math = self::MATH_PARENS_DIVISION;
-
-	/** @var true[] */
-	public $parensStack = [];
-
-	public const MATH_ALWAYS = 0;
-	public const MATH_PARENS_DIVISION = 1;
-	public const MATH_PARENS = 2;
 
 	/**
 	 * @var array
@@ -75,101 +47,58 @@ class Less_Environment {
 	public $functions = [];
 
 	public function Init() {
+		self::$parensStack = 0;
 		self::$tabLevel = 0;
 		self::$lastRule = false;
 		self::$mixin_stack = 0;
 
-		self::$_noSpaceCombinators = [
-			'' => true,
-			' ' => true,
-			'|' => true
-		];
-	}
+		if ( Less_Parser::$options['compress'] ) {
 
-	/**
-	 * @param string $file
-	 * @return void
-	 */
-	public function addParsedFile( $file ) {
-		$this->imports[] = $file;
-	}
+			self::$_outputMap = [
+				','	=> ',',
+				': ' => ':',
+				''  => '',
+				' ' => ' ',
+				':' => ' :',
+				'+' => '+',
+				'~' => '~',
+				'>' => '>',
+				'|' => '|',
+				'^' => '^',
+				'^^' => '^^'
+			];
 
-	public function clone() {
-		$new_env = clone $this;
-		// NOTE: Match JavaScript by-ref behaviour for arrays
-		$new_env->imports =& $this->imports;
-		$new_env->importVisitorOnceMap =& $this->importVisitorOnceMap;
-		return $new_env;
-	}
+		} else {
 
-	/**
-	 * @param string $file
-	 * @return bool
-	 */
-	public function isFileParsed( $file ) {
-		return in_array( $file, $this->imports );
+			self::$_outputMap = [
+				','	=> ', ',
+				': ' => ': ',
+				''  => '',
+				' ' => ' ',
+				':' => ' :',
+				'+' => ' + ',
+				'~' => ' ~ ',
+				'>' => ' > ',
+				'|' => '|',
+				'^' => ' ^ ',
+				'^^' => ' ^^ '
+			];
+
+		}
 	}
 
 	public function copyEvalEnv( $frames = [] ) {
-		$new_env = new self();
+		$new_env = new Less_Environment();
 		$new_env->frames = $frames;
-		$new_env->importantScope = $this->importantScope;
-		$new_env->math = $this->math;
 		return $new_env;
 	}
 
-	/**
-	 * @return bool
-	 * @see less-3.13.1.js#Eval.prototype.isMathOn
-	 */
-	public function isMathOn( $op = "" ) {
-		if ( !$this->mathOn ) {
-			return false;
-		}
-		if ( $op === '/' && $this->math !== $this::MATH_ALWAYS && !$this->parensStack ) {
-			return false;
-		}
-
-		if ( $this->math > $this::MATH_PARENS_DIVISION ) {
-			return (bool)$this->parensStack;
-		}
-		return true;
+	public static function isMathOn() {
+		return !Less_Parser::$options['strictMath'] || self::$parensStack;
 	}
 
-	/**
-	 * @see less-3.13.1.js#Eval.prototype.inParenthesis
-	 */
-	public function inParenthesis() {
-		// Optimization: We don't need undefined/null, always have an array
-		$this->parensStack[] = true;
-	}
-
-	/**
-	 * @see less-3.13.1.js#Eval.prototype.inParenthesis
-	 */
-	public function outOfParenthesis() {
-		array_pop( $this->parensStack );
-	}
-
-	/**
-	 * @param string $path
-	 * @return bool
-	 * @see less-2.5.3.js#Eval.isPathRelative
-	 */
 	public static function isPathRelative( $path ) {
-		return !preg_match( '/^(?:[a-z-]+:|\/|#)/', $path );
-	}
-
-	public function enterCalc() {
-		$this->calcStack[] = true;
-		$this->inCalc = true;
-	}
-
-	public function exitCalc() {
-		array_pop( $this->calcStack );
-		if ( !$this->calcStack ) {
-			$this->inCalc = false;
-		}
+		return !preg_match( '/^(?:[a-z-]+:|\/)/', $path );
 	}
 
 	/**

@@ -1,19 +1,17 @@
 <?php
 /**
  * @private
- * @see less-2.5.3.js#Dimension.prototype
  */
-class Less_Tree_Dimension extends Less_Tree implements Less_Tree_HasValueProperty {
+class Less_Tree_Dimension extends Less_Tree {
 
-	/** @var float */
 	public $value;
-	/** @var Less_Tree_Unit */
 	public $unit;
+	public $type = 'Dimension';
 
 	public function __construct( $value, $unit = null ) {
 		$this->value = floatval( $value );
 
-		if ( $unit instanceof Less_Tree_Unit ) {
+		if ( $unit && ( $unit instanceof Less_Tree_Unit ) ) {
 			$this->unit = $unit;
 		} elseif ( $unit ) {
 			$this->unit = new Less_Tree_Unit( [ $unit ] );
@@ -35,12 +33,10 @@ class Less_Tree_Dimension extends Less_Tree implements Less_Tree_HasValuePropert
 	 */
 	public function genCSS( $output ) {
 		if ( Less_Parser::$options['strictUnits'] && !$this->unit->isSingular() ) {
-			throw new Less_Exception_Compiler(
-				"Multiple units in dimension. Correct the units or use the unit function. Bad unit: " . $this->unit->toString()
-			);
+			throw new Less_Exception_Compiler( "Multiple units in dimension. Correct the units or use the unit function. Bad unit: " . $this->unit->toString() );
 		}
 
-		$value = $this->fround( $this->value );
+		$value = Less_Functions::fround( $this->value );
 		$strValue = (string)$value;
 
 		if ( $value !== 0 && $value < 0.000001 && $value > -0.000001 ) {
@@ -76,31 +72,26 @@ class Less_Tree_Dimension extends Less_Tree implements Less_Tree_HasValuePropert
 
 	/**
 	 * @param string $op
-	 * @param self $other
 	 */
 	public function operate( $op, $other ) {
-		$value = $this->_operate( $op, $this->value, $other->value );
-		$unit = $this->unit->clone();
+		$value = Less_Functions::operate( $op, $this->value, $other->value );
+		$unit = clone $this->unit;
 
 		if ( $op === '+' || $op === '-' ) {
+
 			if ( !$unit->numerator && !$unit->denominator ) {
-				$unit = $other->unit->clone();
-				if ( $this->unit->backupUnit ) {
-					$unit->backupUnit = $this->unit->backupUnit;
-				}
+				$unit->numerator = $other->unit->numerator;
+				$unit->denominator = $other->unit->denominator;
 			} elseif ( !$other->unit->numerator && !$other->unit->denominator ) {
 				// do nothing
 			} else {
 				$other = $other->convertTo( $this->unit->usedUnits() );
 
 				if ( Less_Parser::$options['strictUnits'] && $other->unit->toString() !== $unit->toCSS() ) {
-					throw new Less_Exception_Compiler(
-						"Incompatible units. Change the units or use the unit function. Bad units: '" .
-							$unit->toString() . "' and " . $other->unit->toString() . "'."
-					);
+					throw new Less_Exception_Compiler( "Incompatible units. Change the units or use the unit function. Bad units: '" . $unit->toString() . "' and " . $other->unit->toString() . "'." );
 				}
 
-				$value = $this->_operate( $op, $this->value, $other->value );
+				$value = Less_Functions::operate( $op, $this->value, $other->value );
 			}
 		} elseif ( $op === '*' ) {
 			$unit->numerator = array_merge( $unit->numerator, $other->unit->numerator );
@@ -115,31 +106,35 @@ class Less_Tree_Dimension extends Less_Tree implements Less_Tree_HasValuePropert
 			sort( $unit->denominator );
 			$unit->cancel();
 		}
-		return new self( $value, $unit );
+		return new Less_Tree_Dimension( $value, $unit );
 	}
 
-	/**
-	 * @param Less_Tree $other
-	 * @return int|null
-	 * @see less-2.5.3.js#Dimension.prototype.compare
-	 */
 	public function compare( $other ) {
-		if ( !$other instanceof self ) {
-			return null;
-		}
+		if ( $other instanceof Less_Tree_Dimension ) {
 
-		if ( $this->unit->isEmpty() || $other->unit->isEmpty() ) {
-			$a = $this;
-			$b = $other;
-		} else {
-			$a = $this->unify();
-			$b = $other->unify();
-			if ( $a->unit->compare( $b->unit ) !== 0 ) {
-				return null;
+			if ( $this->unit->isEmpty() || $other->unit->isEmpty() ) {
+				$a = $this;
+				$b = $other;
+			} else {
+				$a = $this->unify();
+				$b = $other->unify();
+				if ( $a->unit->compare( $b->unit ) !== 0 ) {
+					return -1;
+				}
 			}
-		}
+			$aValue = $a->value;
+			$bValue = $b->value;
 
-		return Less_Tree::numericCompare( $a->value, $b->value );
+			if ( $bValue > $aValue ) {
+				return -1;
+			} elseif ( $bValue < $aValue ) {
+				return 1;
+			} else {
+				return 0;
+			}
+		} else {
+			return -1;
+		}
 	}
 
 	public function unify() {
@@ -148,7 +143,7 @@ class Less_Tree_Dimension extends Less_Tree implements Less_Tree_HasValuePropert
 
 	public function convertTo( $conversions ) {
 		$value = $this->value;
-		$unit = $this->unit->clone();
+		$unit = clone $this->unit;
 
 		if ( is_string( $conversions ) ) {
 			$derivedConversions = [];
@@ -170,7 +165,7 @@ class Less_Tree_Dimension extends Less_Tree implements Less_Tree_HasValuePropert
 					continue;
 				}
 
-				$value *= $group[$atomicUnit] / $group[$targetUnit];
+				$value = $value * ( $group[$atomicUnit] / $group[$targetUnit] );
 
 				$unit->numerator[$i] = $targetUnit;
 			}
@@ -182,7 +177,7 @@ class Less_Tree_Dimension extends Less_Tree implements Less_Tree_HasValuePropert
 					continue;
 				}
 
-				$value /= $group[$atomicUnit] / $group[$targetUnit];
+				$value = $value / ( $group[$atomicUnit] / $group[$targetUnit] );
 
 				$unit->denominator[$i] = $targetUnit;
 			}
@@ -190,6 +185,6 @@ class Less_Tree_Dimension extends Less_Tree implements Less_Tree_HasValuePropert
 
 		$unit->cancel();
 
-		return new self( $value, $unit );
+		return new Less_Tree_Dimension( $value, $unit );
 	}
 }

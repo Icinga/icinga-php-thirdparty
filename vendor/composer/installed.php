@@ -493,9 +493,9 @@
             'dev_requirement' => false,
         ),
         'wikimedia/less.php' => array(
-            'pretty_version' => 'v5.4.0',
-            'version' => '5.4.0.0',
-            'reference' => '75a0db4a7698b5fe668af553329605ac40f374af',
+            'pretty_version' => 'v3.2.1',
+            'version' => '3.2.1.0',
+            'reference' => '0d5b30ba792bdbf8991a646fc9c30561b38a5559',
             'type' => 'library',
             'install_path' => __DIR__ . '/../wikimedia/less.php',
             'aliases' => array(),

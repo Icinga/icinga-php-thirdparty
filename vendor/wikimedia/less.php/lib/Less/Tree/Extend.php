@@ -4,30 +4,20 @@
  */
 class Less_Tree_Extend extends Less_Tree {
 
-	/** @var Less_Tree_Selector */
 	public $selector;
-	/** @var string */
 	public $option;
-	/** @var int */
 	public $index;
-	/** @var Less_Tree_Selector[] */
 	public $selfSelectors = [];
-	/** @var bool */
 	public $allowBefore;
-	/** @var bool */
 	public $allowAfter;
-	/** @var bool */
 	public $firstExtendOnThisSelectorPath;
-	/** @var Less_Tree_Ruleset|null */
+	public $type = 'Extend';
 	public $ruleset;
-	/** @var string */
+
 	public $object_id;
-	/** @var array<string,true> */
 	public $parent_ids = [];
 
 	/**
-	 * @param Less_Tree_Selector $selector
-	 * @param string $option
 	 * @param int $index
 	 */
 	public function __construct( $selector, $option, $index ) {
@@ -64,11 +54,7 @@ class Less_Tree_Extend extends Less_Tree {
 		Less_Parser::$has_extends = true;
 		$this->selector = $this->selector->compile( $env );
 		return $this;
-		// return new self( $this->selector->compile($env), $this->option, $this->index);
-	}
-
-	public function clone() {
-		return new self( $this->selector, $this->option, $this->index );
+		// return new Less_Tree_Extend( $this->selector->compile($env), $this->option, $this->index);
 	}
 
 	public function findSelfSelectors( $selectors ) {

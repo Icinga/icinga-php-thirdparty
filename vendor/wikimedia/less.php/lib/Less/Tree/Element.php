@@ -2,7 +2,7 @@
 /**
  * @private
  */
-class Less_Tree_Element extends Less_Tree implements Less_Tree_HasValueProperty {
+class Less_Tree_Element extends Less_Tree {
 
 	/** @var string */
 	public $combinator;
@@ -10,10 +10,11 @@ class Less_Tree_Element extends Less_Tree implements Less_Tree_HasValueProperty 
 	public $combinatorIsEmptyOrWhitespace;
 	/** @var string|Less_Tree */
 	public $value;
-	/** @var int|null */
 	public $index;
-	/** @var array|null */
 	public $currentFileInfo;
+	public $type = 'Element';
+
+	public $value_is_object = false;
 
 	/**
 	 * @param null|string $combinator
@@ -23,6 +24,7 @@ class Less_Tree_Element extends Less_Tree implements Less_Tree_HasValueProperty 
 	 */
 	public function __construct( $combinator, $value, $index = null, $currentFileInfo = null ) {
 		$this->value = $value;
+		$this->value_is_object = is_object( $value );
 
 		// see less-2.5.3.js#Combinator
 		$this->combinator = $combinator ?? '';
@@ -33,15 +35,15 @@ class Less_Tree_Element extends Less_Tree implements Less_Tree_HasValueProperty 
 	}
 
 	public function accept( $visitor ) {
-		if ( $this->value instanceof Less_Tree ) {
+		if ( $this->value_is_object ) { // object or string
 			$this->value = $visitor->visitObj( $this->value );
 		}
 	}
 
 	public function compile( $env ) {
-		return new self(
+		return new Less_Tree_Element(
 			$this->combinator,
-			( $this->value instanceof Less_Tree ? $this->value->compile( $env ) : $this->value ),
+			( $this->value_is_object ? $this->value->compile( $env ) : $this->value ),
 			$this->index,
 			$this->currentFileInfo
 		);
@@ -55,20 +57,17 @@ class Less_Tree_Element extends Less_Tree implements Less_Tree_HasValueProperty 
 	}
 
 	public function toCSS() {
-		if ( $this->value instanceof Less_Tree ) {
+		if ( $this->value_is_object ) {
 			$value = $this->value->toCSS();
 		} else {
 			$value = $this->value;
 		}
 
-		$spaceOrEmpty = ' ';
-		if ( Less_Parser::$options['compress'] ||
-			( isset( Less_Environment::$_noSpaceCombinators[$this->combinator] ) && Less_Environment::$_noSpaceCombinators[$this->combinator] )
-		) {
-			$spaceOrEmpty = '';
+		if ( $value === '' && $this->combinator && $this->combinator === '&' ) {
+			return '';
 		}
 
-		return $spaceOrEmpty . $this->combinator . $spaceOrEmpty . $value;
+		return Less_Environment::$_outputMap[$this->combinator] . $value;
 	}
 
 }

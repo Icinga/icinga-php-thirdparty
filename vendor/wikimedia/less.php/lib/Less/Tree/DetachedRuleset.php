@@ -4,10 +4,9 @@
  */
 class Less_Tree_DetachedRuleset extends Less_Tree {
 
-	/** @var Less_Tree_Ruleset */
 	public $ruleset;
-	/** @var array|null */
 	public $frames;
+	public $type = 'DetachedRuleset';
 
 	public function __construct( $ruleset, $frames = null ) {
 		$this->ruleset = $ruleset;
@@ -24,7 +23,7 @@ class Less_Tree_DetachedRuleset extends Less_Tree {
 		} else {
 			$frames = $env->frames;
 		}
-		return new self( $this->ruleset, $frames );
+		return new Less_Tree_DetachedRuleset( $this->ruleset, $frames );
 	}
 
 	public function callEval( $env ) {

@@ -1,16 +1,13 @@
 <?php
 /**
  * @private
- * @see less-3.13.1.js#Operation.prototype
  */
 class Less_Tree_Operation extends Less_Tree {
 
-	/** @var string */
 	public $op;
-	/** @var Less_Tree[] */
 	public $operands;
-	/** @var bool */
 	public $isSpaced;
+	public $type = 'Operation';
 
 	/**
 	 * @param string $op
@@ -29,33 +26,24 @@ class Less_Tree_Operation extends Less_Tree {
 		$a = $this->operands[0]->compile( $env );
 		$b = $this->operands[1]->compile( $env );
 
-		// Skip operation if argument was not compiled down to a non-operable value.
-		// For example, if one argument is a Less_Tree_Call like 'var(--foo)' then we
-		// preserve it as literal for native CSS.
-		// https://phabricator.wikimedia.org/T331688
-		if ( $env->isMathOn( $this->op ) ) {
-			$op = $this->op === './' ? '/' : $this->op;
+		if ( Less_Environment::isMathOn() ) {
 
 			if ( $a instanceof Less_Tree_Dimension && $b instanceof Less_Tree_Color ) {
 				$a = $a->toColor();
+
 			} elseif ( $b instanceof Less_Tree_Dimension && $a instanceof Less_Tree_Color ) {
 				$b = $b->toColor();
+
 			}
 
-			if ( !( $a instanceof Less_Tree_Dimension || $a instanceof Less_Tree_Color )
-				|| !( $b instanceof Less_Tree_Dimension || $b instanceof Less_Tree_Color )
-			) {
-				if ( $a instanceof Less_Tree_Operation && $a->op === '/' && $env->math === Less_Environment::MATH_PARENS_DIVISION
-				) {
-					return new self( $this->op, [ $a, $b ], $this->isSpaced );
-				}
+			if ( !method_exists( $a, 'operate' ) ) {
 				throw new Less_Exception_Compiler( "Operation on an invalid type" );
 			}
 
-			return $a->operate( $op, $b );
-		} else {
-			return new self( $this->op, [ $a, $b ], $this->isSpaced );
+			return $a->operate( $this->op, $b );
 		}
+
+		return new Less_Tree_Operation( $this->op, [ $a, $b ], $this->isSpaced );
 	}
 
 	/**

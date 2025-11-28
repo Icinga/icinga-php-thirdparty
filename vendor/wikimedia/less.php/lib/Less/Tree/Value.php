@@ -2,21 +2,16 @@
 /**
  * @private
  */
-class Less_Tree_Value extends Less_Tree implements Less_Tree_HasValueProperty {
+class Less_Tree_Value extends Less_Tree {
 
-	/** @var Less_Tree[] */
+	public $type = 'Value';
 	public $value;
-	/** @var int|null */
-	public $index;
-	/** @var array */
-	public $currentFileInfo;
 
 	/**
 	 * @param array<Less_Tree> $value
 	 */
-	public function __construct( $value, $index = null ) {
+	public function __construct( $value ) {
 		$this->value = $value;
-		$this->index = $index;
 	}
 
 	public function accept( $visitor ) {
@@ -30,20 +25,20 @@ class Less_Tree_Value extends Less_Tree implements Less_Tree_HasValueProperty {
 			$ret[] = $v->compile( $env );
 		}
 		if ( $i > 0 ) {
-			return new self( $ret );
+			return new Less_Tree_Value( $ret );
 		}
 		return $ret[0];
 	}
 
 	/**
-	 * @see less-2.5.3.js#Value.prototype.genCSS
+	 * @see Less_Tree::genCSS
 	 */
-	public function genCSS( $output ) {
+	function genCSS( $output ) {
 		$len = count( $this->value );
 		for ( $i = 0; $i < $len; $i++ ) {
 			$this->value[$i]->genCSS( $output );
 			if ( $i + 1 < $len ) {
-				$output->add( Less_Parser::$options['compress'] ? ',' : ', ' );
+				$output->add( Less_Environment::$_outputMap[','] );
 			}
 		}
 	}

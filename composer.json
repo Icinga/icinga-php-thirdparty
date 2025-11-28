@@ -36,7 +36,7 @@
     "shardj/zf1-future": "dev-master",
     "simshaun/recurr": "^5.0",
     "tedivm/jshrink": "^1.8",
-    "wikimedia/less.php": "^5.4",
+    "wikimedia/less.php": "^3.2.1",
     "zircote/swagger-php": "^5.7"
   },
   "autoload": {

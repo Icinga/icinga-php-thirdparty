@@ -4,16 +4,12 @@
  */
 class Less_Tree_Media extends Less_Tree {
 
-	/** @var Less_Tree_Value */
 	public $features;
-	/** @var Less_Tree_Ruleset[] */
 	public $rules;
-	/** @var int|null */
 	public $index;
-	/** @var array|null */
 	public $currentFileInfo;
-	/** @var bool|null */
 	public $isReferenced;
+	public $type = 'Media';
 
 	public function __construct( $value = [], $features = [], $index = null, $currentFileInfo = null ) {
 		$this->index = $index;
@@ -43,22 +39,22 @@ class Less_Tree_Media extends Less_Tree {
 
 	/**
 	 * @param Less_Environment $env
-	 * @return self|Less_Tree_Ruleset
+	 * @return Less_Tree_Media|Less_Tree_Ruleset
 	 * @see less-2.5.3.js#Media.prototype.eval
 	 */
 	public function compile( $env ) {
-		$media = new self( [], [], $this->index, $this->currentFileInfo );
+		$media = new Less_Tree_Media( [], [], $this->index, $this->currentFileInfo );
 
-		$mathBypass = false;
-		if ( !$env->mathOn ) {
-			$mathBypass = true;
-			$env->mathOn = true;
+		$strictMathBypass = false;
+		if ( Less_Parser::$options['strictMath'] === false ) {
+			$strictMathBypass = true;
+			Less_Parser::$options['strictMath'] = true;
 		}
 
 		$media->features = $this->features->compile( $env );
 
-		if ( $mathBypass ) {
-			$env->mathOn = false;
+		if ( $strictMathBypass ) {
+			Less_Parser::$options['strictMath'] = false;
 		}
 
 		$env->mediaPath[] = $media;
@@ -116,7 +112,7 @@ class Less_Tree_Media extends Less_Tree {
 	 */
 	public function compileNested( $env ) {
 		$path = array_merge( $env->mediaPath, [ $this ] );
-		'@phan-var self[] $path';
+		'@phan-var array<Less_Tree_Media> $path';
 
 		// Extract the media-query conditions separated with `,` (OR).
 		foreach ( $path as $key => $p ) {
@@ -134,12 +130,11 @@ class Less_Tree_Media extends Less_Tree {
 		//	b and c and e
 
 		$permuted = $this->permute( $path );
-		'@phan-var (Less_Tree|string)[][] $permuted';
 		$expressions = [];
 		foreach ( $permuted as $path ) {
 
 			for ( $i = 0, $len = count( $path ); $i < $len; $i++ ) {
-				$path[$i] = $path[$i] instanceof Less_Tree ? $path[$i] : new Less_Tree_Anonymous( $path[$i] );
+				$path[$i] = Less_Parser::is_method( $path[$i], 'toCSS' ) ? $path[$i] : new Less_Tree_Anonymous( $path[$i] );
 			}
 
 			for ( $i = count( $path ) - 1; $i > 0; $i-- ) {
