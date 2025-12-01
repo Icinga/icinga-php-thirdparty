@@ -2357,16 +2357,16 @@
         },
         {
             "name": "predis/predis",
-            "version": "v3.2.0",
+            "version": "v3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/predis/predis.git",
-                "reference": "c1845d96ccbceb1269387d1c294fd7e4876f6307"
+                "reference": "153097374b39a2f737fe700ebcd725642526cdec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/predis/predis/zipball/c1845d96ccbceb1269387d1c294fd7e4876f6307",
-                "reference": "c1845d96ccbceb1269387d1c294fd7e4876f6307",
+                "url": "https://api.github.com/repos/predis/predis/zipball/153097374b39a2f737fe700ebcd725642526cdec",
+                "reference": "153097374b39a2f737fe700ebcd725642526cdec",
                 "shasum": ""
             },
             "require": {
@@ -2408,7 +2408,7 @@
             ],
             "support": {
                 "issues": "https://github.com/predis/predis/issues",
-                "source": "https://github.com/predis/predis/tree/v3.2.0"
+                "source": "https://github.com/predis/predis/tree/v3.3.0"
             },
             "funding": [
                 {
@@ -2416,7 +2416,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-08-03T19:20:07+00:00"
+            "time": "2025-11-24T17:48:50+00:00"
         },
         {
             "name": "psr/http-client",
