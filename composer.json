@@ -19,7 +19,7 @@
     "cweagans/composer-patches": "^2.0",
     "dompdf/dompdf": "^3.1",
     "dragonmantank/cron-expression": "^3.6",
-    "erusev/parsedown": "^1.7",
+    "erusev/parsedown": "dev-master",
     "evenement/evenement": "^3.0",
     "ezyang/htmlpurifier": "^4.19",
     "guzzlehttp/guzzle": "^7.10",

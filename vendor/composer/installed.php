@@ -101,12 +101,14 @@
             'dev_requirement' => false,
         ),
         'erusev/parsedown' => array(
-            'pretty_version' => '1.7.4',
-            'version' => '1.7.4.0',
-            'reference' => 'cb17b6477dfff935958ba01325f2e8a2bfa6dab3',
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => '0b274ac959624e6c6d647e9c9b6c2d20da242004',
             'type' => 'library',
             'install_path' => __DIR__ . '/../erusev/parsedown',
-            'aliases' => array(),
+            'aliases' => array(
+                0 => '9999999-dev',
+            ),
             'dev_requirement' => false,
         ),
         'evenement/evenement' => array(
