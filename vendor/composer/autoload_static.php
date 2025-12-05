@@ -46,6 +46,7 @@ class ComposerStaticInit8926729398323edc36be01cce2c4ef5b
             'React\\Stream\\' => 13,
             'React\\Socket\\' => 13,
             'React\\Promise\\' => 14,
+            'React\\Http\\' => 11,
             'React\\EventLoop\\' => 16,
             'React\\Dns\\' => 10,
             'React\\Cache\\' => 12,
@@ -85,6 +86,7 @@ class ComposerStaticInit8926729398323edc36be01cce2c4ef5b
         'F' =>
         array (
             'FontLib\\' => 8,
+            'Fig\\Http\\Message\\' => 17,
         ),
         'E' =>
         array (
@@ -167,6 +169,10 @@ class ComposerStaticInit8926729398323edc36be01cce2c4ef5b
         'React\\Promise\\' =>
         array (
             0 => __DIR__ . '/..' . '/react/promise/src',
+        ),
+        'React\\Http\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/react/http/src',
         ),
         'React\\EventLoop\\' =>
         array (
@@ -255,6 +261,10 @@ class ComposerStaticInit8926729398323edc36be01cce2c4ef5b
         'FontLib\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib',
+        ),
+        'Fig\\Http\\Message\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/fig/http-message-util/src',
         ),
         'Evenement\\' =>
         array (
