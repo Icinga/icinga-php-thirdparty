@@ -35,7 +35,7 @@
     "react/http": "^1.11",
     "react/promise": "^3.3",
     "react/socket": "^1.17",
-    "shardj/zf1-future": "dev-master",
+    "shardj/zf1-future": "dev-master#9eabd56",
     "simshaun/recurr": "^5.0",
     "tedivm/jshrink": "^1.8",
     "wikimedia/less.php": "^3.2.1",
@@ -51,17 +51,5 @@
     "post-update-cmd": [
       "AssetLoader::update"
     ]
-  },
-  "extra": {
-    "composer-exit-on-patch-failure": true,
-    "patches": {
-      "shardj/zf1-future": [
-        {
-          "description": "ZF1-Future: PHP8.5: Fix still missing non-canonical cast",
-          "url": "patches/PHP85-fix-missing-non-canonical-cast.patch",
-          "depth": 1
-        }
-      ]
-    }
   }
 }

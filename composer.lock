@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3fc103d6993f990c63ce9c2ef3ea3df6",
+    "content-hash": "ba68c7ef1ddced97293f6e66aa7eb887",
     "packages": [
         {
             "name": "brick/math",
@@ -2813,12 +2813,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Shardj/zf1-future.git",
-                "reference": "68aaa82251d630b78a97910e6fdd71736a0273a4"
+                "reference": "9eabd56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/68aaa82251d630b78a97910e6fdd71736a0273a4",
-                "reference": "68aaa82251d630b78a97910e6fdd71736a0273a4",
+                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/9eabd56",
+                "reference": "9eabd56",
                 "shasum": ""
             },
             "require": {
@@ -2872,7 +2872,7 @@
                 "issues": "https://github.com/Shardj/zf1-future/issues",
                 "source": "https://github.com/Shardj/zf1-future/tree/master"
             },
-            "time": "2025-11-16T11:45:20+00:00"
+            "time": "2025-12-06T12:26:11+00:00"
         },
         {
             "name": "simshaun/recurr",

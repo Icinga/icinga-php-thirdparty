@@ -441,7 +441,7 @@
         'shardj/zf1-future' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '68aaa82251d630b78a97910e6fdd71736a0273a4',
+            'reference' => '9eabd56',
             'type' => 'library',
             'install_path' => __DIR__ . '/../shardj/zf1-future',
             'aliases' => array(

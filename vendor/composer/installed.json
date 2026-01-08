@@ -2937,12 +2937,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Shardj/zf1-future.git",
-                "reference": "68aaa82251d630b78a97910e6fdd71736a0273a4"
+                "reference": "9eabd56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/68aaa82251d630b78a97910e6fdd71736a0273a4",
-                "reference": "68aaa82251d630b78a97910e6fdd71736a0273a4",
+                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/9eabd56",
+                "reference": "9eabd56",
                 "shasum": ""
             },
             "require": {
@@ -2967,7 +2967,7 @@
             "suggest": {
                 "ext-mbstring": "Multibyte strings handling"
             },
-            "time": "2025-11-16T11:45:20+00:00",
+            "time": "2025-12-06T12:26:11+00:00",
             "default-branch": true,
             "type": "library",
             "extra": {
