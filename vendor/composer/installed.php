@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'icinga/icinga-php-thirdparty',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => 'f4e737502ed542279723806211487aa9e4aa823f',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -166,9 +166,9 @@
             'dev_requirement' => false,
         ),
         'icinga/icinga-php-thirdparty' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'f4e737502ed542279723806211487aa9e4aa823f',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -397,9 +397,9 @@
             'dev_requirement' => false,
         ),
         'react/promise' => array(
-            'pretty_version' => 'v3.3.0',
-            'version' => '3.3.0.0',
-            'reference' => '23444f53a813a3296c1368bb104793ce8d88f04a',
+            'pretty_version' => 'v2.11.0',
+            'version' => '2.11.0.0',
+            'reference' => '1a8460931ea36dc5c76838fec5734d55c88c6831',
             'type' => 'library',
             'install_path' => __DIR__ . '/../react/promise',
             'aliases' => array(),

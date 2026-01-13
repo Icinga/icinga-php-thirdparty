@@ -33,7 +33,7 @@
     "ramsey/uuid": "^4.9",
     "react/async": "^4.3",
     "react/http": "^1.11",
-    "react/promise": "^3.3",
+    "react/promise": "^2.10",
     "react/socket": "^1.17",
     "shardj/zf1-future": "dev-master#9eabd56",
     "simshaun/recurr": "^5.0",
