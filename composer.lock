@@ -4,79 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f0c1087b0d955d08f81bf20768ccf1ef",
+    "content-hash": "8de1a5a52ee5a5d2a0fad454d10b28ce",
     "packages": [
-        {
-            "name": "amirezaeb/heroqr",
-            "version": "v1.1.9",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/AmirezaEb/HeroQR.git",
-                "reference": "b00cea72ed3448f94e7ffce387f1832eb73f67e0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/AmirezaEb/HeroQR/zipball/b00cea72ed3448f94e7ffce387f1832eb73f67e0",
-                "reference": "b00cea72ed3448f94e7ffce387f1832eb73f67e0",
-                "shasum": ""
-            },
-            "require": {
-                "endroid/qr-code": "^6.0",
-                "php": "^8.2"
-            },
-            "require-dev": {
-                "ext-gd": "*",
-                "phpunit/phpunit": "^10.5"
-            },
-            "suggest": {
-                "ext-gd": "Required for image processing, including generating PNG images",
-                "giggsey/libphonenumber-for-php": "Required for advanced phone number validation",
-                "setasign/fpdf": "Required for PDF generation features"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "HeroQR\\Providers\\HeroQRServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "HeroQR\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Amirreza Ebrahimi",
-                    "email": "aabrahimi1718@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A Powerful QR Code Management Library For PHP",
-            "homepage": "https://github.com/AmirezaEb/HeroQR",
-            "keywords": [
-                "AmirezaEb",
-                "HeroQR",
-                "code",
-                "laravel",
-                "management",
-                "php",
-                "php-library",
-                "qr",
-                "qr-code",
-                "qrcode"
-            ],
-            "support": {
-                "issues": "https://github.com/AmirezaEb/HeroQR/issues",
-                "source": "https://github.com/AmirezaEb/HeroQR/tree/v1.1.9"
-            },
-            "time": "2025-09-15T22:04:57+00:00"
-        },
         {
             "name": "bacon/bacon-qr-code",
             "version": "v3.0.3",
