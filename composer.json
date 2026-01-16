@@ -55,7 +55,7 @@
         "simshaun/recurr": "^5",
         "tedivm/jshrink": "^1.6.8",
         "wikimedia/less.php": "^3.2.1",
-        "zircote/swagger-php": "^5.5"
+        "zircote/swagger-php": "^6.0"
     },
     "autoload": {
         "psr-0": { "AssetLoader": "" }
