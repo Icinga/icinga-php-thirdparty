@@ -22,15 +22,15 @@ Annotations are deprecated and may be removed in a future release of swagger-php
 
 ## OpenAPI version support
 
-`swagger-php` allows to generate specs either for **OpenAPI 3.0.0** or **OpenAPI 3.1.0**.
-By default, the spec will be in version `3.0.0`. The command line option `--version` may be used to change this
-to `3.1.0`.
+`swagger-php` allows to generate specs either for **OpenAPI 3.0.0**, **OpenAPI 3.1.0** and **OpenAPI 3.2.0**.
+By default, the spec will be in version `3.0.0`. The command line option `--version` may be used to change to
+any other supported version.
 
 Programmatically, the method `Generator::setVersion()` can be used to change the version.
 
 ## Requirements
 
-`swagger-php` requires at least PHP 7.4 for annotations and PHP 8.1 for using attributes.
+`swagger-php` requires at least PHP 8.2.
 
 ## Installation (with [Composer](https://getcomposer.org))
 
@@ -43,22 +43,6 @@ For cli usage from anywhere, install swagger-php globally and make sure to place
 ```shell
 composer global require zircote/swagger-php
 ```
-
-### radebatz/type-info-extras
-`swagger-php` version `5.5` introduces a new type resolver used internally to determine the schema type
-of properties (and other elements with a schema).
-
-By default, a custom `LegacyTypeResolver` is used. If you are on PHP 8.2 or higher,
-the `TypeInfoTypeResolver` can be used instead.
-For this the [radebatz/type-info-extras](https://github.com/DerManoMann/type-info-extras) package is required.
-Since it is optional, it needs to be installed manually. It will also add `symfony/type-info` as a dependency:
-
-```shell
-composer require radebatz/type-info-extras
-```
-
-If the library code is detected, `swagger-php` will automatically use it.
-Advantages are re-use of 3rd party code, better stability and compatibility with future PHP versions.
 
 ### doctrine/annotations
 As of version `4.8` the [doctrine annotations](https://www.doctrine-project.org/projects/annotations.html) library **is optional** and **no longer installed by default**.
@@ -75,6 +59,9 @@ composer require doctrine/annotations
 Add annotations to your php files.
 
 ```php
+
+use OpenApi\Annotations as OA;
+
 /**
  * @OA\Info(title="My First API", version="0.1")
  */
@@ -96,7 +83,7 @@ Generate always-up-to-date documentation.
 ```php
 <?php
 require("vendor/autoload.php");
-$openapi = \OpenApi\Generator::scan(['/path/to/project']);
+$openapi = (new \OpenApi\Generator->generate(['/path/to/project']);
 header('Content-Type: application/x-yaml');
 echo $openapi->toYaml();
 ```
@@ -123,6 +110,15 @@ $serializer = new Serializer();
 $openapi = $serializer->deserialize($jsonString, 'OpenApi\Annotations\OpenApi');
 echo $openapi->toJson();
 ```
+
+## The `LegacyTypeResolver`
+
+As of version 6, resolution of types is done using the `TypeInfoTypeResolver` class. It uses the `symfony/type-info`
+library under the hood which improves handling of complext types.
+
+If this is not desired, the `LegacyTypeResolver` can be used to preserve the old behaviour of version 5.
+
+The `LegacyTypeResolver` is deprecated and will be removed in a future release.
 
 ## [Contributing](CONTRIBUTING.md)
 

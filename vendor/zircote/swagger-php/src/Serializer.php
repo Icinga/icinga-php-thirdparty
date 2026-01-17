@@ -47,6 +47,7 @@ class Serializer
         OA\Post::class,
         OA\Property::class,
         OA\Put::class,
+        OA\Query::class,
         OA\RequestBody::class,
         OA\Response::class,
         OA\Schema::class,
@@ -107,11 +108,11 @@ class Serializer
                 $property = 'ref';
             }
 
-            if (substr($property, 0, 2) === 'x-') {
+            if (str_starts_with((string) $property, 'x-')) {
                 if (Generator::isDefault($annotation->x)) {
                     $annotation->x = [];
                 }
-                $custom = substr($property, 2);
+                $custom = substr((string) $property, 2);
                 $annotation->x[$custom] = $value;
             } else {
                 $annotation->{$property} = $this->doDeserializeProperty($annotation, $property, $value, $context);
@@ -182,12 +183,12 @@ class Serializer
      *
      * @return array|OA\AbstractAnnotation
      */
-    protected function doDeserializeBaseProperty($type, $value, Context $context)
+    protected function doDeserializeBaseProperty($type, mixed $value, Context $context)
     {
         $isAnnotationClass = is_string($type) && is_subclass_of(trim($type, '[]'), OA\AbstractAnnotation::class);
 
         if ($isAnnotationClass) {
-            $isArray = strpos($type, '[') === 0 && substr($type, -1) === ']';
+            $isArray = str_starts_with($type, '[') && str_ends_with($type, ']');
 
             if ($isArray) {
                 $annotationArr = [];
