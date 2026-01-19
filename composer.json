@@ -14,7 +14,7 @@
         "issues": "https://github.com/Icinga/icinga-php-thirdparty/issues"
     },
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.2 <8.6",
         "ext-curl": "*",
         "clue/block-react": "^1.5",
         "clue/connection-manager-extra": "^1.3",
