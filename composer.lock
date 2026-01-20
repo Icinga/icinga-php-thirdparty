@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "773717adc978e34d04b4ec18433ee8eb",
+    "content-hash": "c38893ac2114afb41d97934cf1311b12",
     "packages": [
         {
             "name": "brick/math",
@@ -475,61 +475,6 @@
                 }
             ],
             "time": "2025-01-03T16:18:33+00:00"
-        },
-        {
-            "name": "clue/soap-react",
-            "version": "v2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/clue/reactphp-soap.git",
-                "reference": "db2e0ba9b0380ac6c4a34df3f1021d2191d45d45"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/clue/reactphp-soap/zipball/db2e0ba9b0380ac6c4a34df3f1021d2191d45d45",
-                "reference": "db2e0ba9b0380ac6c4a34df3f1021d2191d45d45",
-                "shasum": ""
-            },
-            "require": {
-                "ext-soap": "*",
-                "php": ">=7.1",
-                "react/http": "^1.0",
-                "react/promise": "^2.1 || ^1.2"
-            },
-            "require-dev": {
-                "clue/block-react": "^1.0",
-                "phpunit/phpunit": "^9.3 || ^7.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Clue\\React\\Soap\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christian Lück",
-                    "email": "christian@clue.engineering"
-                }
-            ],
-            "description": "Simple, async SOAP webservice client library, built on top of ReactPHP",
-            "homepage": "https://github.com/clue/reactphp-soap",
-            "keywords": [
-                "reactphp",
-                "soap",
-                "soapclient",
-                "webservice",
-                "wsdl"
-            ],
-            "support": {
-                "issues": "https://github.com/clue/reactphp-soap/issues",
-                "source": "https://github.com/clue/reactphp-soap/tree/v2.0.0"
-            },
-            "time": "2020-10-28T11:25:46+00:00"
         },
         {
             "name": "clue/socket-raw",
@@ -3598,23 +3543,24 @@
         },
         {
             "name": "react/promise",
-            "version": "v2.11.0",
+            "version": "v3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise.git",
-                "reference": "1a8460931ea36dc5c76838fec5734d55c88c6831"
+                "reference": "23444f53a813a3296c1368bb104793ce8d88f04a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/1a8460931ea36dc5c76838fec5734d55c88c6831",
-                "reference": "1a8460931ea36dc5c76838fec5734d55c88c6831",
+                "url": "https://api.github.com/repos/reactphp/promise/zipball/23444f53a813a3296c1368bb104793ce8d88f04a",
+                "reference": "23444f53a813a3296c1368bb104793ce8d88f04a",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": ">=7.1.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.6 || ^5.7 || ^4.8.36"
+                "phpstan/phpstan": "1.12.28 || 1.4.10",
+                "phpunit/phpunit": "^9.6 || ^7.5"
             },
             "type": "library",
             "autoload": {
@@ -3658,7 +3604,7 @@
             ],
             "support": {
                 "issues": "https://github.com/reactphp/promise/issues",
-                "source": "https://github.com/reactphp/promise/tree/v2.11.0"
+                "source": "https://github.com/reactphp/promise/tree/v3.3.0"
             },
             "funding": [
                 {
@@ -3666,7 +3612,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2023-11-16T16:16:50+00:00"
+            "time": "2025-08-19T18:57:03+00:00"
         },
         {
             "name": "react/promise-stream",
