@@ -41,6 +41,7 @@
         "psr/http-server-middleware": "^1.0",
         "psr/log": "^3",
         "ramsey/uuid": "^4.2.3",
+        "react/async": "^4.3",
         "react/child-process": "^0.6.5",
         "react/datagram": "^1.9",
         "react/dns": "^1.11",
