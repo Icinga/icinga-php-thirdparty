@@ -63,7 +63,6 @@ return array(
     'Clue\\React\\Term\\' => array($vendorDir . '/clue/term-react/src'),
     'Clue\\React\\Stdio\\' => array($vendorDir . '/clue/stdio-react/src'),
     'Clue\\React\\Socks\\' => array($vendorDir . '/clue/socks-react/src'),
-    'Clue\\React\\Soap\\' => array($vendorDir . '/clue/soap-react/src'),
     'Clue\\React\\Redis\\' => array($vendorDir . '/clue/redis-react/src'),
     'Clue\\React\\Mq\\' => array($vendorDir . '/clue/mq-react/src'),
     'Clue\\React\\HttpProxy\\' => array($vendorDir . '/clue/http-proxy-react/src'),

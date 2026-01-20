@@ -117,7 +117,6 @@ class ComposerStaticInit62e245e292cb86c7d02c2ced4ff448e6
             'Clue\\React\\Term\\' => 16,
             'Clue\\React\\Stdio\\' => 17,
             'Clue\\React\\Socks\\' => 17,
-            'Clue\\React\\Soap\\' => 16,
             'Clue\\React\\Redis\\' => 17,
             'Clue\\React\\Mq\\' => 14,
             'Clue\\React\\HttpProxy\\' => 21,
@@ -361,10 +360,6 @@ class ComposerStaticInit62e245e292cb86c7d02c2ced4ff448e6
         'Clue\\React\\Socks\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/socks-react/src',
-        ),
-        'Clue\\React\\Soap\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/clue/soap-react/src',
         ),
         'Clue\\React\\Redis\\' =>
         array (
