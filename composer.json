@@ -8,6 +8,9 @@
         "sort-packages": true,
         "allow-plugins": {
             "cweagans/composer-patches": true
+        },
+        "platform": {
+            "php": "8.2"
         }
     },
     "support": {
