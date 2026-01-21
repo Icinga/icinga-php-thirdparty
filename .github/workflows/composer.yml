@@ -1,0 +1,17 @@
+name: Composer
+
+on:
+  push: { }
+  pull_request: { }
+
+jobs:
+  validation:
+    name: Composer strict validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout HEAD
+        uses: actions/checkout@v6
+
+      - name: Ensure bin/make-release.sh works
+        run: bin/make-release.sh 1337.42.23 --no-tag
