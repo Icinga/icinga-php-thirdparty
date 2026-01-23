@@ -55,7 +55,7 @@
         "react/promise-timer": "^1.11",
         "react/socket": "^1.17",
         "react/stream": "^1.4",
-        "shardj/zf1-future": "^1.24.4",
+        "shardj/zf1-future": "dev-master#1329203",
         "simshaun/recurr": "^5.0.3",
         "tedivm/jshrink": "^1.8.1",
         "wikimedia/less.php": "^3.2.1",

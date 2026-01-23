@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1cb6a81b01cfa36869f03ea105c76a21",
+    "content-hash": "aa96d2f0104dde859de7db6d67d933b9",
     "packages": [
         {
             "name": "brick/math",
@@ -4132,16 +4132,16 @@
         },
         {
             "name": "shardj/zf1-future",
-            "version": "1.24.4",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Shardj/zf1-future.git",
-                "reference": "3582cce4bcf2c820191be56cf17fdef0addf0771"
+                "reference": "1329203"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/3582cce4bcf2c820191be56cf17fdef0addf0771",
-                "reference": "3582cce4bcf2c820191be56cf17fdef0addf0771",
+                "url": "https://api.github.com/repos/Shardj/zf1-future/zipball/1329203",
+                "reference": "1329203",
                 "shasum": ""
             },
             "require": {
@@ -4149,6 +4149,7 @@
                 "symfony/polyfill-ctype": "^1.30",
                 "symfony/polyfill-mbstring": "^1.30",
                 "symfony/polyfill-php81": "^1.30",
+                "symfony/polyfill-php82": "^1.30",
                 "symfony/polyfill-php83": "^1.30"
             },
             "replace": {
@@ -4165,6 +4166,7 @@
             "suggest": {
                 "ext-mbstring": "Multibyte strings handling"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -4191,9 +4193,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Shardj/zf1-future/issues",
-                "source": "https://github.com/Shardj/zf1-future/tree/release-1.24.4"
+                "source": "https://github.com/Shardj/zf1-future/tree/master"
             },
-            "time": "2025-06-26T19:09:46+00:00"
+            "time": "2026-01-14T22:28:56+00:00"
         },
         {
             "name": "simshaun/recurr",
@@ -4616,6 +4618,86 @@
             ],
             "support": {
                 "source": "https://github.com/symfony/polyfill-php81/tree/v1.33.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-09-09T11:45:10+00:00"
+        },
+        {
+            "name": "symfony/polyfill-php82",
+            "version": "v1.33.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-php82.git",
+                "reference": "5d2ed36f7734637dacc025f179698031951b1692"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-php82/zipball/5d2ed36f7734637dacc025f179698031951b1692",
+                "reference": "5d2ed36f7734637dacc025f179698031951b1692",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "type": "library",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php82\\": ""
+                },
+                "classmap": [
+                    "Resources/stubs"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill backporting some PHP 8.2+ features to lower PHP versions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-php82/tree/v1.33.0"
             },
             "funding": [
                 {
@@ -5324,7 +5406,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "shardj/zf1-future": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
