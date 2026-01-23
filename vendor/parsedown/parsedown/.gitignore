@@ -1,0 +1,7 @@
+composer.lock
+vendor/
+.phpunit.result.cache
+
+# Editor-specific and temp files
+.idea/
+.DS_Store
