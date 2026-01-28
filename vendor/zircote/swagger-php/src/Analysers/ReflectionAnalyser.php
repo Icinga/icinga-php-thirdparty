@@ -38,6 +38,7 @@ class ReflectionAnalyser implements AnalyserInterface
                 $this->annotationFactories[] = $annotationFactory;
             }
         }
+
         if (!$this->annotationFactories) {
             throw new OpenApiException('No suitable annotation factory found. At least one of "Doctrine Annotations" or PHP 8.1 are required');
         }
@@ -91,7 +92,9 @@ class ReflectionAnalyser implements AnalyserInterface
         }
 
         $rc = new \ReflectionClass($fqdn);
-        $contextType = $rc->isInterface() ? 'interface' : ($rc->isTrait() ? 'trait' : ((method_exists($rc, 'isEnum') && $rc->isEnum()) ? 'enum' : 'class'));
+        $contextType = $rc->isInterface()
+            ? 'interface'
+            : ($rc->isTrait() ? 'trait' : ($rc->isEnum() ? 'enum' : 'class'));
         $context = new Context([
             $contextType => $rc->getShortName(),
             'namespace' => $rc->getNamespaceName() ?: null,
@@ -113,7 +116,7 @@ class ReflectionAnalyser implements AnalyserInterface
             'methods' => [],
             'context' => $context,
         ];
-        $normaliseClass = fn (string $name): string => '\\' . ltrim($name, '\\');
+        $normaliseClass = static fn (string $name): string => '\\' . ltrim($name, '\\');
         if ($parentClass = $rc->getParentClass()) {
             $definition['extends'] = $normaliseClass($parentClass->getName());
         }

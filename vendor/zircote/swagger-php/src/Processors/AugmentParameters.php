@@ -20,6 +20,7 @@ use OpenApi\Processors\Concerns\DocblockTrait;
 class AugmentParameters implements GeneratorAwareInterface
 {
     use DocblockTrait;
+
     use GeneratorAwareTrait;
 
     protected bool $augmentOperationParameters;
@@ -65,14 +66,23 @@ class AugmentParameters implements GeneratorAwareInterface
             }
 
             if ($context->reflector instanceof \ReflectionParameter) {
-                $schema = new OA\Schema(['_context' => new Context(['reflector' => $context->reflector], $context)]);
+                $schema = new OA\Schema([
+                    '_context' => new Context([
+                        'generated' => true,
+                        'reflector' => $context->reflector,
+                    ], $context),
+                ]);
                 $this->generator->getTypeResolver()->augmentSchemaType($analysis, $schema);
 
                 $parameter->merge([new OA\Schema([
                     'type' => $schema->type,
                     'format' => $schema->format,
                     'ref' => $schema->ref,
-                    '_context' => new Context(['nested' => $this, 'comment' => null, 'reflector' => $context->reflector], $context)]),
+                    '_context' => new Context([
+                        'nested' => $this,
+                        'comment' => null,
+                        'reflector' => $context->reflector,
+                    ], $context)]),
                 ]);
 
                 if (Generator::isDefault($parameter->required)) {
@@ -113,7 +123,6 @@ class AugmentParameters implements GeneratorAwareInterface
 
     protected function augmentOperationParameters(Analysis $analysis): void
     {
-        /** @var OA\Operation[] $operations */
         $operations = $analysis->getAnnotationsOfType(OA\Operation::class);
 
         foreach ($operations as $operation) {
@@ -130,6 +139,8 @@ class AugmentParameters implements GeneratorAwareInterface
                                 $parameter->description = $details['description'];
                             }
                         }
+                    } elseif (null === $parameter->description) {
+                        $parameter->description = Generator::UNDEFINED;
                     }
                 }
             }
