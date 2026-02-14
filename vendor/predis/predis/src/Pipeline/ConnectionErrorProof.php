@@ -42,11 +42,10 @@ class ConnectionErrorProof extends Pipeline
             return $this->executeSingleNode($connection, $commands);
         } elseif ($connection instanceof ClusterInterface) {
             return $this->executeCluster($connection, $commands);
-        } else {
-            $class = get_class($connection);
-
-            throw new NotSupportedException("The connection class '$class' is not supported.");
         }
+        $class = get_class($connection);
+
+        throw new NotSupportedException("The connection class '$class' is not supported.");
     }
 
     /**
@@ -92,13 +91,11 @@ class ConnectionErrorProof extends Pipeline
         $responses = [];
         $sizeOfPipe = count($commands);
         $exceptions = [];
-        $buffer = '';
 
         foreach ($commands as $command) {
-            $buffer .= $command->serializeCommand();
+            $nodeConnection = $connection->getConnectionByCommand($command);
+            $nodeConnection->write($command->serializeCommand());
         }
-
-        $connection->write($buffer);
 
         for ($i = 0; $i < $sizeOfPipe; ++$i) {
             $command = $commands->dequeue();
