@@ -26,14 +26,13 @@ class BuildPaths
                     $annotation->_context->logger->warning($annotation->identity() . ' is missing required property "path" in ' . $annotation->_context);
                 } elseif (isset($paths[$annotation->path])) {
                     $paths[$annotation->path]->mergeProperties($annotation);
-                    $analysis->annotations->detach($annotation);
+                    $analysis->annotations->offsetUnset($annotation);
                 } else {
                     $paths[$annotation->path] = $annotation;
                 }
             }
         }
 
-        /** @var OA\Operation[] $operations */
         $operations = $analysis->unmerged()->getAnnotationsOfType(OA\Operation::class);
 
         // Merge @OA\Operations into existing @OA\PathItems or create a new one.
