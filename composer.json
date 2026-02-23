@@ -38,7 +38,7 @@
         "ezyang/htmlpurifier": "^4.19",
         "guzzlehttp/guzzle": "^7.10",
         "guzzlehttp/psr7": "^2.8",
-        "icinga/zf1": "2.0.0-rc1",
+        "icinga/zf1": "2.0.0-rc2",
         "jfcherng/php-diff": "^6.16.2",
         "parsedown/parsedown": "^1.8",
         "predis/predis": "^3.4",

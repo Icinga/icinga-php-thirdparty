@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e49858ca4f14ef7860b8969eda5288d",
+    "content-hash": "48fe19991b7f11f63e495cbb8e10c58f",
     "packages": [
         {
             "name": "brick/math",
@@ -1775,11 +1775,11 @@
         },
         {
             "name": "icinga/zf1",
-            "version": "v2.0.0-rc1",
+            "version": "v2.0.0-rc2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Icinga/zf1",
-                "reference": "ec1e99c14715049ca5993dd7fe74d18711e8e67b"
+                "reference": "d0d8caca9b335a4d34876dfe506883f0fd087453"
             },
             "require": {
                 "php": ">=8.2",
@@ -1800,12 +1800,15 @@
                     "resources_": "tests/"
                 }
             },
+            "include-path": [
+                "library/"
+            ],
             "license": [
                 "BSD-3-Clause"
             ],
             "description": "Streamlined Zend Framework 1 fork reduced to the components used by Icinga Web and its ecosystem.",
             "homepage": "https://github.com/Icinga/zf1",
-            "time": "2026-02-20T15:23:10+00:00"
+            "time": "2026-02-23T12:13:29+00:00"
         },
         {
             "name": "jfcherng/php-color-output",
