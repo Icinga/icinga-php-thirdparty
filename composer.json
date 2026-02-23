@@ -6,9 +6,6 @@
     "license": "MIT",
     "config": {
         "sort-packages": true,
-        "allow-plugins": {
-            "cweagans/composer-patches": true
-        },
         "platform": {
             "php": "8.2"
         }
@@ -16,6 +13,12 @@
     "support": {
         "issues": "https://github.com/Icinga/icinga-php-thirdparty/issues"
     },
+    "repositories": [
+      {
+        "type": "git",
+        "url": "https://github.com/Icinga/zf1"
+      }
+    ],
     "require": {
         "php": ">=8.2",
         "ext-curl": "*",
@@ -29,13 +32,13 @@
         "clue/socks-react": "^1.4",
         "clue/stdio-react": "^2.6",
         "components/jquery": "3.7.*",
-        "cweagans/composer-patches": "~2.0",
         "dompdf/dompdf": "^3.1.4",
         "dragonmantank/cron-expression": "^3.6",
         "evenement/evenement": "^3.0.2",
         "ezyang/htmlpurifier": "^4.19",
         "guzzlehttp/guzzle": "^7.10",
         "guzzlehttp/psr7": "^2.8",
+        "icinga/zf1": "2.0.0-rc1",
         "jfcherng/php-diff": "^6.16.2",
         "parsedown/parsedown": "^1.8",
         "predis/predis": "^3.4",
@@ -55,7 +58,6 @@
         "react/promise-timer": "^1.11",
         "react/socket": "^1.17",
         "react/stream": "^1.4",
-        "shardj/zf1-future": "^1.24.4",
         "simshaun/recurr": "^5.0.3",
         "tedivm/jshrink": "^1.8.1",
         "wikimedia/less.php": "^3.2.1",
@@ -71,17 +73,5 @@
         "post-update-cmd": [
             "AssetLoader::update"
         ]
-    },
-    "extra": {
-        "composer-exit-on-patch-failure": true,
-        "patches": {
-            "shardj/zf1-future": [
-                {
-                    "description": "ZF1-Future: ZF backward compatibility",
-                    "url": "patches/shardj-zf1-future.patch",
-                    "depth": 1
-                }
-            ]
-        }
     }
 }
