@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "48fe19991b7f11f63e495cbb8e10c58f",
+    "content-hash": "ee7dc10953ebe00b569f6d182426cedf",
     "packages": [
         {
             "name": "brick/math",
@@ -1778,8 +1778,14 @@
             "version": "v2.0.0-rc2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Icinga/zf1",
+                "url": "https://github.com/Icinga/zf1.git",
                 "reference": "d0d8caca9b335a4d34876dfe506883f0fd087453"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Icinga/zf1/zipball/d0d8caca9b335a4d34876dfe506883f0fd087453",
+                "reference": "d0d8caca9b335a4d34876dfe506883f0fd087453",
+                "shasum": ""
             },
             "require": {
                 "php": ">=8.2",
@@ -1808,6 +1814,9 @@
             ],
             "description": "Streamlined Zend Framework 1 fork reduced to the components used by Icinga Web and its ecosystem.",
             "homepage": "https://github.com/Icinga/zf1",
+            "support": {
+                "source": "https://github.com/Icinga/zf1/tree/v2.0.0-rc2"
+            },
             "time": "2026-02-23T12:13:29+00:00"
         },
         {
