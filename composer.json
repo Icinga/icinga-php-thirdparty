@@ -15,7 +15,7 @@
     },
     "repositories": [
       {
-        "type": "git",
+        "type": "vcs",
         "url": "https://github.com/Icinga/zf1"
       }
     ],
