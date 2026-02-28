@@ -12,18 +12,13 @@ use OpenApi\Analysers\DocBlockAnnotationFactory;
 use OpenApi\Analysers\ReflectionAnalyser;
 use OpenApi\Annotations as OA;
 use OpenApi\Loggers\DefaultLogger;
-use OpenApi\Type\LegacyTypeResolver;
 use OpenApi\Type\TypeInfoTypeResolver;
 use Psr\Log\LoggerInterface;
-use Radebatz\TypeInfoExtras\TypeResolver\StringTypeResolver;
 
 /**
  * OpenApi spec generator.
  *
  * Scans PHP source code and generates OpenApi specifications from the found OpenApi annotations.
- *
- * This is an object-oriented alternative to using the now deprecated <code>\OpenApi\scan()</code> function and
- * static class properties of the <code>Analyzer</code> and <code>Analysis</code> classes.
  */
 class Generator
 {
@@ -37,7 +32,8 @@ class Generator
 
     /** @var array<string,string> */
     public const DEFAULT_ALIASES = ['oa' => 'OpenApi\\Annotations'];
-    /** @var array<string> */
+
+    /** @var list<string> */
     public const DEFAULT_NAMESPACES = ['OpenApi\\Annotations\\'];
 
     /** @var array<string,string> Map of namespace aliases to be supported by doctrine. */
@@ -87,7 +83,7 @@ class Generator
     }
 
     /**
-     * @return array<string>
+     * @return array<string, string>
      */
     public function getAliases(): array
     {
@@ -109,7 +105,7 @@ class Generator
     }
 
     /**
-     * @return array<string>|null
+     * @return list<string>|null
      */
     public function getNamespaces(): ?array
     {
@@ -156,6 +152,27 @@ class Generator
             'generator' => [
                 'ignoreOtherAttributes' => false,
             ],
+            'mergeIntoOpenApi' => [
+                'mergeComponents' => false,
+            ],
+            'expandEnums' => [
+                'enumNames' => null,
+            ],
+            'augmentParameters' => [
+                'augmentOperationParameters' => true,
+            ],
+            'pathFilter' => [
+                'tags' => [],
+                'paths' => [],
+                'recurseCleanup' => false,
+            ],
+            'cleanUnusedComponents' => [
+                'enabled' => false,
+            ],
+            'augmentTags' => [
+                'whitelist' => [],
+                'withDescription' => true,
+            ],
             'operationId' => [
                 'hash' => true,
             ],
@@ -172,7 +189,7 @@ class Generator
         $normalised = [];
         foreach ($config as $key => $value) {
             if (is_numeric($key)) {
-                $token = explode('=', $value);
+                $token = explode('=', (string) $value);
                 if (2 === count($token)) {
                     // 'operationId.hash=false'
                     [$key, $value] = $token;
@@ -183,10 +200,10 @@ class Generator
                 $value = 'true' == $value;
             }
 
-            if ($isList = ('[]' === substr($key, -2))) {
-                $key = substr($key, 0, -2);
+            if ($isList = (str_ends_with((string) $key, '[]'))) {
+                $key = substr((string) $key, 0, -2);
             }
-            $token = explode('.', $key);
+            $token = explode('.', (string) $key);
             if (2 === count($token)) {
                 // 'operationId.hash' => false
                 // namespaced / processor
@@ -237,6 +254,7 @@ class Generator
                 new Processors\BuildPaths(),
                 new Processors\AugmentParameters(),
                 new Processors\AugmentRefs(),
+                new Processors\AugmentItems(),
                 new Processors\MergeJsonContent(),
                 new Processors\MergeXmlContent(),
                 new Processors\AugmentMediaType(),
@@ -300,14 +318,6 @@ class Generator
         return $this;
     }
 
-    /**
-     * @deprecated use `withProcessorPipeline()` instead
-     */
-    public function withProcessor(callable $with): Generator
-    {
-        return $this->withProcessorPipeline($with);
-    }
-
     public function setTypeResolver(?TypeResolverInterface $typeResolver): Generator
     {
         $this->typeResolver = $typeResolver;
@@ -317,9 +327,7 @@ class Generator
 
     public function getTypeResolver(): TypeResolverInterface
     {
-        $this->typeResolver ??= class_exists(StringTypeResolver::class)
-                    ? new TypeInfoTypeResolver()
-                    : new LegacyTypeResolver();
+        $this->typeResolver ??= new TypeInfoTypeResolver();
 
         return $this->typeResolver;
     }
@@ -341,38 +349,6 @@ class Generator
         $this->version = $version;
 
         return $this;
-    }
-
-    /**
-     * @deprecated use non-static `generate()` instead
-     */
-    public static function scan(iterable $sources, array $options = []): ?OA\OpenApi
-    {
-        // merge with defaults
-        $config = $options + [
-                'aliases' => self::DEFAULT_ALIASES,
-                'namespaces' => self::DEFAULT_NAMESPACES,
-                'analyser' => null,
-                'analysis' => null,
-                'processor' => null,
-                'processors' => null,
-                'config' => [],
-                'logger' => null,
-                'validate' => true,
-                'version' => null,
-            ];
-
-        $processorPipeline = $config['processor'] ??
-            ($config['processors'] ? new Pipeline($config['processors']) : null);
-
-        return (new Generator($config['logger']))
-            ->setVersion($config['version'])
-            ->setAliases($config['aliases'])
-            ->setNamespaces($config['namespaces'])
-            ->setAnalyser($config['analyser'])
-            ->setProcessorPipeline($processorPipeline)
-            ->setConfig($config['config'])
-            ->generate($sources, $config['analysis'], $config['validate']);
     }
 
     /**
@@ -449,7 +425,7 @@ class Generator
                     continue;
                 }
                 if (is_dir($resolvedSource)) {
-                    $this->scanSources(Util::finder($resolvedSource), $analysis, $rootContext);
+                    $this->scanSources(new SourceFinder($resolvedSource), $analysis, $rootContext);
                 } else {
                     $rootContext->logger->debug(sprintf('Analysing source: %s', $resolvedSource));
                     $analysis->addAnalysis($analyser->fromFile($resolvedSource, $rootContext));

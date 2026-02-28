@@ -4,7 +4,7 @@
  * This file is part of the Predis package.
  *
  * (c) 2009-2020 Daniele Alessandri
- * (c) 2021-2025 Till Krüss
+ * (c) 2021-2026 Till Krüss
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,6 +12,7 @@
 
 namespace Predis\Command\Redis\Utils;
 
+use RuntimeException;
 use UnexpectedValueException;
 
 class CommandUtility
@@ -52,5 +53,37 @@ class CommandUtility
         }
 
         return $dict;
+    }
+
+    /**
+     * Converts a value into XXH3 hash.
+     *
+     * @param         $value
+     * @return string
+     */
+    public static function xxh3Hash($value): string
+    {
+        if (!in_array('xxh3', hash_algos(), true)) {
+            throw new RuntimeException('XXH3 algorithm is not supported. Please install PECL xxhash extension.');
+        }
+
+        return hash('xxh3', $value);
+    }
+
+    /**
+     * Converts associative array into flatten array (key1, value1...keyN, valueN).
+     *
+     * @param  array $dict
+     * @return array
+     */
+    public static function dictionaryToArray(array $dict): array
+    {
+        $array = [];
+
+        array_walk($dict, function ($value, $key) use (&$array) {
+            array_push($array, $key, $value);
+        });
+
+        return $array;
     }
 }

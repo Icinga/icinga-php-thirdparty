@@ -20,7 +20,6 @@ class AugmentSchemas
 {
     public function __invoke(Analysis $analysis): void
     {
-        /** @var OA\Schema[] $schemas */
         $schemas = $analysis->getAnnotationsOfType(OA\Schema::class);
 
         $this->augmentSchema($schemas);
@@ -99,11 +98,13 @@ class AugmentSchemas
                     $schema->type = 'object';
                 } elseif (is_array($schema->patternProperties) && $schema->patternProperties !== []) {
                     $schema->type = 'object';
+                } elseif (is_array($schema->unevaluatedProperties) && $schema->unevaluatedProperties !== []) {
+                    $schema->type = 'object';
                 } elseif (is_array($schema->propertyNames) && $schema->propertyNames !== []) {
                     $schema->type = 'object';
                 }
             } else {
-                if (is_string($schema->type) && $typeSchema = $analysis->getSchemaForSource($schema->type)) {
+                if (is_string($schema->type) && $typeSchema = $analysis->getAnnotationForSource($schema->type)) {
                     if (Generator::isDefault($schema->format)) {
                         $schema->ref = OA\Components::ref($typeSchema);
                         $schema->type = Generator::UNDEFINED;
