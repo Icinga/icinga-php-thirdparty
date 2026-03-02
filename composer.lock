@@ -4122,16 +4122,16 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v7.4.5",
+            "version": "v7.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "ad4daa7c38668dcb031e63bc99ea9bd42196a2cb"
+                "reference": "8655bf1076b7a3a346cb11413ffdabff50c7ffcf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/ad4daa7c38668dcb031e63bc99ea9bd42196a2cb",
-                "reference": "ad4daa7c38668dcb031e63bc99ea9bd42196a2cb",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/8655bf1076b7a3a346cb11413ffdabff50c7ffcf",
+                "reference": "8655bf1076b7a3a346cb11413ffdabff50c7ffcf",
                 "shasum": ""
             },
             "require": {
@@ -4166,7 +4166,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/v7.4.5"
+                "source": "https://github.com/symfony/finder/tree/v7.4.6"
             },
             "funding": [
                 {
@@ -4186,7 +4186,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-26T15:07:59+00:00"
+            "time": "2026-01-29T09:40:50+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -4433,16 +4433,16 @@
         },
         {
             "name": "symfony/type-info",
-            "version": "v7.4.4",
+            "version": "v7.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/type-info.git",
-                "reference": "f83c725e72b39b2704b9d6fc85070ad6ac7a5889"
+                "reference": "4855ceea609b2c09e48ff76e12a97a3955531735"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/type-info/zipball/f83c725e72b39b2704b9d6fc85070ad6ac7a5889",
-                "reference": "f83c725e72b39b2704b9d6fc85070ad6ac7a5889",
+                "url": "https://api.github.com/repos/symfony/type-info/zipball/4855ceea609b2c09e48ff76e12a97a3955531735",
+                "reference": "4855ceea609b2c09e48ff76e12a97a3955531735",
                 "shasum": ""
             },
             "require": {
@@ -4492,7 +4492,7 @@
                 "type"
             ],
             "support": {
-                "source": "https://github.com/symfony/type-info/tree/v7.4.4"
+                "source": "https://github.com/symfony/type-info/tree/v7.4.6"
             },
             "funding": [
                 {
@@ -4512,20 +4512,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-09T12:14:21+00:00"
+            "time": "2026-02-17T14:00:31+00:00"
         },
         {
             "name": "symfony/yaml",
-            "version": "v7.4.1",
+            "version": "v7.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "24dd4de28d2e3988b311751ac49e684d783e2345"
+                "reference": "58751048de17bae71c5aa0d13cb19d79bca26391"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/24dd4de28d2e3988b311751ac49e684d783e2345",
-                "reference": "24dd4de28d2e3988b311751ac49e684d783e2345",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/58751048de17bae71c5aa0d13cb19d79bca26391",
+                "reference": "58751048de17bae71c5aa0d13cb19d79bca26391",
                 "shasum": ""
             },
             "require": {
@@ -4568,7 +4568,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v7.4.1"
+                "source": "https://github.com/symfony/yaml/tree/v7.4.6"
             },
             "funding": [
                 {
@@ -4588,7 +4588,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-12-04T18:11:45+00:00"
+            "time": "2026-02-09T09:33:46+00:00"
         },
         {
             "name": "tedivm/jshrink",
@@ -4870,16 +4870,16 @@
         },
         {
             "name": "zircote/swagger-php",
-            "version": "6.0.5",
+            "version": "6.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "9a0a612584e7dea0e069b3b1a2120b404f3a51d4"
+                "reference": "9447c1f45b5ae93185caea9a0c8e298399188a25"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/9a0a612584e7dea0e069b3b1a2120b404f3a51d4",
-                "reference": "9a0a612584e7dea0e069b3b1a2120b404f3a51d4",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/9447c1f45b5ae93185caea9a0c8e298399188a25",
+                "reference": "9447c1f45b5ae93185caea9a0c8e298399188a25",
                 "shasum": ""
             },
             "require": {
@@ -4948,7 +4948,7 @@
             ],
             "support": {
                 "issues": "https://github.com/zircote/swagger-php/issues",
-                "source": "https://github.com/zircote/swagger-php/tree/6.0.5"
+                "source": "https://github.com/zircote/swagger-php/tree/6.0.6"
             },
             "funding": [
                 {
@@ -4956,7 +4956,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-10T20:05:00+00:00"
+            "time": "2026-02-28T06:42:58+00:00"
         }
     ],
     "packages-dev": [],
@@ -4975,5 +4975,5 @@
     "platform-overrides": {
         "php": "8.2"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
