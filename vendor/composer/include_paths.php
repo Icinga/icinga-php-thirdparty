@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    $vendorDir . '/shardj/zf1-future/library',
+    $vendorDir . '/icinga/zf1/library',
 );

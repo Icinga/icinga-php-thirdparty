@@ -18,7 +18,6 @@ class MergeJsonContent
 {
     public function __invoke(Analysis $analysis): void
     {
-        /** @var OA\JsonContent[] $annotations */
         $annotations = $analysis->getAnnotationsOfType(OA\JsonContent::class);
 
         foreach ($annotations as $jsonContent) {
@@ -47,6 +46,7 @@ class MergeJsonContent
             }
             $jsonContent->example = Generator::UNDEFINED;
             $jsonContent->examples = Generator::UNDEFINED;
+            /* @phpstan-ignore assign.propertyType */
             $jsonContent->encoding = Generator::UNDEFINED;
 
             $index = array_search($jsonContent, $parent->_unmerged, true);

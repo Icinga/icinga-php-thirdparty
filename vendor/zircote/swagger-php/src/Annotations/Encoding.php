@@ -34,7 +34,7 @@ class Encoding extends AbstractAnnotation
     /**
      * Additional headers.
      *
-     * @var Header[]
+     * @var list<Header>
      */
     public $headers = Generator::UNDEFINED;
 
@@ -78,11 +78,7 @@ class Encoding extends AbstractAnnotation
         'contentType' => 'string',
     ];
 
-    /**
-     * @inheritdoc
-     */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): \stdClass
     {
         $data = parent::jsonSerialize();
 

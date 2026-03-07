@@ -4,7 +4,7 @@
  * This file is part of the Predis package.
  *
  * (c) 2009-2020 Daniele Alessandri
- * (c) 2021-2025 Till Krüss
+ * (c) 2021-2026 Till Krüss
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,17 +16,21 @@ use InvalidArgumentException;
 use Predis\Command\Command;
 use Predis\Command\CommandInterface;
 use Predis\Command\RawCommand;
+use Predis\CommunicationException;
 use Predis\Connection\AbstractAggregateConnection;
 use Predis\Connection\ConnectionException;
 use Predis\Connection\FactoryInterface as ConnectionFactoryInterface;
 use Predis\Connection\NodeConnectionInterface;
 use Predis\Connection\Parameters;
 use Predis\Connection\ParametersInterface;
+use Predis\Connection\RelayFactory;
 use Predis\Replication\ReplicationStrategy;
 use Predis\Replication\RoleException;
 use Predis\Response\Error;
 use Predis\Response\ErrorInterface as ErrorResponseInterface;
 use Predis\Response\ServerException;
+use Predis\Retry\Retry;
+use Predis\Retry\Strategy\ExponentialBackoff;
 use Throwable;
 
 /**
@@ -364,9 +368,8 @@ class SentinelReplication extends AbstractAggregateConnection implements Replica
     {
         if ($error->getErrorType() === 'IDONTKNOW') {
             throw new ConnectionException($sentinel, $error->getMessage());
-        } else {
-            throw new ServerException($error->getMessage());
         }
+        throw new ServerException($error->getMessage());
     }
 
     /**
@@ -566,7 +569,10 @@ class SentinelReplication extends AbstractAggregateConnection implements Replica
     protected function assertConnectionRole(NodeConnectionInterface $connection, $role)
     {
         $role = strtolower($role);
-        $actualRole = $connection->executeCommand(RawCommand::create('ROLE'));
+        $retry = $connection->getParameters()->retry;
+        $actualRole = $retry->callWithRetry(function () use ($connection) {
+            return $connection->executeCommand(RawCommand::create('ROLE'));
+        });
 
         if ($actualRole instanceof Error) {
             throw new ConnectionException($connection, $actualRole->getMessage());
@@ -617,9 +623,9 @@ class SentinelReplication extends AbstractAggregateConnection implements Replica
             return $this->pickSlave();
         } elseif ($role === 'sentinel') {
             return $this->getSentinelConnection();
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -710,33 +716,39 @@ class SentinelReplication extends AbstractAggregateConnection implements Replica
      */
     private function retryCommandOnFailure(CommandInterface $command, $method)
     {
-        $retries = 0;
+        $parameters = $this->getParameters();
 
-        while ($retries <= $this->retryLimit) {
-            try {
-                $response = $this->getConnectionByCommand($command)->$method($command);
-                if ($response instanceof Error && $response->getErrorType() === 'LOADING') {
-                    throw new ConnectionException($this->current, $response->getMessage());
-                }
-                break;
-            } catch (Throwable $exception) {
-                $this->wipeServerList();
-
-                if ($exception instanceof ConnectionException) {
-                    $exception->getConnection()->disconnect();
-                }
-
-                if ($retries === $this->retryLimit) {
-                    throw $exception;
-                }
-
-                usleep($this->retryWait * 1000);
-
-                ++$retries;
-            }
+        if ($parameters->isDisabledRetry() || $this->connectionFactory instanceof RelayFactory) {
+            // Override default parameters, for backward-compatibility
+            // with current behaviour
+            $retry = new Retry(
+                new ExponentialBackoff($this->retryWait * 1000, -1),
+                $this->retryLimit
+            );
+        } else {
+            $retry = $parameters->retry;
         }
+        $retry->updateCatchableExceptions([Throwable::class]);
 
-        return $response;
+        $doCallback = function () use ($method, $command) {
+            $response = $this->getConnectionByCommand($command)->{$method}($command);
+
+            if ($response instanceof Error && $response->getErrorType() === 'LOADING') {
+                throw new ConnectionException($this->current, $response->getMessage());
+            }
+
+            return $response;
+        };
+
+        $failCallback = function (Throwable $exception) {
+            $this->wipeServerList();
+
+            if ($exception instanceof CommunicationException) {
+                $exception->getConnection()->disconnect();
+            }
+        };
+
+        return $retry->callWithRetry($doCallback, $failCallback);
     }
 
     /**
@@ -797,7 +809,18 @@ class SentinelReplication extends AbstractAggregateConnection implements Replica
         }
 
         if (!empty($this->sentinels)) {
-            return $this->sentinels[0]->getParameters();
+            $sentinel = $this->sentinels[0];
+
+            // After querySentinels(), sentinels array contains plain arrays instead of connection objects
+            if (is_array($sentinel)) {
+                return new Parameters($sentinel);
+            }
+
+            if ($sentinel instanceof ParametersInterface) {
+                return $sentinel;
+            }
+
+            return $sentinel->getParameters();
         }
 
         return null;

@@ -105,9 +105,17 @@ class PathItem extends AbstractAnnotation
     public $trace = Generator::UNDEFINED;
 
     /**
+     * A definition of a QUERY operation on this path.
+     *
+     * @since OpenAPI 3.2.0
+     * @var Query
+     */
+    public $query = Generator::UNDEFINED;
+
+    /**
      * An alternative server array to service all operations in this path.
      *
-     * @var Server[]
+     * @var list<Server>
      */
     public $servers = Generator::UNDEFINED;
 
@@ -119,7 +127,7 @@ class PathItem extends AbstractAnnotation
      * A unique parameter is defined by a combination of a name and location.
      * The list can use the Reference Object to link to parameters that are defined at the OpenAPI Object's components/parameters.
      *
-     * @var Parameter[]
+     * @var list<Parameter>
      */
     public $parameters = Generator::UNDEFINED;
 
@@ -143,6 +151,7 @@ class PathItem extends AbstractAnnotation
         Trace::class => 'trace',
         Head::class => 'head',
         Options::class => 'options',
+        Query::class => 'query',
         Parameter::class => ['parameters'],
         PathParameter::class => ['parameters'],
         Server::class => ['servers'],
@@ -159,7 +168,7 @@ class PathItem extends AbstractAnnotation
     /**
      * Returns a list of all operations (all methods) for this path item.
      *
-     * @return Operation[]
+     * @return list<Operation>
      */
     public function operations(): array
     {
@@ -171,5 +180,16 @@ class PathItem extends AbstractAnnotation
         }
 
         return $operations;
+    }
+
+    public function jsonSerialize(): \stdClass
+    {
+        $data = parent::jsonSerialize();
+
+        if ($this->_context->isVersion(['3.0.x', '3.1.x'])) {
+            unset($data->query);
+        }
+
+        return $data;
     }
 }
