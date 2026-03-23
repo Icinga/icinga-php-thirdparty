@@ -37,3 +37,14 @@ INSTALL_PATH="/usr/share/icinga-php/vendor"
 INSTALL_VERSION="stable/0.13.0"
 git clone https://github.com/Icinga/icinga-php-thirdparty.git "$INSTALL_PATH" --branch "$INSTALL_VERSION"
 ```
+
+## License
+
+This package bundles third-party components under multiple upstream licenses.
+Icinga-authored packaging glue is licensed under MIT as described in
+[`LICENSE.md`](LICENSE.md), while bundled third-party components retain their
+respective upstream licenses. See
+[`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md) for bundled components
+and shipped assets under licenses other than MIT, including relevant indirect
+dependencies, and see the bundled license files under `vendor/` and `asset/`
+for the full license texts shipped with this package.

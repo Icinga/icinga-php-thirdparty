@@ -1,7 +1,7 @@
 {
     "name": "icinga/icinga-php-thirdparty",
     "description": "Icinga Web - Bundle for all 3rd party PHP libraries",
-    "license": "MIT",
+    "license": "(MIT and LicenseRef-Icinga-Bundled-Upstream)",
     "type": "project",
     "homepage": "https://github.com/Icinga/icinga-php-thirdparty",
     "require": {
