@@ -32,7 +32,7 @@ fi
 
 git rm -rf vendor
 rm -rf vendor
-composer install || fail "composer install failed"
+composer install --no-dev --optimize-autoloader || fail "composer install failed"
 git add vendor
 find asset/ -type f | xargs -L1 git add -f
 echo "v$VERSION" > VERSION
