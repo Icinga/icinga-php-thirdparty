@@ -1,6 +1,20 @@
-The MIT License
+# MIT License — Applies to Icinga-authored Files
 
-Copyright (c) 2018 Icinga GmbH https://www.icinga.com
+This package contains both Icinga-authored packaging glue and bundled
+third-party components.
+
+The MIT license below applies to Icinga-authored files in this package
+unless a file or directory states otherwise. This includes repository metadata,
+helper scripts, and other Icinga-specific glue code.
+
+Bundled third-party components are not covered by this license. They remain
+available under their respective upstream licenses. See
+[`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md) for bundled components
+and shipped assets under licenses other than MIT, including relevant indirect
+dependencies, and see the bundled license files under `vendor/` and `asset/`
+for the full license texts shipped with this package.
+
+Copyright (c) 2018 Icinga GmbH https://icinga.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
