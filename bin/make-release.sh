@@ -32,7 +32,7 @@ fi
 
 git rm -rf vendor
 rm -rf vendor
-composer install || fail "composer install failed"
+composer install --no-dev --optimize-autoloader || fail "composer install failed"
 git add vendor
 find asset/ -type f | xargs -L1 git add -f
 echo "v$VERSION" > VERSION
@@ -42,7 +42,7 @@ git commit -m "Version v$VERSION"
 composer validate --no-check-all --strict || fail "Composer validate failed"
 
 if [ -z "$NO_OPT" ]; then
-  git tag -a v$VERSION -m "Version v$VERSION"
+  git tag -s v$VERSION -m "Version v$VERSION"
   echo "Finished, tagged v$VERSION"
   echo "Now please run:"
 else
