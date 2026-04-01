@@ -23,7 +23,7 @@
         "ezyang/htmlpurifier": "^4.19",
         "guzzlehttp/guzzle": "^7.10",
         "guzzlehttp/psr7": "^2.9",
-        "icinga/zf1": ">=2.0.0",
+        "icinga/zf1": "^2.0",
         "jfcherng/php-diff": "^6.16.2",
         "parsedown/parsedown": "^1.8",
         "predis/predis": "^3.4.2",
