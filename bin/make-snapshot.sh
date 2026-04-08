@@ -19,10 +19,9 @@ fi
 
 git checkout -b $BRANCH
 
-git mv composer.lock composer.lock.bak
-git commit -am "Backup composer.lock"
-git merge --no-ff -m "Merge latest tag, package pipelines require it" $LATEST_TAG || (git checkout --ours composer.lock.bak && git add composer.lock.bak && git commit --no-edit)
-git mv -f composer.lock.bak composer.lock
-git commit -am "Restore composer.lock" || true # in case composer.lock was not modified
+git merge --no-ff --no-commit -m "Merge latest tag, package pipelines require it" $LATEST_TAG || true
+git restore -WS composer.json
+git restore -WS composer.lock
+git commit --no-edit
 
 bin/make-release.sh "$NEXT_VERSION-dev" --no-checkout
