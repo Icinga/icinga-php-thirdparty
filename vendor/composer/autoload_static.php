@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
+class ComposerStaticInit4a001cab1f055862d7358cec5f70613c
 {
     public static $files = array (
         'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
@@ -192,7 +192,6 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
             'Clue\\React\\Term\\' => 16,
             'Clue\\React\\Stdio\\' => 17,
             'Clue\\React\\Socks\\' => 17,
-            'Clue\\React\\Soap\\' => 16,
             'Clue\\React\\Redis\\' => 17,
             'Clue\\React\\Mq\\' => 14,
             'Clue\\React\\HttpProxy\\' => 21,
@@ -424,10 +423,6 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
         array (
             0 => __DIR__ . '/..' . '/clue/socks-react/src',
         ),
-        'Clue\\React\\Soap\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/clue/soap-react/src',
-        ),
         'Clue\\React\\Redis\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/redis-react/src',
@@ -459,13 +454,6 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
             'Parsedown' =>
             array (
                 0 => __DIR__ . '/..' . '/parsedown/parsedown',
-            ),
-        ),
-        'L' =>
-        array (
-            'Less' =>
-            array (
-                0 => __DIR__ . '/..' . '/wikimedia/less.php/lib',
             ),
         ),
         'J' =>
@@ -590,16 +578,15 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
         'Safe\\Exceptions\\YazException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/YazException.php',
         'Safe\\Exceptions\\ZipException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/ZipException.php',
         'Safe\\Exceptions\\ZlibException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/ZlibException.php',
-        'lessc' => __DIR__ . '/..' . '/wikimedia/less.php/lessc.inc.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit4a001cab1f055862d7358cec5f70613c::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit4a001cab1f055862d7358cec5f70613c::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit4a001cab1f055862d7358cec5f70613c::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit4a001cab1f055862d7358cec5f70613c::$classMap;
 
         }, null, ClassLoader::class);
     }
