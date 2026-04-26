@@ -34,8 +34,12 @@ final class Client implements ConnectorInterface
     public function __construct(
         #[\SensitiveParameter]
         $socksUri,
-        ConnectorInterface $connector = null
+        $connector = null
     ) {
+        if ($connector !== null && !$connector instanceof ConnectorInterface) { // manual type check to support legacy PHP < 7.1
+            throw new InvalidArgumentException('Argument #2 ($connector) expected null|React\Socket\ConnectorInterface');
+        }
+
         // support `sockss://` scheme for SOCKS over TLS
         // support `socks+unix://` scheme for Unix domain socket (UDS) paths
         if (preg_match('/^(socks(?:5|4)?)(s|\+unix):\/\/(.*?@)?(.+?)$/', $socksUri, $match)) {
@@ -180,6 +184,8 @@ final class Client implements ConnectorInterface
             // either close active connection or cancel pending connection attempt
             $connecting->then(function (ConnectionInterface $stream) {
                 $stream->close();
+            }, function () {
+                // ignore to avoid reporting unhandled rejection
             });
             $connecting->cancel();
         });
@@ -201,7 +207,9 @@ final class Client implements ConnectorInterface
                 // avoid garbage references by replacing all closures in call stack.
                 // what a lovely piece of code!
                 $r = new \ReflectionProperty('Exception', 'trace');
-                $r->setAccessible(true);
+                if (PHP_VERSION_ID < 80100) {
+                    $r->setAccessible(true);
+                }
                 $trace = $r->getValue($e);
 
                 // Exception trace arguments are not available on some PHP 7.4 installs
@@ -451,7 +459,7 @@ final class Client implements ConnectorInterface
                 // IPv6 address => skip IP and port
                 return $reader->readLength(18);
             } else {
-                throw new Exception('Invalid SOCKS reponse: Invalid address type');
+                throw new Exception('Invalid SOCKS response: Invalid address type');
             }
         });
     }

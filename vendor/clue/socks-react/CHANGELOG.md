@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.5.0 (2026-04-14)
+
+*   Feature: Improve PHP 8.5+, PHP 8.4+, PHP 8.3+ and PHP 8.2+ support.
+    (#118, #123 and #124 by @clue and #113 by @yadaiio)
+
+*   Feature / Fix: Update close handler to avoid unhandled promise rejections.
+    (#117 by @clue)
+
+*   Fix: Avoid unneeded shutdown timer on already closed connection.
+    (#125 by @clue)
+
+*   Minor documentation improvements.
+    (#112 by @yadaiio)
+
+*   Improve test suite, use reactphp/async instead of clue/reactphp-block and support legacy PHP 7.2 with PHPUnit 8.5.
+    (#121 by @dinooo13 and @clue and #116, #120 and #122 by @clue)
+
 ## 1.4.0 (2022-08-31)
 
 *   Feature: Full support for PHP 8.1 and PHP 8.2.
@@ -176,7 +193,7 @@
 
     ```php
     $promise = $proxy->connect('imap.example.com:143');
-    $promise->then(null, function (Exeption $e) {
+    $promise->then(null, function (Exception $e) {
         if ($e->getCode() === SOCKET_EACCES) {
             echo 'Failed to authenticate with proxy!';
         }
@@ -250,7 +267,7 @@
 
 ## 0.7.0 (2017-04-14)
 
-*   Feature / BC break: Replace depreacted SocketClient with Socket v0.7 and
+*   Feature / BC break: Replace deprecated SocketClient with Socket v0.7 and
     use `connect($uri)` instead of `create($host, $port)`
     (#51 by @clue)
 
@@ -470,7 +487,7 @@
 *   First stable release
 *   Async SOCKS `Client` and `Server` implementation
 *   Project was originally part of [clue/socks](https://github.com/clue/php-socks)
-    and was split off from its latest releave v0.4.0
+    and was split off from its latest release v0.4.0
     ([#1](https://github.com/clue/reactphp-socks/issues/1))
 
     > Upgrading from clue/socks v0.4.0? Use namespace `Clue\React\Socks` instead of `Socks` and you're ready to go!
