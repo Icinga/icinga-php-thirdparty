@@ -8,7 +8,6 @@ $baseDir = dirname($vendorDir);
 return array(
     'Zend_' => array($vendorDir . '/icinga/zf1/library'),
     'Parsedown' => array($vendorDir . '/parsedown/parsedown'),
-    'Less' => array($vendorDir . '/wikimedia/less.php/lib'),
     'JShrink' => array($vendorDir . '/tedivm/jshrink/src'),
     'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),
     'AssetLoader' => array($baseDir . '/'),

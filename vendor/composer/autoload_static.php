@@ -4,14 +4,13 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
+class ComposerStaticInit99ddac94a7f5f494cbd57bae2432989d
 {
     public static $files = array (
         'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-        '972fda704d680a3a53c68e34e193cb22' => __DIR__ . '/..' . '/react/promise-timer/src/functions_include.php',
         '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
         '72243e5536b63e298acb6476f01f1aff' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/special_cases.php',
@@ -95,13 +94,13 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
         'fe43ca06499ac37bc2dedd823af71eb5' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/zip.php',
         '356736db98a6834f0a886b8d509b0ecd' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/zlib.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
+        '972fda704d680a3a53c68e34e193cb22' => __DIR__ . '/..' . '/react/promise-timer/src/functions_include.php',
         '0174385c3be07e86008907d06ee66531' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/Rule/Rule.php',
         '98aea6e41b9cb79b379b10f37ba1f0b7' => __DIR__ . '/..' . '/sabberworm/php-css-parser/src/RuleSet/RuleContainer.php',
         '9d2b9fc6db0f153a0a149fefb182415e' => __DIR__ . '/..' . '/symfony/polyfill-php84/bootstrap.php',
         'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
         'ebf8799635f67b5d7248946fe2154f4a' => __DIR__ . '/..' . '/ringcentral/psr7/src/functions_include.php',
         '662a729f963d39afe703c9d9b7ab4a8c' => __DIR__ . '/..' . '/symfony/polyfill-php83/bootstrap.php',
-        'f67ee1ef46ff5893b59dcf4c4e98a0e8' => __DIR__ . '/..' . '/clue/block-react/src/functions_include.php',
         '2cffec82183ee1cea088009cef9a6fc3' => __DIR__ . '/..' . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
@@ -110,6 +109,11 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
     );
 
     public static $prefixLengthsPsr4 = array (
+        'c' =>
+        array (
+            'chillerlan\\Settings\\' => 20,
+            'chillerlan\\QRCode\\' => 18,
+        ),
         'S' =>
         array (
             'Symfony\\Polyfill\\Php84\\' => 23,
@@ -155,13 +159,16 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
             'Psr\\Container\\' => 14,
+            'Psr\\Clock\\' => 10,
             'Predis\\' => 7,
             'PhpParser\\' => 10,
+            'ParagonIE\\ConstantTime\\' => 23,
             'PHPStan\\PhpDocParser\\' => 21,
         ),
         'O' =>
         array (
             'OpenApi\\' => 8,
+            'OTPHP\\' => 6,
         ),
         'M' =>
         array (
@@ -202,7 +209,6 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
             'Clue\\React\\Term\\' => 16,
             'Clue\\React\\Stdio\\' => 17,
             'Clue\\React\\Socks\\' => 17,
-            'Clue\\React\\Soap\\' => 16,
             'Clue\\React\\Redis\\' => 17,
             'Clue\\React\\Mq\\' => 14,
             'Clue\\React\\HttpProxy\\' => 21,
@@ -214,6 +220,14 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
     );
 
     public static $prefixDirsPsr4 = array (
+        'chillerlan\\Settings\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/chillerlan/php-settings-container/src',
+        ),
+        'chillerlan\\QRCode\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/chillerlan/php-qrcode/src',
+        ),
         'Symfony\\Polyfill\\Php84\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php84',
@@ -364,6 +378,10 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
         ),
+        'Psr\\Clock\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/clock/src',
+        ),
         'Predis\\' =>
         array (
             0 => __DIR__ . '/..' . '/predis/predis/src',
@@ -372,6 +390,10 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
+        'ParagonIE\\ConstantTime\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
+        ),
         'PHPStan\\PhpDocParser\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
@@ -379,6 +401,10 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
         'OpenApi\\' =>
         array (
             0 => __DIR__ . '/..' . '/zircote/swagger-php/src',
+        ),
+        'OTPHP\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/spomky-labs/otphp/src',
         ),
         'Masterminds\\' =>
         array (
@@ -458,10 +484,6 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
         array (
             0 => __DIR__ . '/..' . '/clue/socks-react/src',
         ),
-        'Clue\\React\\Soap\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/clue/soap-react/src',
-        ),
         'Clue\\React\\Redis\\' =>
         array (
             0 => __DIR__ . '/..' . '/clue/redis-react/src',
@@ -493,13 +515,6 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
             'Parsedown' =>
             array (
                 0 => __DIR__ . '/..' . '/parsedown/parsedown',
-            ),
-        ),
-        'L' =>
-        array (
-            'Less' =>
-            array (
-                0 => __DIR__ . '/..' . '/wikimedia/less.php/lib',
             ),
         ),
         'J' =>
@@ -540,7 +555,14 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
         'Dompdf\\Cpdf' => __DIR__ . '/..' . '/dompdf/dompdf/lib/Cpdf.php',
         'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
         'Override' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/Override.php',
+        'Pdo\\Dblib' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Dblib.php',
+        'Pdo\\Firebird' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Firebird.php',
+        'Pdo\\Mysql' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Mysql.php',
+        'Pdo\\Odbc' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Odbc.php',
+        'Pdo\\Pgsql' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Pgsql.php',
+        'Pdo\\Sqlite' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/Pdo/Sqlite.php',
         'ReflectionConstant' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/ReflectionConstant.php',
+        'RoundingMode' => __DIR__ . '/..' . '/symfony/polyfill-php84/Resources/stubs/RoundingMode.php',
         'SQLite3Exception' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/SQLite3Exception.php',
         'Safe\\DateTime' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/DateTime.php',
         'Safe\\DateTimeImmutable' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/DateTimeImmutable.php',
@@ -625,16 +647,15 @@ class ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b
         'Safe\\Exceptions\\YazException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/YazException.php',
         'Safe\\Exceptions\\ZipException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/ZipException.php',
         'Safe\\Exceptions\\ZlibException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/ZlibException.php',
-        'lessc' => __DIR__ . '/..' . '/wikimedia/less.php/lessc.inc.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit2d4e2c1b564e581804703a616ba4fd3b::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit99ddac94a7f5f494cbd57bae2432989d::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit99ddac94a7f5f494cbd57bae2432989d::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit99ddac94a7f5f494cbd57bae2432989d::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit99ddac94a7f5f494cbd57bae2432989d::$classMap;
 
         }, null, ClassLoader::class);
     }
