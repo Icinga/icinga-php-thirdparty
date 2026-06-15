@@ -714,29 +714,29 @@
         },
         {
             "name": "clue/stdio-react",
-            "version": "v2.6.0",
+            "version": "v2.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/reactphp-stdio.git",
-                "reference": "dfa6c378aabdff718202d4e2453f752c38ea3399"
+                "reference": "d8ced39f09f1f062e4a7f006aa6739f870eefb37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/reactphp-stdio/zipball/dfa6c378aabdff718202d4e2453f752c38ea3399",
-                "reference": "dfa6c378aabdff718202d4e2453f752c38ea3399",
+                "url": "https://api.github.com/repos/clue/reactphp-stdio/zipball/d8ced39f09f1f062e4a7f006aa6739f870eefb37",
+                "reference": "d8ced39f09f1f062e4a7f006aa6739f870eefb37",
                 "shasum": ""
             },
             "require": {
                 "clue/term-react": "^1.0 || ^0.1.1",
                 "clue/utf8-react": "^1.0 || ^0.1",
                 "php": ">=5.3",
-                "react/event-loop": "^1.2",
-                "react/stream": "^1.2"
+                "react/event-loop": "^1.6",
+                "react/stream": "^1.4"
             },
             "require-dev": {
                 "clue/arguments": "^2.0",
                 "clue/commander": "^1.2",
-                "phpunit/phpunit": "^9.3 || ^5.7 || ^4.8.35"
+                "phpunit/phpunit": "^9.6 || ^8.5 || ^5.7 || ^4.8.36"
             },
             "suggest": {
                 "ext-mbstring": "Using ext-mbstring should provide slightly better performance for handling I/O"
@@ -774,7 +774,7 @@
             ],
             "support": {
                 "issues": "https://github.com/clue/reactphp-stdio/issues",
-                "source": "https://github.com/clue/reactphp-stdio/tree/v2.6.0"
+                "source": "https://github.com/clue/reactphp-stdio/tree/v2.7.0"
             },
             "funding": [
                 {
@@ -786,7 +786,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-03-18T15:09:30+00:00"
+            "time": "2026-06-14T21:56:40+00:00"
         },
         {
             "name": "clue/term-react",
