@@ -98,7 +98,7 @@ class MergeIntoOpenApi
                         }
                     }
 
-                    $analysis->annotations->offsetUnset($components);
+                    $analysis->removeAnnotation($components);
                 }
 
                 $merge = array_filter($merge, static fn (OA\AbstractAnnotation $annotation): bool => !$annotation instanceof OA\Components);
@@ -106,6 +106,6 @@ class MergeIntoOpenApi
             }
         }
 
-        $openapi->merge($merge, true);
+        $analysis->mergeAnnotations($openapi, $merge, true);
     }
 }

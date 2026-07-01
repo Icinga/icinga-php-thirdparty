@@ -35,8 +35,24 @@ class Stdio extends EventEmitter implements DuplexStreamInterface
      * @param ?WritableStreamInterface $output
      * @param ?Readline                $readline
      */
-    public function __construct(LoopInterface $loop = null, ReadableStreamInterface $input = null, WritableStreamInterface $output = null, Readline $readline = null)
+    public function __construct($loop = null, $input = null, $output = null, $readline = null)
     {
+        if ($loop !== null && !$loop instanceof LoopInterface) { // manual type check to support legacy PHP < 7.1
+            throw new \InvalidArgumentException('Argument #1 ($loop) expected null|React\EventLoop\LoopInterface');
+        }
+
+        if ($input !== null && !$input instanceof ReadableStreamInterface) { // manual type check to support legacy PHP < 7.1
+            throw new \InvalidArgumentException('Argument #2 ($input) expected null|React\Stream\ReadableStreamInterface');
+        }
+
+        if ($output !== null && !$output instanceof WritableStreamInterface) { // manual type check to support legacy PHP < 7.1
+            throw new \InvalidArgumentException('Argument #3 ($output) expected null|React\Stream\WritableStreamInterface');
+        }
+
+        if ($readline !== null && !$readline instanceof Readline) { // manual type check to support legacy PHP < 7.1
+            throw new \InvalidArgumentException('Argument #4 ($readline) expected null|Clue\React\Stdio\Readline');
+        }
+
         if ($input === null) {
             $input = $this->createStdin($loop); // @codeCoverageIgnore
         }
@@ -546,7 +562,7 @@ class Stdio extends EventEmitter implements DuplexStreamInterface
      * @return ReadableStreamInterface
      * @codeCoverageIgnore this is covered by functional tests with/without ext-readline
      */
-    private function createStdin(LoopInterface $loop = null)
+    private function createStdin($loop = null)
     {
         // STDIN not defined ("php -a") or already closed (`fclose(STDIN)`)
         // also support starting program with closed STDIN ("example.php 0<&-")
@@ -586,7 +602,7 @@ class Stdio extends EventEmitter implements DuplexStreamInterface
      * @return WritableStreamInterface
      * @codeCoverageIgnore this is covered by functional tests
      */
-    private function createStdout(LoopInterface $loop = null)
+    private function createStdout($loop = null)
     {
         // STDOUT not defined ("php -a") or already closed (`fclose(STDOUT)`)
         // also support starting program with closed STDOUT ("example.php >&-")

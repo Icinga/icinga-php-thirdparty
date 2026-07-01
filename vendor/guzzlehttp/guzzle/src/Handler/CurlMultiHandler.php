@@ -6,6 +6,7 @@ use Closure;
 use GuzzleHttp\Promise as P;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\TransportSharing;
 use GuzzleHttp\Utils;
 use Psr\Http\Message\RequestInterface;
 
@@ -24,6 +25,11 @@ class CurlMultiHandler
      * @var CurlFactoryInterface
      */
     private $factory;
+
+    /**
+     * @var CurlShareHandleState|null
+     */
+    private $shareHandleState;
 
     /**
      * @var int
@@ -68,9 +74,28 @@ class CurlMultiHandler
     private $deferredCancels = [];
 
     /**
+     * @var string|null Owner signature of the proxy tunnels the multi handle's
+     *                  connection cache may hold
+     */
+    private $proxyTunnelOwner;
+
+    /** @var array<string, int> Count of attached transfers per proxy tunnel signature. */
+    private $activeProxyTunnelSignatures = [];
+
+    /** @var array<int, string> Maps an attached handle id to its proxy tunnel signature. */
+    private $activeProxyTunnelHandles = [];
+
+    /**
+     * @var bool Guards against multi-handle recreation re-entrancy from
+     *           processMessages (a retried transfer re-invokes the handler)
+     */
+    private $processingMessages = false;
+
+    /**
      * This handler accepts the following options:
      *
      * - handle_factory: An optional factory  used to create curl handles
+     * - transport_sharing: Optional transport sharing mode.
      * - select_timeout: Optional timeout (in seconds) to block before timing
      *   out while selecting curl handles. Defaults to 1 second.
      * - options: An associative array of CURLMOPT_* options and
@@ -78,12 +103,27 @@ class CurlMultiHandler
      */
     public function __construct(array $options = [])
     {
-        $this->factory = $options['handle_factory'] ?? new CurlFactory(50);
+        CurlShareHandleState::assertNoRequiredSharingCustomFactoryConflict($options, 'CurlMultiHandler');
+        $transportSharing = $options['transport_sharing'] ?? null;
+        $sharingMode = CurlShareHandleState::normalizeMode($transportSharing, 'transport_sharing');
+
+        if (\array_key_exists('handle_factory', $options) && $options['handle_factory'] !== null) {
+            $this->shareHandleState = null;
+            $this->factory = $options['handle_factory'];
+        } else {
+            $this->shareHandleState = $sharingMode !== TransportSharing::NONE
+                ? CurlShareHandleState::fromOption($transportSharing)
+                : null;
+
+            $this->factory = $this->shareHandleState !== null
+                ? new CurlFactory(50, $this->shareHandleState->mode, $this->shareHandleState->handle)
+                : new CurlFactory(50);
+        }
 
         if (isset($options['select_timeout'])) {
             $this->selectTimeout = $options['select_timeout'];
         } elseif ($selectTimeout = Utils::getenv('GUZZLE_CURL_SELECT_TIMEOUT')) {
-            @trigger_error('Since guzzlehttp/guzzle 7.2.0: Using environment variable GUZZLE_CURL_SELECT_TIMEOUT is deprecated. Use option "select_timeout" instead.', \E_USER_DEPRECATED);
+            \trigger_deprecation('guzzlehttp/guzzle', '7.2', 'The GUZZLE_CURL_SELECT_TIMEOUT environment variable is deprecated; use the "select_timeout" option instead.');
             $this->selectTimeout = (int) $selectTimeout;
         } else {
             $this->selectTimeout = 1;
@@ -129,14 +169,20 @@ class CurlMultiHandler
     public function __destruct()
     {
         if (isset($this->_mh)) {
-            \curl_multi_close($this->_mh);
-            unset($this->_mh);
+            try {
+                \curl_multi_close($this->_mh);
+            } catch (\Throwable $e) {
+                // Destructors must not throw.
+            } finally {
+                unset($this->_mh);
+            }
         }
     }
 
     public function __invoke(RequestInterface $request, array $options): PromiseInterface
     {
         $easy = $this->factory->create($request, $options);
+        $this->applyProxyTunnelOwnership($easy);
         $id = (int) $easy->handle;
 
         $promise = new Promise(
@@ -152,6 +198,130 @@ class CurlMultiHandler
     }
 
     /**
+     * Isolates the connection cache when the request's proxy tunnel section
+     * differs from the one the multi handle's cache may already hold.
+     */
+    private function applyProxyTunnelOwnership(EasyHandle $easy): void
+    {
+        $signature = $easy->proxyTunnelSignature;
+        if ($signature === null || $signature === $this->proxyTunnelOwner) {
+            return;
+        }
+
+        if ($this->proxyTunnelOwner === null) {
+            // No in-domain transfer has ever run on this multi handle: latch
+            // the owner without destroying pooled direct connections.
+            $this->proxyTunnelOwner = $signature;
+
+            return;
+        }
+
+        if (
+            $this->handles === []
+            && !$this->executingMulti
+            && !$this->processingMessages
+            && $this->deferredCancels === []
+        ) {
+            // Idle: hand the connection cache over by recreating the multi
+            // handle (unsetting re-arms the lazy __get initializer, which
+            // re-applies the CURLMOPT_* options).
+            if (isset($this->_mh)) {
+                \curl_multi_close($this->_mh);
+                unset($this->_mh);
+            }
+            $this->proxyTunnelOwner = $signature;
+
+            return;
+        }
+
+        // Busy: isolate this transfer from the owner's pooled tunnels.
+        $this->isolateProxyTunnelTransfer($easy);
+    }
+
+    private function addCurlHandle(EasyHandle $easy): void
+    {
+        $this->isolateFromForeignActiveProxyTunnel($easy);
+        \curl_multi_add_handle($this->_mh, $easy->handle);
+        $this->markProxyTunnelActive($easy);
+    }
+
+    /**
+     * @param resource|\CurlHandle $handle
+     */
+    private function removeCompletedHandleFromMulti(int $id, $handle): void
+    {
+        \curl_multi_remove_handle($this->_mh, $handle);
+        $this->unmarkProxyTunnelActiveById($id);
+    }
+
+    private function isolateFromForeignActiveProxyTunnel(EasyHandle $easy): void
+    {
+        $signature = $easy->proxyTunnelSignature;
+
+        if ($signature === null || $this->activeProxyTunnelSignatures === []) {
+            return;
+        }
+
+        if (\count($this->activeProxyTunnelSignatures) === 1 && isset($this->activeProxyTunnelSignatures[$signature])) {
+            return;
+        }
+
+        $this->isolateProxyTunnelTransfer($easy);
+    }
+
+    private function isolateProxyTunnelTransfer(EasyHandle $easy): void
+    {
+        // Unqualified curl_setopt so the test bootstrap shadow records it.
+        curl_setopt($easy->handle, \CURLOPT_FRESH_CONNECT, true);
+        curl_setopt($easy->handle, \CURLOPT_FORBID_REUSE, true);
+    }
+
+    private function markProxyTunnelActive(EasyHandle $easy): void
+    {
+        $signature = $easy->proxyTunnelSignature;
+        if ($signature === null) {
+            return;
+        }
+
+        $id = (int) $easy->handle;
+        if (isset($this->activeProxyTunnelHandles[$id])) {
+            if ($this->activeProxyTunnelHandles[$id] === $signature) {
+                return;
+            }
+
+            $this->unmarkProxyTunnelActiveById($id);
+        }
+
+        $this->activeProxyTunnelHandles[$id] = $signature;
+        $this->activeProxyTunnelSignatures[$signature] = ($this->activeProxyTunnelSignatures[$signature] ?? 0) + 1;
+    }
+
+    private function unmarkProxyTunnelActive(EasyHandle $easy): void
+    {
+        $this->unmarkProxyTunnelActiveById((int) $easy->handle);
+    }
+
+    private function unmarkProxyTunnelActiveById(int $id): void
+    {
+        if (!isset($this->activeProxyTunnelHandles[$id])) {
+            return;
+        }
+
+        $signature = $this->activeProxyTunnelHandles[$id];
+        unset($this->activeProxyTunnelHandles[$id]);
+
+        if (!isset($this->activeProxyTunnelSignatures[$signature])) {
+            return;
+        }
+
+        --$this->activeProxyTunnelSignatures[$signature];
+
+        if ($this->activeProxyTunnelSignatures[$signature] <= 0) {
+            unset($this->activeProxyTunnelSignatures[$signature]);
+        }
+    }
+
+    /**
      * Ticks the curl event loop.
      */
     public function tick(): void
@@ -162,10 +332,7 @@ class CurlMultiHandler
             foreach ($this->delays as $id => $delay) {
                 if ($currentTime >= $delay) {
                     unset($this->delays[$id]);
-                    \curl_multi_add_handle(
-                        $this->_mh,
-                        $this->handles[$id]['easy']->handle
-                    );
+                    $this->addCurlHandle($this->handles[$id]['easy']);
                 }
             }
         }
@@ -243,7 +410,7 @@ class CurlMultiHandler
         $id = (int) $easy->handle;
         $this->handles[$id] = $entry;
         if (empty($easy->options['delay'])) {
-            \curl_multi_add_handle($this->_mh, $easy->handle);
+            $this->addCurlHandle($easy);
         } else {
             $this->delays[$id] = Utils::currentTime() + ($easy->options['delay'] / 1000);
         }
@@ -259,7 +426,7 @@ class CurlMultiHandler
     private function cancel($id): bool
     {
         if (!is_int($id)) {
-            trigger_deprecation('guzzlehttp/guzzle', '7.4', 'Not passing an integer to %s::%s() is deprecated and will cause an error in 8.0.', __CLASS__, __FUNCTION__);
+            \trigger_deprecation('guzzlehttp/guzzle', '7.4', 'Not passing an int to %s::%s() is deprecated and will cause an error in 8.0.', __CLASS__, __FUNCTION__);
         }
 
         // Cannot cancel if it has been processed.
@@ -299,6 +466,7 @@ class CurlMultiHandler
     {
         $handle = $easy->handle;
         \curl_multi_remove_handle($this->_mh, $handle);
+        $this->unmarkProxyTunnelActive($easy);
 
         if (PHP_VERSION_ID < 80000) {
             \curl_close($handle);
@@ -307,31 +475,47 @@ class CurlMultiHandler
 
     private function processMessages(): void
     {
-        while ($done = \curl_multi_info_read($this->_mh)) {
-            if ($done['msg'] !== \CURLMSG_DONE) {
-                // if it's not done, then it would be premature to remove the handle. ref https://github.com/guzzle/guzzle/pull/2892#issuecomment-945150216
-                continue;
-            }
-            if (!isset($done['handle'])) {
-                // Work around a PHP issue where cancelled transfers may omit the handle.
-                // Remove this once we no longer support PHP versions before the fix in
-                // https://github.com/php/php-src/pull/16302.
-                continue;
-            }
-            $id = (int) $done['handle'];
-            \curl_multi_remove_handle($this->_mh, $done['handle']);
+        // CurlFactory::finish can retry a transfer by re-invoking this handler
+        // from inside this loop; the guard keeps that re-entry from recreating
+        // the multi handle mid-iteration (see applyProxyTunnelOwnership).
+        $this->processingMessages = true;
 
-            if (!isset($this->handles[$id])) {
-                // Probably was cancelled.
-                continue;
-            }
+        try {
+            while ($done = \curl_multi_info_read($this->_mh)) {
+                if ($done['msg'] !== \CURLMSG_DONE) {
+                    // if it's not done, then it would be premature to remove the handle. ref https://github.com/guzzle/guzzle/pull/2892#issuecomment-945150216
+                    continue;
+                }
+                if (!isset($done['handle'])) {
+                    // Work around a PHP issue where cancelled transfers may omit the handle.
+                    // Remove this once we no longer support PHP versions before the fix in
+                    // https://github.com/php/php-src/pull/16302.
+                    continue;
+                }
+                $id = (int) $done['handle'];
+                $this->removeCompletedHandleFromMulti($id, $done['handle']);
 
-            $entry = $this->handles[$id];
-            unset($this->handles[$id], $this->delays[$id]);
-            $entry['easy']->errno = $done['result'];
-            $entry['deferred']->resolve(
-                CurlFactory::finish($this, $entry['easy'], $this->factory)
-            );
+                if (!isset($this->handles[$id])) {
+                    // Probably was cancelled.
+                    continue;
+                }
+
+                $entry = $this->handles[$id];
+                unset($this->handles[$id], $this->delays[$id]);
+                $entry['easy']->errno = $done['result'];
+
+                try {
+                    $result = CurlFactory::finish($this, $entry['easy'], $this->factory);
+                } catch (\Throwable $e) {
+                    $entry['deferred']->reject($e);
+
+                    continue;
+                }
+
+                $entry['deferred']->resolve($result);
+            }
+        } finally {
+            $this->processingMessages = false;
         }
     }
 

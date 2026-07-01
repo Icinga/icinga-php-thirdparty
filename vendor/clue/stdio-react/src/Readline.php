@@ -37,7 +37,12 @@ class Readline extends EventEmitter implements ReadableStreamInterface
     private $autocomplete = null;
     private $autocompleteSuggestions = 8;
 
-    public function __construct(ReadableStreamInterface $input, WritableStreamInterface $output, EventEmitterInterface $base = null)
+    /**
+     * @param ReadableStreamInterface $input
+     * @param WritableStreamInterface $output
+     * @param ?EventEmitterInterface  $base
+     */
+    public function __construct(ReadableStreamInterface $input, WritableStreamInterface $output, $base = null)
     {
         $this->input = $input;
         $this->output = $output;
@@ -48,6 +53,10 @@ class Readline extends EventEmitter implements ReadableStreamInterface
         }
         // push input through control code parser
         $parser = new ControlCodeParser($input);
+
+        if ($base !== null && !$base instanceof EventEmitterInterface) { // manual type check to support legacy PHP < 7.1
+            throw new \InvalidArgumentException('Argument #3 ($base) expected null|Evenement\EventEmitterInterface');
+        }
 
         $that = $this;
         $codes = array(
@@ -778,9 +787,11 @@ class Readline extends EventEmitter implements ReadableStreamInterface
     /**
      * Will be invoked for character(s) that could not otherwise be processed by the sequencer
      *
+     * @param string                  $chars
+     * @param ?EventEmitterInterface  $base
      * @internal
      */
-    public function onFallback($chars, EventEmitterInterface $base = null)
+    public function onFallback($chars, $base = null)
     {
         // check if there's any special key binding for any of the chars
         $buffer = '';

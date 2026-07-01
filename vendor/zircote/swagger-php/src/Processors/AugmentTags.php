@@ -61,7 +61,9 @@ class AugmentTags
         $declaredTags = [];
         if (!Generator::isDefault($analysis->openapi->tags)) {
             foreach ($analysis->openapi->tags as $tag) {
-                $declaredTags[$tag->name] = $tag;
+                if (!empty($tag->name)) {
+                    $declaredTags[$tag->name] = $tag;
+                }
             }
         }
         if ($declaredTags) {
@@ -74,7 +76,7 @@ class AugmentTags
             $declatedTagNames = array_keys($declaredTags);
             foreach ($usedTagNames as $tagName) {
                 if (!in_array($tagName, $declatedTagNames)) {
-                    $analysis->openapi->merge([new OA\Tag([
+                    $analysis->mergeAnnotations($analysis->openapi, [new OA\Tag([
                         'name' => $tagName,
                         'description' => $this->withDescription
                             ? $tagName
@@ -104,7 +106,7 @@ class AugmentTags
         foreach ($declaredTags as $tag) {
             if (!in_array($tag->name, $tagsToKeep)) {
                 if (false !== $index = array_search($tag, $analysis->openapi->tags, true)) {
-                    $analysis->annotations->offsetUnset($tag);
+                    $analysis->removeAnnotation($tag);
                     unset($analysis->openapi->tags[$index]);
                     $analysis->openapi->tags = array_values($analysis->openapi->tags);
                 }

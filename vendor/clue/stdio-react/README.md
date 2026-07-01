@@ -1,6 +1,7 @@
 # clue/reactphp-stdio
 
-[![CI status](https://github.com/clue/reactphp-stdio/workflows/CI/badge.svg)](https://github.com/clue/reactphp-stdio/actions)
+[![CI status](https://github.com/clue/reactphp-stdio/actions/workflows/ci.yml/badge.svg)](https://github.com/clue/reactphp-stdio/actions)
+[![code coverage](https://img.shields.io/badge/code%20coverage-100%25-success)](#tests)
 [![installs on Packagist](https://img.shields.io/packagist/dt/clue/stdio-react?color=blue&label=installs%20on%20Packagist)](https://packagist.org/packages/clue/stdio-react)
 
 Async, event-driven and UTF-8 aware console input & output (STDIN, STDOUT) for
@@ -38,13 +39,11 @@ without requiring any extensions or special installation.
 
 ## Support us
 
-We invest a lot of time developing, maintaining and updating our awesome
-open-source projects. You can help us sustain this high-quality of our work by
-[becoming a sponsor on GitHub](https://github.com/sponsors/clue). Sponsors get
-numerous benefits in return, see our [sponsoring page](https://github.com/sponsors/clue)
-for details.
-
-Let's take these projects to the next level together! 🚀
+I maintain an ecosystem of open-source projects that have been downloaded
+hundreds of millions of times and are actively maintained and continuously
+improved. If you find any of these projects useful, please consider
+[becoming a sponsor on GitHub](https://github.com/sponsors/clue). Your support
+helps ensure long-term maintenance and continued development. Thank you! 🚀
 
 ## Quickstart example
 
@@ -618,7 +617,7 @@ $stdio->write('hello world!' . PHP_EOL);
 ```
 
 Depending on your program, it may or may not be reasonable to
-replace all such occurences.
+replace all such occurrences.
 As an alternative, you may utilize output buffering that will
 automatically forward all write events to the [`Stdio`](#stdio)
 instance like this:
@@ -642,7 +641,7 @@ This project follows [SemVer](https://semver.org/).
 This will install the latest supported version:
 
 ```bash
-$ composer require clue/stdio-react:^2.6
+composer require clue/stdio-react:^2.7
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
@@ -653,7 +652,7 @@ HHVM.
 It's *highly recommended to use the latest supported PHP version* for this project.
 
 Internally, it will use the `ext-mbstring` to count and measure string sizes.
-If this extension is missing, then this library will use a slighty slower Regex
+If this extension is missing, then this library will use a slightly slower Regex
 work-around that should otherwise work equally well.
 Installing `ext-mbstring` is highly recommended.
 
@@ -680,21 +679,29 @@ To run the test suite, you first need to clone this repo and then install all
 dependencies [through Composer](https://getcomposer.org/):
 
 ```bash
-$ composer install
+composer install
 ```
 
 To run the test suite, go to the project root and run:
 
 ```bash
-$ vendor/bin/phpunit
+vendor/bin/phpunit
+```
+
+The test suite is set up to always ensure 100% code coverage across all
+supported environments. If you have the Xdebug extension installed, you can also
+generate a code coverage report locally like this:
+
+```bash
+XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-text
 ```
 
 ## License
 
 This project is released under the permissive [MIT license](LICENSE).
 
-> Did you know that I offer custom development services and issuing invoices for
-  sponsorships of releases and for contributions? Contact me (@clue) for details.
+> Do you use this project in a commercial setting? Sponsoring with invoicing is
+  available, contact me ([@clue](https://github.com/clue)) for details.
 
 ## More
 

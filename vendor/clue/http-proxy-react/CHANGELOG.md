@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.10.0 (2026-06-29)
+
+*   Feature: Remove abandoned `ringcentral/psr7` dependency to support PSR-7 v2 (`psr/http-message`).
+    (#65 by @kwhat and @clue)
+
+*   Feature: Improve PHP 8.5+ and PHP 8.4+ support and update test environment.
+    (#59, #60 and #67 by @clue)
+
+*   Improve test suite to ensure 100% code coverage and support legacy PHP 7.2 with PHPUnit 8.5.
+    (#66 and #68 by @clue)
+
 ## 1.9.0 (2024-04-10)
 
 *   Feature / Fix: Forward compatibility with Promise v3.

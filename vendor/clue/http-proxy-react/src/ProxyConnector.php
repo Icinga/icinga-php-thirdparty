@@ -5,7 +5,6 @@ namespace Clue\React\HttpProxy;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
-use RingCentral\Psr7;
 use React\Promise;
 use React\Promise\Deferred;
 use React\Socket\ConnectionInterface;
@@ -60,7 +59,7 @@ class ProxyConnector implements ConnectorInterface
     public function __construct(
         #[\SensitiveParameter]
         $proxyUrl,
-        ConnectorInterface $connector = null,
+        $connector = null,
         array $httpHeaders = array()
     ) {
         // support `http+unix://` scheme for Unix domain socket (UDS) paths
@@ -71,7 +70,7 @@ class ProxyConnector implements ConnectorInterface
             // connector uses Unix transport scheme and explicit path given
             $connector = new FixedUriConnector(
                 'unix://' . $match[2],
-                $connector ?: new UnixConnector()
+                $connector ?: new UnixConnector() // @codeCoverageIgnore
             );
         }
 
@@ -82,6 +81,10 @@ class ProxyConnector implements ConnectorInterface
         $parts = parse_url($proxyUrl);
         if (!$parts || !isset($parts['scheme'], $parts['host']) || ($parts['scheme'] !== 'http' && $parts['scheme'] !== 'https')) {
             throw new InvalidArgumentException('Invalid proxy URL "' . $proxyUrl . '"');
+        }
+
+        if ($connector !== null && !$connector instanceof ConnectorInterface) { // manual type check to support legacy PHP < 7.1
+            throw new \InvalidArgumentException('Argument #2 ($connector) expected null|React\Socket\ConnectorInterface');
         }
 
         // apply default port and TCP/TLS transport for given scheme
@@ -179,30 +182,30 @@ class ProxyConnector implements ConnectorInterface
                     $fn = null;
 
                     // try to parse headers as response message
-                    try {
-                        $response = Psr7\parse_response(substr($buffer, 0, $pos));
-                    } catch (Exception $e) {
+                    if (!preg_match('/^HTTP\/1\.[01] ([0-9]{3})( .*)?\r\n/', $buffer, $matches)) {
                         $deferred->reject(new RuntimeException(
                             'Connection to ' . $uri . ' failed because proxy returned invalid response (EBADMSG)',
-                            defined('SOCKET_EBADMSG') ? SOCKET_EBADMSG: 71,
-                            $e
+                            defined('SOCKET_EBADMSG') ? SOCKET_EBADMSG : 71
                         ));
                         $stream->close();
                         return;
                     }
 
-                    if ($response->getStatusCode() === 407) {
+                    $statusCode = (int) $matches[1];
+                    $reasonPhrase = isset($matches[2]) ? trim($matches[2]) : '';
+
+                    if ($statusCode === 407) {
                         // map status code 407 (Proxy Authentication Required) to EACCES
                         $deferred->reject(new RuntimeException(
-                            'Connection to ' . $uri . ' failed because proxy denied access with HTTP error code ' . $response->getStatusCode() . ' (' . $response->getReasonPhrase() . ') (EACCES)',
+                            'Connection to ' . $uri . ' failed because proxy denied access with HTTP error code ' . $statusCode . ' (' . $reasonPhrase . ') (EACCES)',
                             defined('SOCKET_EACCES') ? SOCKET_EACCES : 13
                         ));
                         $stream->close();
                         return;
-                    } elseif ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+                    } elseif ($statusCode < 200 || $statusCode >= 300) {
                         // map non-2xx status code to ECONNREFUSED
                         $deferred->reject(new RuntimeException(
-                            'Connection to ' . $uri . ' failed because proxy refused connection with HTTP error code ' . $response->getStatusCode() . ' (' . $response->getReasonPhrase() . ') (ECONNREFUSED)',
+                            'Connection to ' . $uri . ' failed because proxy refused connection with HTTP error code ' . $statusCode . ' (' . $reasonPhrase . ') (ECONNREFUSED)',
                             defined('SOCKET_ECONNREFUSED') ? SOCKET_ECONNREFUSED : 111
                         ));
                         $stream->close();
@@ -257,7 +260,9 @@ class ProxyConnector implements ConnectorInterface
             // avoid garbage references by replacing all closures in call stack.
             // what a lovely piece of code!
             $r = new \ReflectionProperty('Exception', 'trace');
-            $r->setAccessible(true);
+            if (PHP_VERSION_ID < 80100) {
+                $r->setAccessible(true); // @codeCoverageIgnore
+            }
             $trace = $r->getValue($e);
 
             // Exception trace arguments are not available on some PHP 7.4 installs

@@ -77,7 +77,7 @@ class AugmentParameters implements GeneratorAwareInterface
 
                 $this->generator->getTypeResolver()->augmentSchemaType($analysis, $schema);
 
-                $parameter->merge([new OA\Schema([
+                $analysis->mergeAnnotations($parameter, [new OA\Schema([
                     'type' => $schema->type,
                     'format' => $schema->format,
                     'items' => $schema->items,
@@ -86,7 +86,7 @@ class AugmentParameters implements GeneratorAwareInterface
                     'anyOf' => $schema->anyOf,
                     'ref' => $schema->ref,
                     '_context' => new Context([
-                        'nested' => $this,
+                        'nested' => null,
                         'comment' => null,
                         'reflector' => $context->reflector,
                     ], $context)]),
@@ -113,14 +113,14 @@ class AugmentParameters implements GeneratorAwareInterface
             $keys = [];
             $parametersWithoutKey = [];
             foreach ($analysis->openapi->components->parameters as $parameter) {
-                if (!Generator::isDefault($parameter->parameter)) {
+                if (!Generator::isDefault($parameter->parameter) && $parameter->parameter !== null) {
                     $keys[$parameter->parameter] = $parameter;
                 } else {
                     $parametersWithoutKey[] = $parameter;
                 }
             }
             foreach ($parametersWithoutKey as $parameter) {
-                if (!Generator::isDefault($parameter->name) && empty($keys[$parameter->name])) {
+                if (!Generator::isDefault($parameter->name) && $parameter->name !== null && empty($keys[$parameter->name])) {
                     $parameter->parameter = $parameter->name;
                     $keys[$parameter->parameter] = $parameter;
                 }
