@@ -62,14 +62,6 @@ class Serializer
     ];
 
     /**
-     * @param class-string<OA\AbstractAnnotation> $className
-     */
-    protected static function isValidAnnotationClass(string $className): bool
-    {
-        return in_array($className, self::$VALID_ANNOTATIONS);
-    }
-
-    /**
      * Deserialize a string.
      *
      * @param class-string<OA\AbstractAnnotation> $className
@@ -105,6 +97,14 @@ class Serializer
     }
 
     /**
+     * @param class-string<OA\AbstractAnnotation> $className
+     */
+    protected static function isValidAnnotationClass(string $className): bool
+    {
+        return in_array($className, self::$VALID_ANNOTATIONS);
+    }
+
+    /**
      * Do deserialization.
      *
      * @param class-string<OA\AbstractAnnotation> $className
@@ -118,7 +118,7 @@ class Serializer
             }
 
             if (str_starts_with((string) $property, 'x-')) {
-                if (Generator::isDefault($annotation->x)) {
+                if (Undefined::isDefault($annotation->x)) {
                     $annotation->x = [];
                 }
                 $custom = substr((string) $property, 2);
@@ -153,9 +153,9 @@ class Serializer
                 if ($declaration === $property) {
                     if (is_object($value)) {
                         return $this->doDeserialize($value, $nestedClass, $context);
-                    } else {
-                        return $value;
                     }
+
+                    return $value;
                 }
             } elseif (count($declaration) === 1 && $declaration[0] === $property) {
                 // property is an annotation array
@@ -189,7 +189,7 @@ class Serializer
      *
      * @return array|OA\AbstractAnnotation
      */
-    protected function doDeserializeBaseProperty($type, mixed $value, Context $context)
+    protected function doDeserializeBaseProperty(array|string $type, mixed $value, Context $context)
     {
         $isAnnotationClass = is_string($type) && is_subclass_of(trim($type, '[]'), OA\AbstractAnnotation::class);
 

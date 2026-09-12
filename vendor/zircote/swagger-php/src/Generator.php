@@ -10,9 +10,11 @@ use OpenApi\Analysers\AnalyserInterface;
 use OpenApi\Analysers\AttributeAnnotationFactory;
 use OpenApi\Analysers\DocBlockAnnotationFactory;
 use OpenApi\Analysers\ReflectionAnalyser;
-use OpenApi\Annotations as OA;
+use OpenApi\Annotations\OpenApi;
 use OpenApi\Loggers\DefaultLogger;
 use OpenApi\Type\TypeInfoTypeResolver;
+use OpenApi\Utils\Pipeline;
+use OpenApi\Utils\SourceScanner;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -22,19 +24,19 @@ use Psr\Log\LoggerInterface;
  */
 class Generator
 {
-    /**
-     * Allows Annotation classes to know the context of the annotation that is being processed.
-     */
-    public static ?Context $context = null;
-
-    /** @var string Magic value to differentiate between null and undefined. */
-    public const UNDEFINED = '@OA\Generator::UNDEFINED🙈';
+    /** @deprecated Use {@see Undefined::UNDEFINED} instead. */
+    public const UNDEFINED = Undefined::UNDEFINED;
 
     /** @var array<string,string> */
     public const DEFAULT_ALIASES = ['oa' => 'OpenApi\\Annotations'];
 
     /** @var list<string> */
     public const DEFAULT_NAMESPACES = ['OpenApi\\Annotations\\'];
+
+    /**
+     * Allows Annotation classes to know the context of the annotation that is being processed.
+     */
+    public static ?Context $context = null;
 
     /** @var array<string,string> Map of namespace aliases to be supported by doctrine. */
     protected array $aliases;
@@ -71,15 +73,12 @@ class Generator
         $this->setNamespaces(self::DEFAULT_NAMESPACES);
     }
 
+    /**
+     * @deprecated use {@see Undefined::isDefault()} instead
+     */
     public static function isDefault(...$value): bool
     {
-        foreach ($value as $v) {
-            if ($v !== Generator::UNDEFINED) {
-                return false;
-            }
-        }
-
-        return true;
+        return Undefined::isDefault(...$value);
     }
 
     /**
@@ -183,46 +182,6 @@ class Generator
         return $this->config + $this->getDefaultConfig();
     }
 
-    protected function normaliseConfig(array $config): array
-    {
-        $normalised = [];
-        foreach ($config as $key => $value) {
-            if (is_numeric($key)) {
-                $token = explode('=', (string) $value);
-                if (2 === count($token)) {
-                    // 'operationId.hash=false'
-                    [$key, $value] = $token;
-                }
-            }
-
-            if (in_array($value, ['true', 'false'])) {
-                $value = 'true' == $value;
-            }
-
-            if ($isList = (str_ends_with((string) $key, '[]'))) {
-                $key = substr((string) $key, 0, -2);
-            }
-            $token = explode('.', (string) $key);
-            if (2 === count($token)) {
-                // 'operationId.hash' => false
-                // namespaced / processor
-                if ($isList) {
-                    $normalised[$token[0]][$token[1]][] = $value;
-                } else {
-                    $normalised[$token[0]][$token[1]] = $value;
-                }
-            } else {
-                if ($isList) {
-                    $normalised[$key][] = $value;
-                } else {
-                    $normalised[$key] = $value;
-                }
-            }
-        }
-
-        return $normalised;
-    }
-
     /**
      * Set generator and/or processor config.
      *
@@ -298,7 +257,7 @@ class Generator
             }
         };
 
-        if ($this->processorPipeline) {
+        if ($this->processorPipeline instanceof Pipeline) {
             $this->processorPipeline->walk($walker);
         }
 
@@ -380,7 +339,7 @@ class Generator
      * @param null|Analysis $analysis custom analysis instance
      * @param bool          $validate flag to enable/disable validation of the returned spec
      */
-    public function generate(iterable $sources, ?Analysis $analysis = null, bool $validate = true): ?OA\OpenApi
+    public function generate(iterable $sources, ?Analysis $analysis = null, bool $validate = true): ?OpenApi
     {
         $rootContext = new Context([
             'version' => $this->getVersion(),
@@ -395,7 +354,7 @@ class Generator
         // post-processing
         $this->getProcessorPipeline()->process($analysis);
 
-        if ($analysis->openapi) {
+        if ($analysis->openapi instanceof OpenApi) {
             // overwrite default/annotated version
             $analysis->openapi->openapi = $this->getVersion() ?: $analysis->openapi->openapi;
             // update context to provide the same to validation/serialisation code
@@ -410,26 +369,54 @@ class Generator
         return $analysis->openapi;
     }
 
+    protected function normaliseConfig(array $config): array
+    {
+        $normalised = [];
+        foreach ($config as $key => $value) {
+            if (is_numeric($key)) {
+                $token = explode('=', (string) $value);
+                if (2 === count($token)) {
+                    // 'operationId.hash=false'
+                    [$key, $value] = $token;
+                }
+            }
+
+            if (in_array($value, ['true', 'false'])) {
+                $value = 'true' == $value;
+            }
+
+            if ($isList = (str_ends_with((string) $key, '[]'))) {
+                $key = substr((string) $key, 0, -2);
+            }
+            $token = explode('.', (string) $key);
+            if (2 === count($token)) {
+                // 'operationId.hash' => false
+                // namespaced / processor
+                if ($isList) {
+                    $normalised[$token[0]][$token[1]][] = $value;
+                } else {
+                    $normalised[$token[0]][$token[1]] = $value;
+                }
+            } else {
+                if ($isList) {
+                    $normalised[$key][] = $value;
+                } else {
+                    $normalised[$key] = $value;
+                }
+            }
+        }
+
+        return $normalised;
+    }
+
     protected function scanSources(iterable $sources, Analysis $analysis, Context $rootContext): void
     {
         $analyser = $this->getAnalyser();
+        $scanner = new SourceScanner($rootContext->logger);
 
-        foreach ($sources as $source) {
-            if (is_iterable($source)) {
-                $this->scanSources($source, $analysis, $rootContext);
-            } else {
-                $resolvedSource = $source instanceof \SplFileInfo ? $source->getPathname() : realpath($source);
-                if (!$resolvedSource) {
-                    $rootContext->logger->warning(sprintf('Skipping invalid source: %s', $source));
-                    continue;
-                }
-                if (is_dir($resolvedSource)) {
-                    $this->scanSources(new SourceFinder($resolvedSource), $analysis, $rootContext);
-                } else {
-                    $rootContext->logger->debug(sprintf('Analysing source: %s', $resolvedSource));
-                    $analysis->addAnalysis($analyser->fromFile($resolvedSource, $rootContext));
-                }
-            }
+        foreach ($scanner->scan($sources) as $file) {
+            $rootContext->logger->debug(sprintf('Analysing source: %s', $file));
+            $analysis->addAnalysis($analyser->fromFile($file, $rootContext));
         }
     }
 }

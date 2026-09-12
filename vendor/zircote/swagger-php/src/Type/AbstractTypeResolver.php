@@ -7,20 +7,19 @@
 namespace OpenApi\Type;
 
 use OpenApi\Analysis;
+use OpenApi\Annotations\AbstractAnnotation;
 use OpenApi\Annotations as OA;
-use OpenApi\Generator;
 use OpenApi\TypeResolverInterface;
+use OpenApi\Undefined;
+use OpenApi\Utils\TypeMapper;
 
 abstract class AbstractTypeResolver implements TypeResolverInterface
 {
-    protected function type2ref(OA\Schema $schema, Analysis $analysis, string $sourceClass = OA\Schema::class): void
+    protected TypeMapper $typeMapper;
+
+    public function __construct()
     {
-        if (!Generator::isDefault($schema->type) && !is_array($schema->type)) {
-            if ($typeSchema = $analysis->getAnnotationForSource($schema->type, $sourceClass)) {
-                $schema->type = Generator::UNDEFINED;
-                $schema->ref = OA\Components::ref($typeSchema);
-            }
-        }
+        $this->typeMapper = new TypeMapper();
     }
 
     /**
@@ -29,46 +28,34 @@ abstract class AbstractTypeResolver implements TypeResolverInterface
     public function mapNativeType(OA\Schema $schema, $type): bool
     {
         if (is_array($type)) {
-            $mapped = [];
-            foreach ($type as $t) {
-                $mapped[] = $this->native2spec(strtolower((string) $t));
-            }
-
-            $schema->type = $mapped;
+            $schema->type = $this->typeMapper->toSpecTypes(
+                array_map(static fn ($t): string => strtolower((string) $t), $type)
+            );
 
             return true;
         }
 
-        $type = strtolower($type);
-        if (!array_key_exists($type, TypeResolverInterface::NATIVE_TYPE_MAP)) {
+        $result = $this->typeMapper->map($type);
+        if (null === $result) {
             return false;
         }
 
-        $type = TypeResolverInterface::NATIVE_TYPE_MAP[$type];
-        if (is_array($type)) {
-            if (Generator::isDefault($schema->format)) {
-                $schema->format = $type[1];
-            }
-            $type = $type[0];
-        }
-
-        // PHP `mixed` is not a valid OpenAPI type; represent as unconstrained (no type set)
-        if ('mixed' === $type) {
+        if ('mixed' === $result['type']) {
             return true;
         }
 
-        $schema->type = $type;
+        if (null !== $result['format'] && Undefined::isDefault($schema->format)) {
+            $schema->format = $result['format'];
+        }
+
+        $schema->type = $result['type'];
 
         return true;
     }
 
     public function native2spec(string $type): string
     {
-        $mapped = array_key_exists($type, TypeResolverInterface::NATIVE_TYPE_MAP)
-            ? TypeResolverInterface::NATIVE_TYPE_MAP[$type]
-            : $type;
-
-        return is_array($mapped) ? $mapped[0] : $mapped;
+        return $this->typeMapper->toSpecType($type);
     }
 
     public function augmentSchemaType(Analysis $analysis, OA\Schema $schema, string $sourceClass = OA\Schema::class): void
@@ -83,6 +70,16 @@ abstract class AbstractTypeResolver implements TypeResolverInterface
         $this->doAugment($analysis, $schema, $context->reflector, $sourceClass);
 
         $this->mapNativeType($schema, $schema->type);
+    }
+
+    protected function type2ref(OA\Schema $schema, Analysis $analysis, string $sourceClass = OA\Schema::class): void
+    {
+        if (!Undefined::isDefault($schema->type) && !is_array($schema->type)) {
+            if (($typeSchema = $analysis->getAnnotationForSource($schema->type, $sourceClass)) instanceof AbstractAnnotation) {
+                $schema->type = Undefined::UNDEFINED;
+                $schema->ref = OA\Components::ref($typeSchema);
+            }
+        }
     }
 
     /**

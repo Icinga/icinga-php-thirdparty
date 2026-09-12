@@ -6,9 +6,11 @@
 
 namespace OpenApi\Console;
 
-use OpenApi\Annotations as OA;
+use OpenApi\Builder;
+use OpenApi\Builder\Result;
 use OpenApi\Generator;
-use OpenApi\SourceFinder;
+use OpenApi\Utils\Pipeline;
+use OpenApi\Utils\SourceFinder;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -35,23 +37,23 @@ class GenerateCommand
                 $io->info('Bootstrapping: ' . $filename);
             }
 
-            require_once($filename);
+            require_once $filename;
         }
 
         if ($input->defaults) {
             $io->title('Default config');
-            $io->writeln(json_encode((new Generator())->getDefaultConfig(), JSON_PRETTY_PRINT));
+            $io->writeln(json_encode($this->getDefaultConfig($input), JSON_PRETTY_PRINT));
 
             return 0;
         }
 
-        $openapi = $this->generate($input);
+        $result = $this->generate($input);
 
         if (!$input->output) {
             if ($input->format->isJson()) {
-                echo $openapi->toJson();
+                echo $result->toJson();
             } else {
-                echo $openapi->toYaml();
+                echo $result->toYaml();
             }
             echo "\n";
         } else {
@@ -59,36 +61,69 @@ class GenerateCommand
             if (is_dir($outputPath)) {
                 $outputPath .= '/openapi.yaml';
             }
-            $openapi->saveAs($outputPath, $input->format->value);
+            $result->saveAs($outputPath, $input->format->value);
         }
 
         return $this->logger->hasErrored() ? 1 : 0;
     }
 
-    private function generate(GenerateInput $input): OA\OpenApi
+    /**
+     * The config keys `--config` accepts; these differ per mode.
+     *
+     * Mirrors the routing in {@see self::generate()}: spec mode configures the
+     * augmenter pipeline, classic and hybrid configure the Generator.
+     *
+     * @return array<string,mixed>
+     */
+    protected function getDefaultConfig(GenerateInput $input): array
     {
-        $generator = new Generator($this->logger);
+        return $input->mode->isSpec()
+            ? (new Builder())->getAugmenters()->getConfig()
+            : (new Generator())->getDefaultConfig();
+    }
 
-        foreach ($input->addProcessor as $processor) {
-            $class = '\OpenApi\Processors\\' . ucfirst((string) $processor);
-            if (class_exists($class)) {
-                $processor = new $class();
-            } elseif (class_exists($processor)) {
-                $processor = new $processor();
-            }
-            $generator->getProcessorPipeline()->add($processor);
+    protected function generate(GenerateInput $input): Result
+    {
+        $builder = (new Builder())
+            ->addSource(new SourceFinder($input->paths, $input->exclude, $input->pattern))
+            ->setMode($input->mode)
+            ->setLogger($this->logger);
+
+        if ($input->version !== null) {
+            $builder->setVersion($input->version);
         }
 
-        foreach ($input->removeProcessor as $processor) {
-            $class = class_exists($processor)
-                ? $processor
-                : '\OpenApi\Processors\\' . ucfirst((string) $processor);
-            $generator->getProcessorPipeline()->remove($class);
+        if ($input->config || $input->addProcessor || $input->removeProcessor) {
+            $builder->withGenerator(function (Generator $generator) use ($input): void {
+                if ($input->config && $input->mode !== Builder\Mode::SPEC) {
+                    $generator->setConfig($input->config);
+                }
+
+                foreach ($input->addProcessor as $processor) {
+                    $class = '\OpenApi\Processors\\' . ucfirst((string) $processor);
+                    if (class_exists($class)) {
+                        $processor = new $class();
+                    } elseif (class_exists($processor)) {
+                        $processor = new $processor();
+                    }
+                    $generator->getProcessorPipeline()->add($processor);
+                }
+
+                foreach ($input->removeProcessor as $processor) {
+                    $class = class_exists($processor)
+                        ? $processor
+                        : '\OpenApi\Processors\\' . ucfirst((string) $processor);
+                    $generator->getProcessorPipeline()->remove($class);
+                }
+            });
         }
 
-        return $generator
-            ->setVersion($input->version)
-            ->setConfig($input->config)
-            ->generate(new SourceFinder($input->paths, $input->exclude, $input->pattern));
+        if ($input->config && $input->mode === Builder\Mode::SPEC) {
+            $builder->withAugmenters(function (Pipeline $augmenters) use ($input): void {
+                $augmenters->configure($input->config);
+            });
+        }
+
+        return $builder->build();
     }
 }

@@ -6,6 +6,7 @@
 
 namespace OpenApi\Console;
 
+use OpenApi\Builder\Mode;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -15,7 +16,7 @@ class GenerateInput
     #[Argument('Source path(s) to scan')]
     public array $paths;
 
-    #[Option('Generator config (e.g. -c operationId.hash=false)', shortcut: 'c')]
+    #[Option('Generator/Augmenter config; keys differ per mode, see -D (e.g. -c operationId.hash=false)', shortcut: 'c')]
     public array $config = [];
 
     #[Option('Show default config', shortcut: 'D')]
@@ -44,6 +45,9 @@ class GenerateInput
 
     #[Option('The OpenAPI version')]
     public ?string $version = null;
+
+    #[Option('Set mode classic, hybrid or spec', shortcut: 'm')]
+    public Mode $mode = Mode::CLASSIC;
 
     #[Option('Show additional error information', shortcut: 'd')]
     public bool $debug = false;

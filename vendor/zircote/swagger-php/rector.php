@@ -2,9 +2,6 @@
 
 use Rector\CodeQuality\Rector\Class_\CompleteDynamicPropertiesRector;
 use Rector\CodeQuality\Rector\For_\ForRepeatedCountToOwnVariableRector;
-use Rector\CodeQuality\Rector\If_\CombineIfRector;
-use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
-use Rector\CodeQuality\Rector\If_\ShortenElseIfRector;
 use Rector\CodingStyle\Rector\ClassMethod\NewlineBeforeNewAssignSetRector;
 use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
 use Rector\CodingStyle\Rector\Encapsed\WrapEncapsedVariableInCurlyBracesRector;
@@ -14,6 +11,7 @@ use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector;
 use Rector\Php55\Rector\String_\StringClassNameToClassConstantRector;
+use Rector\Php74\Rector\If_\IfToNullCoalescingAssignRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php81\Rector\Array_\ArrayToFirstClassCallableRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
@@ -24,8 +22,6 @@ return RectorConfig::configure()
     ->withSkipPath(__DIR__ . '/tests/Fixtures')
     ->withSkip([
         NewlineBeforeNewAssignSetRector::class,
-        CombineIfRector::class,
-        ExplicitBoolCompareRector::class,
         ForRepeatedCountToOwnVariableRector::class,
         ReadOnlyPropertyRector::class,
         RemoveAlwaysTrueIfConditionRector::class => [
@@ -34,9 +30,7 @@ return RectorConfig::configure()
         RemoveDeadInstanceOfRector::class => [
             __DIR__ . '/src/Processors/ExpandEnums.php',
         ],
-        ShortenElseIfRector::class,
         NewlineAfterStatementRector::class,
-        NullableCompareToNullRector::class,
         StringClassNameToClassConstantRector::class => [
             __DIR__ . '/src/Analysers/DocBlockParser.php',
             __DIR__ . '/src/Analysers/TypeResolverTrait.php',
@@ -44,11 +38,8 @@ return RectorConfig::configure()
             __DIR__ . '/tests/Analysers/TokenScannerTest.php',
             __DIR__ . '/tests/AnalysisTest.php',
             __DIR__ . '/tests/ContextTest.php',
+            __DIR__ . '/tests/Utils/TokenScannerTest.php',
         ],
-        WrapEncapsedVariableInCurlyBracesRector::class => [
-            __DIR__ . '/src/Type/LegacyTypeResolver.php',
-        ],
-        EncapsedStringsToSprintfRector::class,
         ParamTypeByMethodCallTypeRector::class => [
             __DIR__ . '/src/Serializer.php',
         ],
@@ -58,6 +49,11 @@ return RectorConfig::configure()
         ],
         ArrayToFirstClassCallableRector::class => [
             __DIR__ . '/tests/Analysers/ComposerAutoloaderScannerTest.php',
+        ],
+        // `Operation::$operationId` is documented `@var string`, so phpstan rejects `??=`
+        // on it; the null check here is deliberate defensive handling
+        IfToNullCoalescingAssignRector::class => [
+            __DIR__ . '/src/Processors/OperationId.php',
         ],
     ])
     ->withPreparedSets(

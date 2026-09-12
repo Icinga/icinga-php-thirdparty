@@ -8,7 +8,7 @@ namespace OpenApi\Processors;
 
 use OpenApi\Analysis;
 use OpenApi\Annotations as OA;
-use OpenApi\Generator;
+use OpenApi\Undefined;
 
 /**
  * Ensures that all tags used on operations also exist in the global <code>tags</code> list.
@@ -24,6 +24,56 @@ class AugmentTags
     {
         $this->whitelist = $whitelist;
         $this->withDescription = $withDescription;
+    }
+
+    public function __invoke(Analysis $analysis): void
+    {
+        $operations = $analysis->getAnnotationsOfType(OA\Operation::class);
+
+        $usedTagNames = [];
+        foreach ($operations as $operation) {
+            if (!Undefined::isDefault($operation->tags)) {
+                $usedTagNames = array_merge($usedTagNames, $operation->tags);
+            }
+        }
+        $usedTagNames = array_unique($usedTagNames);
+
+        $declaredTags = [];
+        if (!Undefined::isDefault($analysis->openapi->tags)) {
+            foreach ($analysis->openapi->tags as $tag) {
+                if (!empty($tag->name)) {
+                    $declaredTags[$tag->name] = $tag;
+                }
+            }
+        }
+        if ($declaredTags !== []) {
+            // last one wins
+            $analysis->openapi->tags = array_values($declaredTags);
+        }
+
+        // Add a tag for each tag that is used in operations but not declared in the global tags
+        if ($usedTagNames !== []) {
+            $declatedTagNames = array_keys($declaredTags);
+            foreach ($usedTagNames as $tagName) {
+                if (!in_array($tagName, $declatedTagNames)) {
+                    $analysis->mergeAnnotations($analysis->openapi, [new OA\Tag([
+                        'name' => $tagName,
+                        'description' => $this->withDescription
+                            ? $tagName
+                            : Undefined::UNDEFINED,
+                    ])]);
+                }
+            }
+        }
+
+        // clear invalid parents
+        foreach ($declaredTags as $tag) {
+            if (!array_key_exists($tag->parent, $declaredTags)) {
+                $tag->parent = Undefined::UNDEFINED;
+            }
+        }
+
+        $this->removeUnusedTags($usedTagNames, $declaredTags, $analysis);
     }
 
     /**
@@ -46,56 +96,6 @@ class AugmentTags
         return $this;
     }
 
-    public function __invoke(Analysis $analysis): void
-    {
-        $operations = $analysis->getAnnotationsOfType(OA\Operation::class);
-
-        $usedTagNames = [];
-        foreach ($operations as $operation) {
-            if (!Generator::isDefault($operation->tags)) {
-                $usedTagNames = array_merge($usedTagNames, $operation->tags);
-            }
-        }
-        $usedTagNames = array_unique($usedTagNames);
-
-        $declaredTags = [];
-        if (!Generator::isDefault($analysis->openapi->tags)) {
-            foreach ($analysis->openapi->tags as $tag) {
-                if (!empty($tag->name)) {
-                    $declaredTags[$tag->name] = $tag;
-                }
-            }
-        }
-        if ($declaredTags) {
-            // last one wins
-            $analysis->openapi->tags = array_values($declaredTags);
-        }
-
-        // Add a tag for each tag that is used in operations but not declared in the global tags
-        if ($usedTagNames) {
-            $declatedTagNames = array_keys($declaredTags);
-            foreach ($usedTagNames as $tagName) {
-                if (!in_array($tagName, $declatedTagNames)) {
-                    $analysis->mergeAnnotations($analysis->openapi, [new OA\Tag([
-                        'name' => $tagName,
-                        'description' => $this->withDescription
-                            ? $tagName
-                            : Generator::UNDEFINED,
-                    ])]);
-                }
-            }
-        }
-
-        // clear invalid parents
-        foreach ($declaredTags as $tag) {
-            if (!array_key_exists($tag->parent, $declaredTags)) {
-                $tag->parent = Generator::UNDEFINED;
-            }
-        }
-
-        $this->removeUnusedTags($usedTagNames, $declaredTags, $analysis);
-    }
-
     private function removeUnusedTags(array $usedTagNames, array $declaredTags, Analysis $analysis): void
     {
         if (in_array('*', $this->whitelist)) {
@@ -108,7 +108,9 @@ class AugmentTags
                 if (false !== $index = array_search($tag, $analysis->openapi->tags, true)) {
                     $analysis->removeAnnotation($tag);
                     unset($analysis->openapi->tags[$index]);
-                    $analysis->openapi->tags = array_values($analysis->openapi->tags);
+                    if ($analysis->openapi->tags !== []) {
+                        $analysis->openapi->tags = array_values($analysis->openapi->tags);
+                    }
                 }
             }
         }

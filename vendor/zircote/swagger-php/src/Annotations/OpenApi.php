@@ -7,8 +7,8 @@
 namespace OpenApi\Annotations;
 
 use OpenApi\Analysis;
-use OpenApi\Generator;
 use OpenApi\OpenApiException;
+use OpenApi\Undefined;
 
 /**
  * This is the root document object for the API specification.
@@ -51,7 +51,7 @@ class OpenApi extends AbstractAnnotation
      *
      * @var Info
      */
-    public $info = Generator::UNDEFINED;
+    public $info = Undefined::UNDEFINED;
 
     /**
      * An array of <code>@Server</code> objects, which provide connectivity information to a target server.
@@ -60,21 +60,21 @@ class OpenApi extends AbstractAnnotation
      *
      * @var list<Server>
      */
-    public $servers = Generator::UNDEFINED;
+    public $servers = Undefined::UNDEFINED;
 
     /**
      * The available paths and operations for the API.
      *
      * @var array<PathItem>
      */
-    public $paths = Generator::UNDEFINED;
+    public $paths = Undefined::UNDEFINED;
 
     /**
      * An element to hold various components for the specification.
      *
      * @var Components
      */
-    public $components = Generator::UNDEFINED;
+    public $components = Undefined::UNDEFINED;
 
     /**
      * A declaration of which security mechanisms can be used across the API.
@@ -86,7 +86,7 @@ class OpenApi extends AbstractAnnotation
      *
      * @var array
      */
-    public $security = Generator::UNDEFINED;
+    public $security = Undefined::UNDEFINED;
 
     /**
      * A list of tags used by the specification with additional metadata.
@@ -98,14 +98,14 @@ class OpenApi extends AbstractAnnotation
      *
      * @var list<Tag>
      */
-    public $tags = Generator::UNDEFINED;
+    public $tags = Undefined::UNDEFINED;
 
     /**
      * Additional external documentation.
      *
      * @var ExternalDocumentation
      */
-    public $externalDocs = Generator::UNDEFINED;
+    public $externalDocs = Undefined::UNDEFINED;
 
     /**
      * The available webhooks for the API.
@@ -113,12 +113,12 @@ class OpenApi extends AbstractAnnotation
      * @since OpenAPI 3.1.0
      * @var list<Webhook>
      */
-    public $webhooks = Generator::UNDEFINED;
+    public $webhooks = Undefined::UNDEFINED;
 
     /**
      * @var Analysis
      */
-    public $_analysis = Generator::UNDEFINED;
+    public $_analysis = Undefined::UNDEFINED;
 
     /**
      * @inheritdoc
@@ -167,15 +167,15 @@ class OpenApi extends AbstractAnnotation
         }
 
         /* paths is optional in 3.1.x */
-        if (OpenApi::versionMatch($version, '3.0.x') && Generator::isDefault($this->paths)) {
+        if (OpenApi::versionMatch($version, '3.0.x') && Undefined::isDefault($this->paths)) {
             $this->_context->logger->warning('Required @OA\PathItem() not found');
             $isValid = false;
         }
 
         if (OpenApi::versionMatch($version, '3.1.x')
-            && Generator::isDefault($this->paths)
-            && Generator::isDefault($this->webhooks)
-            && Generator::isDefault($this->components)
+            && Undefined::isDefault($this->paths)
+            && Undefined::isDefault($this->webhooks)
+            && Undefined::isDefault($this->components)
         ) {
             $this->_context->logger->warning('At least one of @OA\PathItem(), @OA\Components() or @OA\Webhook() required');
             $isValid = false;
@@ -235,6 +235,21 @@ class OpenApi extends AbstractAnnotation
         return self::resolveRef($ref, '#/', $this, []);
     }
 
+    public function jsonSerialize(): \stdClass
+    {
+        $data = parent::jsonSerialize();
+
+        if ($this->_context->isVersion('3.0.x')) {
+            unset($data->webhooks);
+        }
+
+        if (isset($data->tags) && $data->tags === []) {
+            unset($data->tags);
+        }
+
+        return $data;
+    }
+
     /**
      * Recursive helper for ref().
      *
@@ -252,7 +267,6 @@ class OpenApi extends AbstractAnnotation
         $subpath = $slash === false ? $path : substr($path, 0, $slash);
         $property = Components::refDecode($subpath);
         $unresolved = $slash === false ? $resolved . $subpath : $resolved . $subpath . '/';
-
         if (is_object($container)) {
             // support use x-* in ref
             $xKey = str_starts_with($property, 'x-') ? substr($property, 2) : null;
@@ -264,9 +278,7 @@ class OpenApi extends AbstractAnnotation
             if (property_exists($container, $property) === false && !$xKey) {
                 throw new OpenApiException('$ref "' . $ref . '" not found');
             }
-
             $nextContainer = $xKey ? $container->x[$xKey] : $container->{$property};
-
             if ($slash === false) {
                 return $nextContainer;
             }
@@ -278,7 +290,9 @@ class OpenApi extends AbstractAnnotation
             }
 
             return self::resolveRef($ref, $unresolved, $nextContainer, $mapping);
-        } elseif (is_array($container)) {
+        }
+
+        if (is_array($container)) {
             if (array_key_exists($property, $container)) {
                 return self::resolveRef($ref, $unresolved, $container[$property], []);
             }
@@ -292,16 +306,5 @@ class OpenApi extends AbstractAnnotation
         }
 
         throw new OpenApiException('$ref "' . $unresolved . '" not found');
-    }
-
-    public function jsonSerialize(): \stdClass
-    {
-        $data = parent::jsonSerialize();
-
-        if ($this->_context->isVersion('3.0.x')) {
-            unset($data->webhooks);
-        }
-
-        return $data;
     }
 }
