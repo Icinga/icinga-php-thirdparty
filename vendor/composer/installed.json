@@ -2,27 +2,28 @@
     "packages": [
         {
             "name": "brick/math",
-            "version": "0.18.0",
-            "version_normalized": "0.18.0.0",
+            "version": "1.0.0",
+            "version_normalized": "1.0.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "82944324d1c1bdb2c2618e89978d4e2ad78d69ad"
+                "reference": "2effe05d2177c451b86c6a073196a4034c02f211"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/82944324d1c1bdb2c2618e89978d4e2ad78d69ad",
-                "reference": "82944324d1c1bdb2c2618e89978d4e2ad78d69ad",
+                "url": "https://api.github.com/repos/brick/math/zipball/2effe05d2177c451b86c6a073196a4034c02f211",
+                "reference": "2effe05d2177c451b86c6a073196a4034c02f211",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.2"
             },
             "require-dev": {
-                "phpstan/phpstan": "2.1.22",
+                "phpstan/phpstan": "2.2.13",
+                "phpstan/phpstan-phpunit": "2.0.18",
                 "phpunit/phpunit": "^11.5"
             },
-            "time": "2026-06-14T18:21:03+00:00",
+            "time": "2026-09-12T10:28:18+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -52,7 +53,7 @@
             ],
             "support": {
                 "issues": "https://github.com/brick/math/issues",
-                "source": "https://github.com/brick/math/tree/0.18.0"
+                "source": "https://github.com/brick/math/tree/1.0.0"
             },
             "funding": [
                 {
@@ -1430,17 +1431,17 @@
         },
         {
             "name": "ezyang/htmlpurifier",
-            "version": "v4.19.0",
-            "version_normalized": "4.19.0.0",
+            "version": "v4.19.1",
+            "version_normalized": "4.19.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "b287d2a16aceffbf6e0295559b39662612b77fcf"
+                "reference": "5e0539132d934f936fbae2c88b55d58f9438623f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/b287d2a16aceffbf6e0295559b39662612b77fcf",
-                "reference": "b287d2a16aceffbf6e0295559b39662612b77fcf",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/5e0539132d934f936fbae2c88b55d58f9438623f",
+                "reference": "5e0539132d934f936fbae2c88b55d58f9438623f",
                 "shasum": ""
             },
             "require": {
@@ -1456,7 +1457,7 @@
                 "ext-iconv": "Converts text to and from non-UTF-8 encodings",
                 "ext-tidy": "Used for pretty-printing HTML"
             },
-            "time": "2025-10-17T16:34:55+00:00",
+            "time": "2026-09-15T15:42:51+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1488,7 +1489,7 @@
             ],
             "support": {
                 "issues": "https://github.com/ezyang/htmlpurifier/issues",
-                "source": "https://github.com/ezyang/htmlpurifier/tree/v4.19.0"
+                "source": "https://github.com/ezyang/htmlpurifier/tree/v4.19.1"
             },
             "install-path": "../ezyang/htmlpurifier"
         },
@@ -2496,17 +2497,17 @@
         },
         {
             "name": "predis/predis",
-            "version": "v3.6.0",
-            "version_normalized": "3.6.0.0",
+            "version": "v3.6.1",
+            "version_normalized": "3.6.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/predis/predis.git",
-                "reference": "2ff20c08bb63697245ffee3f198d1673086c302d"
+                "reference": "e2db96312ecf57a01a3477bf192d1ebc0ad7e9fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/predis/predis/zipball/2ff20c08bb63697245ffee3f198d1673086c302d",
-                "reference": "2ff20c08bb63697245ffee3f198d1673086c302d",
+                "url": "https://api.github.com/repos/predis/predis/zipball/e2db96312ecf57a01a3477bf192d1ebc0ad7e9fb",
+                "reference": "e2db96312ecf57a01a3477bf192d1ebc0ad7e9fb",
                 "shasum": ""
             },
             "require": {
@@ -2522,7 +2523,7 @@
             "suggest": {
                 "ext-relay": "Faster connection with in-memory caching (>=0.6.2)"
             },
-            "time": "2026-08-14T23:07:56+00:00",
+            "time": "2026-09-17T20:41:00+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -2550,7 +2551,7 @@
             ],
             "support": {
                 "issues": "https://github.com/predis/predis/issues",
-                "source": "https://github.com/predis/predis/tree/v3.6.0"
+                "source": "https://github.com/predis/predis/tree/v3.6.1"
             },
             "funding": [
                 {
@@ -3201,21 +3202,21 @@
         },
         {
             "name": "ramsey/uuid",
-            "version": "4.9.3",
-            "version_normalized": "4.9.3.0",
+            "version": "4.9.4",
+            "version_normalized": "4.9.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/uuid.git",
-                "reference": "1df15849d00943a67d677dc9cfd80795f038c9f8"
+                "reference": "75d73f48d02797c2c285a7e9f348fadc0102ffe2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/uuid/zipball/1df15849d00943a67d677dc9cfd80795f038c9f8",
-                "reference": "1df15849d00943a67d677dc9cfd80795f038c9f8",
+                "url": "https://api.github.com/repos/ramsey/uuid/zipball/75d73f48d02797c2c285a7e9f348fadc0102ffe2",
+                "reference": "75d73f48d02797c2c285a7e9f348fadc0102ffe2",
                 "shasum": ""
             },
             "require": {
-                "brick/math": ">=0.8.16 <=0.18",
+                "brick/math": "^0.8.16 || ^0.9 || ^0.10 || ^0.11 || ^0.12 || ^0.13 || ^0.14 || ^0.15 || ^0.16 || ^0.17 || ^0.18 || ^0.19 || ^0.20 || ^1.0",
                 "php": "^8.0",
                 "ramsey/collection": "^1.2 || ^2.0"
             },
@@ -3248,7 +3249,7 @@
                 "paragonie/random-lib": "Provides RandomLib for use with the RandomLibAdapter",
                 "ramsey/uuid-doctrine": "Allows the use of Ramsey\\Uuid\\Uuid as Doctrine field type."
             },
-            "time": "2026-06-18T03:57:49+00:00",
+            "time": "2026-09-16T11:39:30+00:00",
             "type": "library",
             "extra": {
                 "captainhook": {
@@ -3276,7 +3277,7 @@
             ],
             "support": {
                 "issues": "https://github.com/ramsey/uuid/issues",
-                "source": "https://github.com/ramsey/uuid/tree/4.9.3"
+                "source": "https://github.com/ramsey/uuid/tree/4.9.4"
             },
             "install-path": "../ramsey/uuid"
         },
@@ -4467,17 +4468,17 @@
         },
         {
             "name": "symfony/console",
-            "version": "v7.4.18",
-            "version_normalized": "7.4.18.0",
+            "version": "v7.4.19",
+            "version_normalized": "7.4.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "23d6f88a29f6d0eac45bd77d70307adf83ba7ab0"
+                "reference": "3a1973458b153f566a8d7499bc06ece323d60063"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/23d6f88a29f6d0eac45bd77d70307adf83ba7ab0",
-                "reference": "23d6f88a29f6d0eac45bd77d70307adf83ba7ab0",
+                "url": "https://api.github.com/repos/symfony/console/zipball/3a1973458b153f566a8d7499bc06ece323d60063",
+                "reference": "3a1973458b153f566a8d7499bc06ece323d60063",
                 "shasum": ""
             },
             "require": {
@@ -4510,7 +4511,7 @@
                 "symfony/stopwatch": "^6.4|^7.0|^8.0",
                 "symfony/var-dumper": "^6.4|^7.0|^8.0"
             },
-            "time": "2026-08-25T14:18:37+00:00",
+            "time": "2026-09-13T10:38:41+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -4544,7 +4545,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v7.4.18"
+                "source": "https://github.com/symfony/console/tree/v7.4.19"
             },
             "funding": [
                 {
@@ -4642,17 +4643,17 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v7.4.17",
-            "version_normalized": "7.4.17.0",
+            "version": "v7.4.19",
+            "version_normalized": "7.4.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "5ce28827081f6d1f0c32eaf3882750f19cb5bbe6"
+                "reference": "1b900bc6ae5ba60c5eee69c11ba44566190576fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/5ce28827081f6d1f0c32eaf3882750f19cb5bbe6",
-                "reference": "5ce28827081f6d1f0c32eaf3882750f19cb5bbe6",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/1b900bc6ae5ba60c5eee69c11ba44566190576fe",
+                "reference": "1b900bc6ae5ba60c5eee69c11ba44566190576fe",
                 "shasum": ""
             },
             "require": {
@@ -4661,7 +4662,7 @@
             "require-dev": {
                 "symfony/filesystem": "^6.4|^7.0|^8.0"
             },
-            "time": "2026-08-21T12:09:28+00:00",
+            "time": "2026-09-10T19:14:10+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -4689,7 +4690,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/v7.4.17"
+                "source": "https://github.com/symfony/finder/tree/v7.4.19"
             },
             "funding": [
                 {
@@ -5403,17 +5404,17 @@
         },
         {
             "name": "symfony/string",
-            "version": "v7.4.15",
-            "version_normalized": "7.4.15.0",
+            "version": "v7.4.19",
+            "version_normalized": "7.4.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "e394af32256bf9e7bf80849d95e589167c10097b"
+                "reference": "02731ce2bd26514bec9efc0baef2cd0b0cf67f46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/e394af32256bf9e7bf80849d95e589167c10097b",
-                "reference": "e394af32256bf9e7bf80849d95e589167c10097b",
+                "url": "https://api.github.com/repos/symfony/string/zipball/02731ce2bd26514bec9efc0baef2cd0b0cf67f46",
+                "reference": "02731ce2bd26514bec9efc0baef2cd0b0cf67f46",
                 "shasum": ""
             },
             "require": {
@@ -5434,7 +5435,7 @@
                 "symfony/translation-contracts": "^2.5|^3.0",
                 "symfony/var-exporter": "^6.4|^7.0|^8.0"
             },
-            "time": "2026-07-28T07:33:02+00:00",
+            "time": "2026-09-11T14:46:58+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -5473,7 +5474,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/v7.4.15"
+                "source": "https://github.com/symfony/string/tree/v7.4.19"
             },
             "funding": [
                 {
@@ -5871,17 +5872,17 @@
         },
         {
             "name": "zircote/swagger-php",
-            "version": "6.8.1",
-            "version_normalized": "6.8.1.0",
+            "version": "6.10.0",
+            "version_normalized": "6.10.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "08c8a2d256e8f8e4b6f86d44d3044494194df552"
+                "reference": "66a3b923188f69b7ad3a35986d34c16b673678c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/08c8a2d256e8f8e4b6f86d44d3044494194df552",
-                "reference": "08c8a2d256e8f8e4b6f86d44d3044494194df552",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/66a3b923188f69b7ad3a35986d34c16b673678c5",
+                "reference": "66a3b923188f69b7ad3a35986d34c16b673678c5",
                 "shasum": ""
             },
             "require": {
@@ -5890,7 +5891,7 @@
                 "phpstan/phpdoc-parser": "^2.0",
                 "psr/log": "^1.1 || ^2.0 || ^3.0",
                 "radebatz/type-info-extras": "^1.0.2",
-                "symfony/console": "^7.4 || ^8.0",
+                "symfony/console": "^6.4 || ^7.0 || ^8.0",
                 "symfony/deprecation-contracts": "^2 || ^3",
                 "symfony/finder": "^5.0 || ^6.0 || ^7.0 || ^8.0",
                 "symfony/yaml": "^5.4 || ^6.0 || ^7.0 || ^8.0"
@@ -5905,7 +5906,7 @@
                 "phpunit/phpunit": "^11.5 || >=12.5.22",
                 "rector/rector": "2.6.5"
             },
-            "time": "2026-09-09T03:13:32+00:00",
+            "time": "2026-09-21T23:32:10+00:00",
             "bin": [
                 "bin/openapi"
             ],
@@ -5951,7 +5952,7 @@
             ],
             "support": {
                 "issues": "https://github.com/zircote/swagger-php/issues",
-                "source": "https://github.com/zircote/swagger-php/tree/6.8.1"
+                "source": "https://github.com/zircote/swagger-php/tree/6.10.0"
             },
             "funding": [
                 {
