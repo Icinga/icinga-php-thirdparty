@@ -1,0 +1,59 @@
+<?php declare(strict_types=1);
+
+/**
+ * @license Apache 2.0
+ */
+
+namespace OpenApi\Assembler;
+
+use OpenApi\Contracts\AttributeInterface;
+use OpenApi\Contracts\AttributeTranslatorInterface;
+use OpenApi\Spec as OA;
+
+/**
+ * Add the required `OA\Property` on schema properties that only have:
+ * - an `OA\Schema`
+ * - an `OA\Encoding`
+ *
+ * This is what implements the implicit `OA\Property` shortcut. The `OA\MediaType` shortcuts
+ * are the `Augmenter\Shortcuts` augmenter; the `OA\Parameter` ones are plain subclasses.
+ *
+ * @phpstan-import-type AttributeReflector from AttributeTranslatorInterface
+ */
+class OptionalPropertyAttributeTranslator extends AbstractAttributeTranslator
+{
+    /**
+     * @param  array<AttributeInterface> $attributes current attributes
+     * @param  array<object>             $created    newly created attribute instances
+     * @param  AttributeReflector        $reflector
+     * @return array<AttributeInterface>
+     */
+    public function translate(array $attributes, array $created, \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\ReflectionClassConstant $reflector): array
+    {
+        $hasInstance = fn (array $list, string $class): bool => array_reduce(
+            $list,
+            static fn (bool $found, object $attribute): bool =>
+                $found || $attribute instanceof $class,
+            false
+        );
+
+        $translated = [...$attributes, ...$created];
+
+        $hasSchema = $hasInstance($translated, OA\Schema::class);
+        $hasEncoding = $hasInstance($translated, OA\Encoding::class);
+
+        if ($reflector instanceof \ReflectionProperty
+            || ($reflector instanceof \ReflectionParameter && $reflector->getDeclaringFunction()->getName() === '__construct')
+        ) {
+            $hasProperty = $hasInstance($translated, OA\Property::class);
+
+            if ($hasEncoding && !$hasProperty) {
+                $translated = [new OA\Property\Encoded(), ...$translated];
+            } elseif ($hasSchema && !$hasProperty) {
+                $translated = [new OA\Property(), ...$translated];
+            }
+        }
+
+        return $translated;
+    }
+}
