@@ -29,23 +29,33 @@ class Refs implements PipeInterface, LoggerAwareInterface
     public function __invoke(mixed $payload): mixed
     {
         foreach ($payload->schemas as $schema) {
-            $reflector = $schema->getClassReflector();
-            if ($reflector === null) {
+            if ($schema->getClassReflector() === null) {
                 continue;
             }
             $this->mergeAllOf($schema);
-            $this->dedupAllOfRefs($schema);
         }
 
         $index = $payload->buildComponentIndex();
         $refMap = $index->buildRefMap();
 
+        if ($refMap !== []) {
+            $this->resolveRefRefs($payload);
+            $this->resolveFQCNRefs($payload, $refMap);
+        }
+
+        // deduplicate once every ref carries its final value: a FQCN and the component
+        // pointer added by Augmenter\Inheritance name the same schema but differ as strings
+        foreach ($payload->schemas as $schema) {
+            if ($schema->getClassReflector() === null) {
+                continue;
+            }
+            $this->dedupAllOfRefs($schema);
+        }
+
         if ($refMap === []) {
             return null;
         }
 
-        $this->resolveRefRefs($payload);
-        $this->resolveFQCNRefs($payload, $refMap);
         $this->resolveDiscriminatorMappings($payload, $refMap);
         $this->resolveAllOfPropertyRefs($payload);
 
@@ -174,11 +184,14 @@ class Refs implements PipeInterface, LoggerAwareInterface
 
         $unique = [];
         foreach ($schema->allOf as $ii => $allOf) {
-            if ($allOf->ref !== null) {
-                if (isset($unique[$allOf->ref])) {
+            // resolveRefRefs() has collapsed every Schema\Ref into its string by now, but only
+            // runs when the ref map is non-empty; key on the string form defensively
+            $ref = $allOf->ref instanceof OA\Schema\Ref ? $allOf->ref->ref : $allOf->ref;
+            if (is_string($ref)) {
+                if (isset($unique[$ref])) {
                     continue;
                 }
-                $unique[$allOf->ref] = $allOf;
+                $unique[$ref] = $allOf;
             } else {
                 $unique[$ii] = $allOf;
             }
