@@ -4,16 +4,17 @@
  * @license Apache 2.0
  */
 
-namespace OpenApi\Utils;
+namespace OpenApi\Specification;
 
 use OpenApi\Contracts\AttributeInterface;
 use OpenApi\Spec as OA;
 use OpenApi\Specification;
+use OpenApi\Utils\JsonPointer;
 
 /**
  * Traversal helpers for walking the Specification tree.
  */
-class SpecificationWalker
+class Walker
 {
     public function __construct(
         protected readonly Specification $specification,
@@ -80,8 +81,10 @@ class SpecificationWalker
     /**
      * @template T of AttributeInterface
      *
-     * @param class-string<T>   $visitee
-     * @param callable(T): void $visitor
+     * @param class-string<T>                       $visitee
+     * @param callable(T): void                     $visitor
+     * @param array<mixed>                          $candidates
+     * @param \SplObjectStorage<object, mixed>|null $seen
      */
     protected function walk(string $visitee, callable $visitor, array $candidates, ?\SplObjectStorage $seen = null): void
     {
