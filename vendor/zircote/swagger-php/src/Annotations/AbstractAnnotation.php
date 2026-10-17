@@ -41,7 +41,7 @@ abstract class AbstractAnnotation implements \JsonSerializable
     /**
      * Annotations that couldn't be merged by mapping or postprocessing.
      *
-     * @var array
+     * @var list<AbstractAnnotation>
      */
     public $_unmerged = [];
 
@@ -81,7 +81,7 @@ abstract class AbstractAnnotation implements \JsonSerializable
     /**
      * Reverse mapping of $_nested with the allowed parent annotations.
      *
-     * @var array<class-string<AbstractAnnotation>>
+     * @var list<class-string<AbstractAnnotation>>
      */
     public static $_parents = [];
 
@@ -111,6 +111,9 @@ abstract class AbstractAnnotation implements \JsonSerializable
         $nestedContext = new Context(['nested' => $this], $this->_context);
         foreach ($properties as $property => $value) {
             if (property_exists($this, $property)) {
+                if ($value instanceof AbstractAnnotation) {
+                    $value = $this->nested($value, $nestedContext);
+                }
                 $this->{$property} = $value;
                 if (is_array($value)) {
                     foreach ($value as $key => $annotation) {
@@ -326,7 +329,16 @@ abstract class AbstractAnnotation implements \JsonSerializable
                     }
                 }
             }
-            if (property_exists($this, 'nullable') && $this->nullable === true) {
+            $nullable = property_exists($this, 'nullable') && $this->nullable === true;
+            // a Schema's $ref is a JSON Schema keyword in 3.1, so its annotations stay beside it
+            if (!$nullable && $this instanceof Schema && !$this->_context->isVersion('3.0.x')) {
+                foreach (['title', 'default', 'example', 'examples', 'deprecated', 'readOnly', 'writeOnly'] as $prop) {
+                    if (property_exists($data, $prop)) {
+                        $ref[$prop] = $data->{$prop};
+                    }
+                }
+            }
+            if ($nullable) {
                 $ref = ['oneOf' => [$ref]];
                 if (!$this->_context->isVersion('3.0.x')) {
                     $ref['oneOf'][] = ['type' => 'null'];

@@ -7,6 +7,7 @@
 namespace OpenApi\Augmenter;
 
 use OpenApi\Contracts\AttributeInterface;
+use OpenApi\Spec as OA;
 use OpenApi\Specification;
 use OpenApi\Specification\ComponentName;
 use OpenApi\Utils\Config;
@@ -21,6 +22,11 @@ use Psr\Log\LoggerAwareTrait;
  * Iterates multiple times to catch nested dependencies (a schema only
  * referenced by another unused schema should also be removed).
  *
+ * Removal is reported once per run, as a notice with the count and the switch that turns it
+ * off; the components themselves are listed at debug level. A response component keyed by a
+ * status code is also reported on its own, as a warning, because it is a response that was
+ * meant to nest into an operation.
+ *
  * @implements PipeInterface<Specification>
  */
 class Cleanup implements PipeInterface, LoggerAwareInterface
@@ -28,6 +34,9 @@ class Cleanup implements PipeInterface, LoggerAwareInterface
     use LoggerAwareTrait;
 
     protected const MAX_ITERATIONS = 10;
+
+    /** @var list<string> references of the components removed so far, in removal order */
+    protected array $removed = [];
 
     public function __construct(
         #[Config('Enables/disables removal of unreferenced components.')]
@@ -41,12 +50,17 @@ class Cleanup implements PipeInterface, LoggerAwareInterface
             return null;
         }
 
+        $this->removed = [];
+
         for ($i = 0; $i < self::MAX_ITERATIONS; ++$i) {
             if (!$this->cleanup($payload)) {
+                $this->reportRemoved();
+
                 return null;
             }
         }
 
+        $this->reportRemoved();
         $this->logger?->warning('CleanUnused: maximum iterations ({max}) reached, some unused components may remain', [
             'max' => self::MAX_ITERATIONS,
         ]);
@@ -97,7 +111,10 @@ class Cleanup implements PipeInterface, LoggerAwareInterface
         $removed = false;
         foreach ($specification->{$bucket} as $index => $item) {
             $name = ComponentName::of($item);
-            if ($name !== null && !isset($usedRefs[JsonPointer::ref('components', $bucket, $name)])) {
+            $ref = $name !== null ? JsonPointer::ref('components', $bucket, $name) : null;
+            if ($ref !== null && !isset($usedRefs[$ref])) {
+                $this->reportStatusCodeKey($item, $name);
+                $this->removed[] = $ref;
                 unset($specification->{$bucket}[$index]);
                 $removed = true;
             }
@@ -107,5 +124,53 @@ class Cleanup implements PipeInterface, LoggerAwareInterface
         }
 
         return $removed;
+    }
+
+    protected function reportRemoved(): void
+    {
+        if ($this->removed === []) {
+            return;
+        }
+
+        $count = count($this->removed);
+        $this->logger?->notice(sprintf(
+            'Removed %d unreferenced %s; set cleanup.enabled to false to keep %s',
+            $count,
+            $count === 1 ? 'component' : 'components',
+            $count === 1 ? 'it' : 'them',
+        ));
+
+        foreach ($this->removed as $ref) {
+            $this->logger?->debug(sprintf('Removed unreferenced component %s', $ref));
+        }
+    }
+
+    /**
+     * `Response::$response` is the status code when the response is nested in an operation
+     * and the component name when it is not, and `isRoot()` cannot tell the two apart — it
+     * is true whenever the key is set. So a response that fails to nest becomes a component
+     * named after its status code, which nothing references and this then removes.
+     *
+     * Removing it is right, and silence is not: the response the author wrote disappears
+     * from the document with nothing said. This is the last point at which it is visible.
+     *
+     * A component whose key does not look like a status code is left alone. An unreferenced
+     * reusable response is ordinary — a library may declare more than any one document uses.
+     */
+    protected function reportStatusCodeKey(AttributeInterface $item, string $name): void
+    {
+        if (!$item instanceof OA\Response) {
+            return;
+        }
+
+        if (preg_match(OA\Response::STATUS_CODE_PATTERN, $name) !== 1) {
+            return;
+        }
+
+        $this->logger?->warning(sprintf(
+            'Response "%s" is a component named after a status code; it was most likely meant to nest into an operation in %s',
+            $name,
+            $item->getSourceLocation(),
+        ));
     }
 }
