@@ -25,8 +25,10 @@ class Http extends OA\Security\Scheme
         ?string $description = null,
         ?string $scheme = null,
         ?string $bearerFormat = null,
+        ?string $component = null,
         ?array $x = null,
         ?array $attachables = null,
+        ?OA\Fan $fan = null,
     ) {
         parent::__construct(
             securityScheme: $securityScheme,
@@ -34,8 +36,10 @@ class Http extends OA\Security\Scheme
             description: $description,
             scheme: $scheme,
             bearerFormat: $bearerFormat,
+            component: $component,
             x: $x,
             attachables: $attachables,
+            fan: $fan,
         );
     }
 }

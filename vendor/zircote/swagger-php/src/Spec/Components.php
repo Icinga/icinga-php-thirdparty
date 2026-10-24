@@ -13,14 +13,17 @@ namespace OpenApi\Spec;
  * of the OpenAPI document. The Components attribute itself is not emitted — its children
  * are promoted to their respective Specification buckets.
  *
- * The primary use case is for DTOs that are NOT roots and therefore cannot be declared
- * at class level on their own: Parameter, Header, Link, and Example. Other types
- * (Schema, PathItem, SecurityScheme, named Response/RequestBody) are already roots and
- * can be declared directly on a class without needing a Components wrapper.
+ * Any attribute given a `component:` key is a root on its own and needs no wrapper. The
+ * wrapper remains for the historic spellings — a Header or Example keyed by `header`/`example`
+ * — and for grouping several components on one class.
+ *
+ * On a class it also makes a holder: each member declares a component of its own, and one
+ * without a key is named after the member, the way a class names its own. A component declared
+ * on a member needs the holder; without it, a keyed one is left out with a warning.
  *
  *   #[Components]
  *   class SharedComponents {
- *       #[Parameter(parameter: 'tenant_id', name: 'tenant_id', in: 'path', schema: new Schema(type: 'string'))]
+ *       #[Parameter(component: 'tenant_id', name: 'tenant_id', in: 'path', schema: new Schema(type: 'string'))]
  *       public string $tenantId;
  *
  *       #[Header(header: 'X-Rate-Limit', schema: new Schema(type: 'integer'))]
@@ -42,8 +45,11 @@ class Components extends AbstractAttribute
      * @param list<Security\Scheme>    $securitySchemes
      * @param list<Link>               $links
      * @param list<Example>            $examples
+     * @param list<PathItem>           $pathItems
+     * @param list<MediaType>          $mediaTypes      OpenAPI 3.2; earlier compilers omit them with a warning
      * @param array<string,mixed>|null $x               Vendor extensions (x-* properties)
      * @param list<Attachable>|null    $attachables     Reusable custom attachable attributes
+     * @param Fan|null                 $fan             Where this attribute goes when more than one attribute could hold it
      */
     public function __construct(
         public array $schemas = [],
@@ -54,10 +60,13 @@ class Components extends AbstractAttribute
         public array $securitySchemes = [],
         public array $links = [],
         public array $examples = [],
+        public array $pathItems = [],
+        public array $mediaTypes = [],
         ?array $x = null,
         ?array $attachables = null,
+        ?Fan $fan = null,
     ) {
-        parent::__construct(x: $x, attachables: $attachables);
+        parent::__construct(x: $x, attachables: $attachables, fan: $fan);
     }
 
     public function isRoot(): bool

@@ -23,15 +23,19 @@ class MutualTls extends OA\Security\Scheme
     public function __construct(
         ?string $securityScheme = null,
         ?string $description = null,
+        ?string $component = null,
         ?array $x = null,
         ?array $attachables = null,
+        ?OA\Fan $fan = null,
     ) {
         parent::__construct(
             securityScheme: $securityScheme,
             type: OA\SchemeType::MutualTLS,
             description: $description,
+            component: $component,
             x: $x,
             attachables: $attachables,
+            fan: $fan,
         );
     }
 }

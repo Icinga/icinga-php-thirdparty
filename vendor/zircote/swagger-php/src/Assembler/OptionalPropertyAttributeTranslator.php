@@ -18,15 +18,20 @@ use OpenApi\Spec as OA;
  * This is what implements the implicit `OA\Property` shortcut. The `OA\MediaType` shortcuts
  * are the `Augmenter\Shortcuts` augmenter; the `OA\Parameter` ones are plain subclasses.
  *
+ * Not in a class carrying `OA\Components`: there a schema on a property is a component of its
+ * own, named after the property, so it is left for the holder to absorb.
+ *
  * @phpstan-import-type AttributeReflector from AttributeTranslatorInterface
  */
 class OptionalPropertyAttributeTranslator extends AbstractAttributeTranslator
 {
     /**
-     * @param  array<AttributeInterface> $attributes current attributes
-     * @param  array<object>             $created    newly created attribute instances
-     * @param  AttributeReflector        $reflector
-     * @return array<AttributeInterface>
+     * @param  array<object>      $attributes current attributes; a previous translator's
+     *                                        output, so not yet narrowed to AttributeInterface
+     * @param  array<object>      $created    newly created attribute instances
+     * @param  AttributeReflector $reflector
+     * @return array<object>      attributes to carry forward; AttributeFactory filters
+     *                            the final result down to AttributeInterface
      */
     public function translate(array $attributes, array $created, \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\ReflectionClassConstant $reflector): array
     {
@@ -42,8 +47,9 @@ class OptionalPropertyAttributeTranslator extends AbstractAttributeTranslator
         $hasSchema = $hasInstance($translated, OA\Schema::class);
         $hasEncoding = $hasInstance($translated, OA\Encoding::class);
 
-        if ($reflector instanceof \ReflectionProperty
-            || ($reflector instanceof \ReflectionParameter && $reflector->getDeclaringFunction()->getName() === '__construct')
+        if (($reflector instanceof \ReflectionProperty
+            || ($reflector instanceof \ReflectionParameter && $reflector->getDeclaringFunction()->getName() === '__construct'))
+            && $reflector->getDeclaringClass()?->getAttributes(OA\Components::class) === []
         ) {
             $hasProperty = $hasInstance($translated, OA\Property::class);
 

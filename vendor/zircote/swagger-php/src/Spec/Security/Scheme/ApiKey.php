@@ -25,8 +25,10 @@ class ApiKey extends OA\Security\Scheme
         ?string $description = null,
         ?string $name = null,
         string|OA\SchemeIn|null $in = null,
+        ?string $component = null,
         ?array $x = null,
         ?array $attachables = null,
+        ?OA\Fan $fan = null,
     ) {
         parent::__construct(
             securityScheme: $securityScheme,
@@ -34,8 +36,10 @@ class ApiKey extends OA\Security\Scheme
             description: $description,
             name: $name,
             in: $in,
+            component: $component,
             x: $x,
             attachables: $attachables,
+            fan: $fan,
         );
     }
 }

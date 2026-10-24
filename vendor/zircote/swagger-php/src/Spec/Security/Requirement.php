@@ -7,6 +7,7 @@
 namespace OpenApi\Spec\Security;
 
 use OpenApi\Spec as OA;
+use OpenApi\Utils\SecurityRequirement;
 
 /**
  * A security requirement declaring which security schemes apply.
@@ -25,6 +26,7 @@ class Requirement extends OA\AbstractAttribute
      * @param array<string,list<string>>|null $schemes     Map of scheme names to scopes (for AND logic with multiple schemes)
      * @param array<string,mixed>|null        $x           Vendor extensions (x-* properties)
      * @param list<OA\Attachable>|null        $attachables Reusable custom attachable attributes
+     * @param OA\Fan|null                     $fan         Where this attribute goes when more than one attribute could hold it
      */
     public function __construct(
         public ?string $scheme = null,
@@ -32,8 +34,9 @@ class Requirement extends OA\AbstractAttribute
         public ?array $schemes = null,
         ?array $x = null,
         ?array $attachables = null,
+        ?OA\Fan $fan = null,
     ) {
-        parent::__construct(x: $x, attachables: $attachables);
+        parent::__construct(x: $x, attachables: $attachables, fan: $fan);
     }
 
     public function merge(): array
@@ -49,12 +52,14 @@ class Requirement extends OA\AbstractAttribute
     /**
      * Resolve to the normalised map format: ['schemeName' => [...scopes]].
      *
+     * A bare scheme name in `$schemes` stands for that scheme with no scopes.
+     *
      * @return array<string, list<string>>
      */
     public function toArray(): array
     {
         if ($this->schemes !== null) {
-            return $this->schemes;
+            return SecurityRequirement::normalise($this->schemes);
         }
 
         if ($this->scheme !== null) {

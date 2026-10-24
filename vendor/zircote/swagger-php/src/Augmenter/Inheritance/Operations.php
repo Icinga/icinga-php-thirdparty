@@ -19,7 +19,8 @@ use OpenApi\Utils\AttributeFactory;
  * composition can apply.
  *
  * Walks each PathItem class's ancestors: if an ancestor has no PathItem
- * of its own, its operations are cloned and re-associated with the child class. The
+ * of its own, each child class gets a deep copy of its operations, re-associated with the child.
+ * A deep copy, so a change to one child's responses or parameters stays with that child. The
  * original operations (associated with the abstract parent) are removed since they
  * have no PathItem context of their own.
  *
@@ -34,7 +35,7 @@ class Operations
 
     public function resolve(Specification $specification): mixed
     {
-        $pathItemClasses = $this->indexPathItemClasses($specification);
+        $pathItemClasses = $specification->buildPathItemHierarchy()->classes();
 
         if ($pathItemClasses === []) {
             return null;
@@ -48,26 +49,9 @@ class Operations
     }
 
     /**
-     * @return array<class-string, true>
-     */
-    protected function indexPathItemClasses(Specification $specification): array
-    {
-        $map = [];
-
-        foreach ($specification->pathItems as $pathItem) {
-            $className = $pathItem->getClassName();
-            if ($className !== null) {
-                $map[$className] = true;
-            }
-        }
-
-        return $map;
-    }
-
-    /**
      * Find operations whose owning class has no PathItem — these are inheritable.
      *
-     * @param  array<class-string, true>               $pathItemClasses
+     * @param  array<class-string, OA\PathItem>        $pathItemClasses
      * @return array<class-string, list<OA\Operation>> Grouped by declaring class
      */
     protected function findInheritableOperations(Specification $specification, array $pathItemClasses): array
@@ -89,7 +73,7 @@ class Operations
     /**
      * For each PathItem class, walk ancestors and clone or discover inheritable operations.
      *
-     * @param array<class-string, true>               $pathItemClasses
+     * @param array<class-string, OA\PathItem>        $pathItemClasses
      * @param array<class-string, list<OA\Operation>> $ancestorOperations Already-assembled operations
      */
     protected function cloneToChildren(Specification $specification, array $pathItemClasses, array $ancestorOperations): void
@@ -109,9 +93,9 @@ class Operations
 
                 if (isset($ancestorOperations[$parentName])) {
                     foreach ($ancestorOperations[$parentName] as $operation) {
-                        $clone = clone $operation;
-                        $clone->setReflector($reflector);
-                        $specification->add($clone);
+                        $copy = $operation->copy();
+                        $copy->setReflector($reflector);
+                        $specification->add($copy);
                         $toRemove[spl_object_id($operation)] = true;
                     }
                 } else {

@@ -36,8 +36,10 @@ class Path extends OA\Parameter
         mixed $example = Undefined::UNDEFINED,
         ?array $examples = null,
         OA\MediaType|array|null $content = null,
+        ?string $component = null,
         ?array $x = null,
         ?array $attachables = null,
+        ?OA\Fan $fan = null,
     ) {
         parent::__construct(
             parameter: $parameter,
@@ -53,8 +55,10 @@ class Path extends OA\Parameter
             example: $example,
             examples: $examples,
             content: $content,
+            component: $component,
             x: $x,
             attachables: $attachables,
+            fan: $fan,
         );
     }
 }

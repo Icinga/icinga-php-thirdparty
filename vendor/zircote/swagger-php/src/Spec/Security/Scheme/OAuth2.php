@@ -25,16 +25,20 @@ class OAuth2 extends OA\Security\Scheme
         ?string $securityScheme = null,
         ?string $description = null,
         ?array $flows = null,
+        ?string $component = null,
         ?array $x = null,
         ?array $attachables = null,
+        ?OA\Fan $fan = null,
     ) {
         parent::__construct(
             securityScheme: $securityScheme,
             type: OA\SchemeType::OAuth2,
             description: $description,
             flows: $flows,
+            component: $component,
             x: $x,
             attachables: $attachables,
+            fan: $fan,
         );
     }
 }

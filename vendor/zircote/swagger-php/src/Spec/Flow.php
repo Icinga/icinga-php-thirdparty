@@ -15,7 +15,7 @@ namespace OpenApi\Spec;
  * - `OA\Flow\ClientCredentials` - client credentials grant (tokenUrl required)
  * - `OA\Flow\AuthorizationCode` - authorization code grant (authorizationUrl + tokenUrl required)
  *
- *   #[OA\Security\Scheme\OAuth2(securityScheme: 'oauth2', flows: [
+ *   #[OA\Security\Scheme\OAuth2(component: 'oauth2', flows: [
  *       new OA\Flow\AuthorizationCode(
  *           authorizationUrl: 'https://example.com/oauth/authorize',
  *           tokenUrl: 'https://example.com/oauth/token',
@@ -52,6 +52,7 @@ class Flow extends AbstractAttribute
      * @param array<string,string>|null $scopes           The available scopes for the OAuth2 security scheme
      * @param array<string,mixed>|null  $x                Vendor extensions (x-* properties)
      * @param list<Attachable>|null     $attachables      Reusable custom attachable attributes
+     * @param Fan|null                  $fan              Where this attribute goes when more than one attribute could hold it
      */
     public function __construct(
         string|FlowType|null $flow = null,
@@ -61,8 +62,9 @@ class Flow extends AbstractAttribute
         public ?array $scopes = null,
         ?array $x = null,
         ?array $attachables = null,
+        ?Fan $fan = null,
     ) {
-        parent::__construct(x: $x, attachables: $attachables);
+        parent::__construct(x: $x, attachables: $attachables, fan: $fan);
         $this->flow = $flow instanceof \BackedEnum ? $flow->value : $flow;
     }
 

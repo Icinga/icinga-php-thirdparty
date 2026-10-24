@@ -7,10 +7,16 @@
 namespace OpenApi\Utils;
 
 use OpenApi\Assembler\DefaultAttributeTranslator;
+use OpenApi\Assembler\OperationMethodsTranslator;
 use OpenApi\Assembler\OptionalPropertyAttributeTranslator;
 use OpenApi\Contracts\AttributeInterface;
 use OpenApi\Contracts\AttributeTranslatorInterface;
 use OpenApi\OpenApiException;
+use OpenApi\Spec as OA;
+use OpenApi\Specification\ComponentName;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 
 /**
  * Creates spec attribute instances from PHP reflectors.
@@ -20,8 +26,10 @@ use OpenApi\OpenApiException;
  * collection) and augmenter pipes that need to manufacture spec objects
  * from reflection (e.g. Augmenter\Inheritance for non-schema ancestor members).
  */
-class AttributeFactory
+class AttributeFactory implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var TypedList<AttributeTranslatorInterface>
      */
@@ -33,6 +41,7 @@ class AttributeFactory
         $translators = [
             new DefaultAttributeTranslator(),
             new OptionalPropertyAttributeTranslator(),
+            new OperationMethodsTranslator(),
         ];
 
         $this->translators = new TypedList($translators);
@@ -72,13 +81,17 @@ class AttributeFactory
     }
 
     /**
-     * Reset all translators.
+     * Reset all translators, and give those that log this factory's logger.
      *
      * Called at the start of each top-level collection unit.
      */
     public function resetTranslators(): void
     {
         foreach ($this->translators as $translator) {
+            if ($translator instanceof LoggerAwareInterface && $this->logger instanceof LoggerInterface) {
+                $translator->setLogger($this->logger);
+            }
+
             $translator->reset();
         }
     }
@@ -87,6 +100,8 @@ class AttributeFactory
      * Read and resolve attributes from a single member reflector.
      *
      * For methods, also resolves parameter-level attributes into the method-level ones.
+     *
+     * @param \ReflectionClass<object>|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\ReflectionClassConstant $reflector
      *
      * @return list<AttributeInterface>
      */
@@ -124,6 +139,8 @@ class AttributeFactory
      * Each member is fully resolved internally (merge + parameter absorption for methods),
      * then all results are returned for hierarchical absorption into class-level containers.
      *
+     * @param \ReflectionClass<object> $class
+     *
      * @return list<AttributeInterface>
      */
     public function membersOf(\ReflectionClass $class): array
@@ -147,6 +164,8 @@ class AttributeFactory
             foreach ($constructor->getParameters() as $parameter) {
                 array_push($inner, ...$this->resolveNesting($this->readAttributes($parameter)));
             }
+
+            $this->reportConstructorAttributes($class, $constructor);
         }
 
         foreach ($class->getReflectionConstants() as $constant) {
@@ -168,6 +187,8 @@ class AttributeFactory
 
     /**
      * Check whether a reflector has any `AttributeInterface` attributes.
+     *
+     * @param \ReflectionClass<object>|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\ReflectionClassConstant $reflector
      */
     public function hasAttributes(\ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\ReflectionClassConstant $reflector): bool
     {
@@ -176,6 +197,8 @@ class AttributeFactory
 
     /**
      * Get methods directly implemented by a class (not inherited from parents).
+     *
+     * @param \ReflectionClass<object> $class
      *
      * @return list<\ReflectionMethod>
      */
@@ -201,7 +224,9 @@ class AttributeFactory
     /**
      * Get interfaces directly implemented by a class (not inherited from parents).
      *
-     * @return list<\ReflectionClass>
+     * @param \ReflectionClass<object> $class
+     *
+     * @return list<\ReflectionClass<object>>
      */
     public function getDirectInterfaces(\ReflectionClass $class): array
     {
@@ -228,19 +253,21 @@ class AttributeFactory
      * PHP's ReflectionClass::getTraits() flattens the entire trait tree, so we
      * must exclude traits that come from a parent class or from another trait's use.
      *
-     * @return list<\ReflectionClass>
+     * @param \ReflectionClass<object> $class
+     *
+     * @return list<\ReflectionClass<object>>
      */
     public function getDirectTraits(\ReflectionClass $class): array
     {
         $scannerDetails = $this->tokenScanner->detailsFor($class);
 
         if ($scannerDetails !== null) {
-            return array_filter(
+            return array_values(array_filter(
                 array_map(
                     fn (string $name): ?\ReflectionClass => class_exists($name) || trait_exists($name) ? new \ReflectionClass($name) : null,
                     $scannerDetails['traits'],
                 ),
-            );
+            ));
         }
 
         return [];
@@ -249,8 +276,9 @@ class AttributeFactory
     /**
      * Hierarchical absorb: inner-level attributes declare which outer-level types can contain them.
      *
-     * Inner attributes that match an outer attribute via contained() are nested into it (first match wins).
-     * Inner attributes that find no container pass through alongside outer.
+     * An inner attribute matching one outer attribute via contained() is nested into it. Matching
+     * more than one is an error, unless the inner attribute fans out to all of them. Inner
+     * attributes that find no container pass through alongside outer.
      *
      * @param  list<AttributeInterface> $outer
      * @param  list<AttributeInterface> $inner
@@ -259,27 +287,100 @@ class AttributeFactory
     public function resolveHierarchy(array $outer, array $inner): array
     {
         foreach ($inner as $innerAttribute) {
-            $absorbed = false;
-            $containedTargets = $innerAttribute->contained();
-
-            if ($containedTargets !== []) {
-                foreach ($outer as $outerAttribute) {
-                    foreach ($containedTargets as $parentClass => $slot) {
-                        if ($outerAttribute instanceof $parentClass) {
-                            $this->nestChild($outerAttribute, $innerAttribute, $slot);
-                            $absorbed = true;
-                            break 2;
-                        }
-                    }
+            $matches = [];
+            foreach ($outer as $outerAttribute) {
+                $match = $this->matchTarget($innerAttribute, $outerAttribute, $innerAttribute->contained());
+                if ($match !== null) {
+                    $matches[] = $match;
                 }
             }
 
-            if (!$absorbed) {
+            if ($matches === []) {
                 $outer[] = $innerAttribute;
+                continue;
             }
+
+            $this->nestIntoMatches($innerAttribute, $matches, 'Ambiguous hierarchy: %s matches multiple containers');
         }
 
         return $outer;
+    }
+
+    /**
+     * A component declared on a member is one only in a class carrying `OA\Components`. Without
+     * it, the key alone does not say which is meant: on a property the same schema is the
+     * property's own, and on a method it would be a component. So a keyed component left over
+     * from a member is dropped, and said so.
+     *
+     * A schema on a property arrives inside the `OA\Property` the shortcut adds, so its key is
+     * looked for there. Unkeyed attributes are left alone: a parent class without a schema leaves
+     * its properties unabsorbed on purpose, for `Augmenter\Inheritance` to read again.
+     *
+     * @param list<AttributeInterface> $outer    the class's own attributes
+     * @param list<AttributeInterface> $resolved the class's attributes after absorbing its members
+     *
+     * @return list<AttributeInterface>
+     */
+    public function withoutStrayComponents(array $outer, array $resolved): array
+    {
+        foreach ($outer as $attribute) {
+            if ($attribute instanceof OA\Components) {
+                return $resolved;
+            }
+        }
+
+        $kept = [];
+        foreach ($resolved as $attribute) {
+            $component = $attribute instanceof OA\Property ? $attribute->schema : $attribute;
+            $key = $component instanceof AttributeInterface && ($component->isRoot() || $attribute instanceof OA\Property)
+                ? ComponentName::of($component)
+                : null;
+
+            if ($key === null || in_array($attribute, $outer, true)) {
+                $kept[] = $attribute;
+                continue;
+            }
+
+            $this->logger?->warning(sprintf(
+                '%s "%s" ignored, a component declared on a member needs %s on its class, in %s',
+                $component::class,
+                $key,
+                OA\Components::class,
+                $attribute->getSourceLocation(),
+            ));
+        }
+
+        return $kept;
+    }
+
+    /**
+     * The constructor is not a place to declare anything: only its parameters, as promoted
+     * properties, are read. What sits on it is ignored, and said so; the class takes the same
+     * attributes.
+     *
+     * @param \ReflectionClass<object> $class
+     */
+    protected function reportConstructorAttributes(\ReflectionClass $class, \ReflectionMethod $constructor): void
+    {
+        // inherited or brought in by a trait, it is reported where it is declared
+        $scannerDetails = $this->tokenScanner->detailsFor($class);
+        if ($constructor->getDeclaringClass()->getName() !== $class->getName()
+            || ($scannerDetails && !in_array($constructor->getName(), $scannerDetails['methods'], true))
+        ) {
+            return;
+        }
+
+        $attributes = $constructor->getAttributes(AttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
+        if ($attributes === []) {
+            return;
+        }
+
+        $this->logger?->warning(sprintf(
+            '%s ignored on a constructor, declare %s on the class in %s',
+            implode(', ', array_map(static fn (\ReflectionAttribute $attribute): string => $attribute->getName(), $attributes)),
+            count($attributes) === 1 ? 'it' : 'them',
+            SourceLocation::fromReflector($constructor),
+        ));
     }
 
     /**
@@ -363,7 +464,8 @@ class AttributeFactory
     }
 
     /**
-     * Merge one attribute into a matching unmerged sibling, if there is exactly one.
+     * Merge one attribute into its matching unmerged sibling. Matching more than one is an error,
+     * unless the attribute fans out to all of them.
      *
      * @param list<AttributeInterface> $attributes
      * @param array<int,true>          $merged
@@ -371,33 +473,102 @@ class AttributeFactory
     protected function mergeIntoSibling(array $attributes, int $index, array &$merged): void
     {
         $attribute = $attributes[$index];
-        $mergeTargets = $attribute->merge();
 
-        $matchingTarget = null;
-        $matchingSlot = null;
+        $matches = [];
         foreach ($attributes as $candidateIndex => $candidate) {
             if ($candidateIndex === $index || isset($merged[$candidateIndex])) {
                 continue;
             }
 
-            foreach ($mergeTargets as $targetClass => $slot) {
-                if ($candidate instanceof $targetClass) {
-                    if ($matchingTarget instanceof AttributeInterface) {
-                        throw OpenApiException::fromSource(
-                            sprintf('Ambiguous merge: %s matches multiple siblings on the same target', $attribute::class),
-                            $attribute->getSourceLocation(),
-                        );
-                    }
-                    $matchingTarget = $candidate;
-                    $matchingSlot = $slot;
-                }
+            $match = $this->matchTarget($attribute, $candidate, $attribute->merge());
+            if ($match !== null) {
+                $matches[] = $match;
             }
         }
 
-        if ($matchingTarget instanceof AttributeInterface) {
-            $this->nestChild($matchingTarget, $attribute, $matchingSlot);
+        if ($matches !== []) {
+            $this->nestIntoMatches($attribute, $matches, 'Ambiguous merge: %s matches multiple siblings on the same target');
             $merged[$index] = true;
         }
+    }
+
+    /**
+     * Nest a child into the one parent it matched, or with `Fan::All` into each of several that
+     * match by the same target type: the child itself into the first, a copy into every other.
+     * Several matches are an error otherwise, and so are matches of different target types,
+     * whatever the child's `fan`.
+     *
+     * @param non-empty-list<array{AttributeInterface, string, list<class-string>}> $matches parent, slot and the target types it matched by
+     */
+    protected function nestIntoMatches(AttributeInterface $child, array $matches, string $ambiguous): void
+    {
+        if (count($matches) > 1) {
+            // one type when a target type is shared by every match, whichever order they come in
+            $shared = array_intersect(...array_column($matches, 2));
+            $fanned = $child->getFan() === OA\Fan::All;
+
+            if (!$fanned || $shared === []) {
+                throw OpenApiException::fromSource(
+                    sprintf(
+                        '%s (%s). %s',
+                        sprintf($ambiguous, $child::class),
+                        implode(', ', array_map($this->matchLabel(...), array_column($matches, 0))),
+                        $fanned
+                            ? 'Fan::All only puts it into several attributes of one type. Nest it explicitly in the one it belongs to.'
+                            : 'Nest it explicitly in the one it belongs to, give it a `component` and reference it from each, or set `fan: Fan::All` to put it in all of them.',
+                    ),
+                    $child->getSourceLocation(),
+                );
+            }
+        }
+
+        foreach ($matches as $position => [$parent, $slot]) {
+            $this->nestChild($parent, $position === 0 ? $child : $child->copy(), $slot);
+        }
+    }
+
+    /**
+     * The slot a child takes in a candidate parent, with the target types of `$targets` the
+     * candidate is an instance of, or null when it is none of them. A candidate matching
+     * several target types that name different slots is an error: the slot would be decided by
+     * the order of `$targets`.
+     *
+     * @param array<class-string, string> $targets target type and slot, from `merge()` or `contained()`
+     *
+     * @return array{AttributeInterface, string, list<class-string>}|null
+     */
+    protected function matchTarget(AttributeInterface $child, AttributeInterface $candidate, array $targets): ?array
+    {
+        $matched = array_filter($targets, static fn (string $slot, string $type): bool => $candidate instanceof $type, ARRAY_FILTER_USE_BOTH);
+        if ($matched === []) {
+            return null;
+        }
+
+        $slots = array_values(array_unique($matched));
+        if (count($slots) > 1) {
+            throw OpenApiException::fromSource(
+                sprintf(
+                    'Ambiguous slot: %s matches %s as more than one target type (%s), and they name different slots (%s)',
+                    $child::class,
+                    $this->matchLabel($candidate),
+                    implode(', ', array_keys($matched)),
+                    implode(', ', $slots),
+                ),
+                $child->getSourceLocation(),
+            );
+        }
+
+        return [$candidate, $slots[0], array_keys($matched)];
+    }
+
+    /**
+     * An attribute as an ambiguity message names it: its class, and its component key if it has one.
+     */
+    protected function matchLabel(AttributeInterface $attribute): string
+    {
+        $component = ComponentName::isComponentType($attribute) ? ComponentName::of($attribute) : null;
+
+        return $component !== null ? sprintf('%s "%s"', $attribute::class, $component) : $attribute::class;
     }
 
     protected function nestChild(AttributeInterface $parent, AttributeInterface $child, string $slot): void
@@ -434,6 +605,8 @@ class AttributeFactory
     }
 
     /**
+     * @param \ReflectionClass<object>|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\ReflectionClassConstant $reflector
+     *
      * @return list<AttributeInterface>
      */
     protected function readAttributes(\ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter|\ReflectionClassConstant $reflector): array
