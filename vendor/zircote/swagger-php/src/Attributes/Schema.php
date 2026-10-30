@@ -1,0 +1,161 @@
+<?php declare(strict_types=1);
+
+/**
+ * @license Apache 2.0
+ */
+
+namespace OpenApi\Attributes;
+
+use OpenApi\Annotations as OA;
+use OpenApi\Undefined;
+
+/**
+ * @phpstan-import-type EnumValue from \OpenApi\Spec\Schema
+ */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
+class Schema extends OA\Schema
+{
+    /**
+     * @param string|class-string|object|null        $ref
+     * @param list<string>                           $required
+     * @param list<Property>                         $properties
+     * @param string|non-empty-array<string>|null    $type
+     * @param array<mixed>                           $examples
+     * @param array<Schema|OA\Schema>                $allOf
+     * @param array<Schema|OA\Schema>                $anyOf
+     * @param array<Schema|OA\Schema>                $oneOf
+     * @param list<EnumValue|null>|class-string|null $enum
+     * @param array<string,mixed>|null               $x
+     * @param list<Attachable>|null                  $attachables
+     */
+    public function __construct(
+        // Schema
+        string|object|null $ref = null,
+        ?string $schema = null,
+        ?string $title = null,
+        ?string $description = Undefined::UNDEFINED,
+        ?int $maxProperties = null,
+        ?int $minProperties = null,
+        ?array $required = null,
+        ?array $properties = null,
+        string|array|null $type = null,
+        ?string $format = null,
+        ?Items $items = null,
+        ?string $collectionFormat = null,
+        ?string $pattern = null,
+        ?Discriminator $discriminator = null,
+        ?bool $readOnly = null,
+        ?bool $writeOnly = null,
+        ?Xml $xml = null,
+        ?ExternalDocumentation $externalDocs = null,
+        mixed $example = Undefined::UNDEFINED,
+        ?array $examples = null,
+        ?bool $nullable = null,
+        ?bool $deprecated = null,
+        ?array $allOf = null,
+        ?array $anyOf = null,
+        ?array $oneOf = null,
+        ?string $contentEncoding = null,
+        ?string $contentMediaType = null,
+
+        // JSON Schema
+        mixed $default = Undefined::UNDEFINED,
+        int|float|null $maximum = null,
+        bool|int|float|null $exclusiveMaximum = null,
+        int|float|null $minimum = null,
+        bool|int|float|null $exclusiveMinimum = null,
+        int|null $maxLength = null,
+        int|null $minLength = null,
+        int|null $maxItems = null,
+        int|null $minItems = null,
+        bool|null $uniqueItems = null,
+        array|string|null $enum = null,
+        mixed $not = Undefined::UNDEFINED,
+        bool|AdditionalProperties|null $additionalProperties = null,
+        array|null $additionalItems = null,
+        array|null $contains = null,
+        int|null $minContains = null,
+        int|null $maxContains = null,
+        array|null $prefixItems = null,
+        array|null $patternProperties = null,
+        bool|array|null $unevaluatedProperties = null,
+        mixed $unevaluatedItems = Undefined::UNDEFINED,
+        mixed $dependencies = Undefined::UNDEFINED,
+        array|null $dependentRequired = null,
+        array|null $dependentSchemas = null,
+        mixed $propertyNames = Undefined::UNDEFINED,
+        mixed $const = Undefined::UNDEFINED,
+        mixed $if = Undefined::UNDEFINED,
+        mixed $then = Undefined::UNDEFINED,
+        mixed $else = Undefined::UNDEFINED,
+        mixed $contentSchema = Undefined::UNDEFINED,
+
+        // abstract annotation
+        ?array $x = null,
+        ?array $attachables = null
+    ) {
+        parent::__construct([
+            'ref' => $ref ?? Undefined::UNDEFINED,
+            'schema' => $schema ?? Undefined::UNDEFINED,
+            'title' => $title ?? Undefined::UNDEFINED,
+            'description' => $description,
+            'maxProperties' => $maxProperties ?? Undefined::UNDEFINED,
+            'minProperties' => $minProperties ?? Undefined::UNDEFINED,
+            'required' => $required ?? Undefined::UNDEFINED,
+            'properties' => $properties ?? Undefined::UNDEFINED,
+            'type' => $type ?? Undefined::UNDEFINED,
+            'format' => $format ?? Undefined::UNDEFINED,
+            'collectionFormat' => $collectionFormat ?? Undefined::UNDEFINED,
+            'pattern' => $pattern ?? Undefined::UNDEFINED,
+            'readOnly' => $readOnly ?? Undefined::UNDEFINED,
+            'writeOnly' => $writeOnly ?? Undefined::UNDEFINED,
+            'xml' => $xml ?? Undefined::UNDEFINED,
+            'example' => $example,
+            'nullable' => $nullable ?? Undefined::UNDEFINED,
+            'deprecated' => $deprecated ?? Undefined::UNDEFINED,
+            'allOf' => $allOf ?? Undefined::UNDEFINED,
+            'anyOf' => $anyOf ?? Undefined::UNDEFINED,
+            'oneOf' => $oneOf ?? Undefined::UNDEFINED,
+            'contentEncoding' => $contentEncoding ?? Undefined::UNDEFINED,
+            'contentMediaType' => $contentMediaType ?? Undefined::UNDEFINED,
+
+            // JSON Schema
+            'default' => $default,
+            'maximum' => $maximum ?? Undefined::UNDEFINED,
+            'exclusiveMaximum' => $exclusiveMaximum ?? Undefined::UNDEFINED,
+            'minimum' => $minimum ?? Undefined::UNDEFINED,
+            'exclusiveMinimum' => $exclusiveMinimum ?? Undefined::UNDEFINED,
+            'maxLength' => $maxLength ?? Undefined::UNDEFINED,
+            'minLength' => $minLength ?? Undefined::UNDEFINED,
+            'maxItems' => $maxItems ?? Undefined::UNDEFINED,
+            'minItems' => $minItems ?? Undefined::UNDEFINED,
+            'uniqueItems' => $uniqueItems ?? Undefined::UNDEFINED,
+            'enum' => $enum ?? Undefined::UNDEFINED,
+            'not' => $not,
+            'additionalProperties' => $additionalProperties ?? Undefined::UNDEFINED,
+            'additionalItems' => $additionalItems ?? Undefined::UNDEFINED,
+            'contains' => $contains ?? Undefined::UNDEFINED,
+            'minContains' => $minContains ?? Undefined::UNDEFINED,
+            'maxContains' => $maxContains ?? Undefined::UNDEFINED,
+            'prefixItems' => $prefixItems ?? Undefined::UNDEFINED,
+            'patternProperties' => $patternProperties ?? Undefined::UNDEFINED,
+            'unevaluatedProperties' => $unevaluatedProperties ?? Undefined::UNDEFINED,
+            'unevaluatedItems' => $unevaluatedItems,
+            'dependencies' => $dependencies,
+            'dependentRequired' => $dependentRequired ?? Undefined::UNDEFINED,
+            'dependentSchemas' => $dependentSchemas ?? Undefined::UNDEFINED,
+            'propertyNames' => $propertyNames,
+            'const' => $const,
+            'if' => $if,
+            'then' => $then,
+            'else' => $else,
+            'contentSchema' => $contentSchema,
+
+            // abstract annotation
+            'x' => $x ?? Undefined::UNDEFINED,
+            'attachables' => $attachables ?? Undefined::UNDEFINED,
+            'examples' => $examples ?: Undefined::UNDEFINED,
+            'value' => $this->combine($items, $discriminator, $externalDocs),
+        ]);
+    }
+}
