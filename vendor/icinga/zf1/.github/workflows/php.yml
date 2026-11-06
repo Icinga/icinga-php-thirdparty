@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  php:
+    name: PHP
+    uses: Icinga/github-actions/.github/workflows/php.yml@main
+    with:
+      env: |
+        {
+          "PHPUNIT_BOOTSTRAP": "tests/bootstrap.php"
+        }
