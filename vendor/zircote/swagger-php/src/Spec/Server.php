@@ -1,0 +1,53 @@
+<?php declare(strict_types=1);
+
+/**
+ * @license Apache 2.0
+ */
+
+namespace OpenApi\Spec;
+
+/**
+ * A host the API is available on, optionally templated with `ServerVariable` substitutions.
+ *
+ * @see [Server Object](https://spec.openapis.org/oas/v3.1.1.html#server-object)
+ */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+class Server extends AbstractAttribute
+{
+    /**
+     * @param string|null               $url         A URL to the target host
+     * @param string|null               $description A description of the host (CommonMark syntax)
+     * @param list<ServerVariable>|null $variables   Variables for server URL template substitution
+     * @param array<string,mixed>|null  $x           Vendor extensions (x-* properties)
+     * @param list<Attachable>|null     $attachables Reusable custom attachable attributes
+     * @param Fan|null                  $fan         Where this attribute goes when more than one attribute could hold it
+     */
+    public function __construct(
+        public ?string $url = null,
+        public ?string $description = null,
+        public ?array $variables = null,
+        ?array $x = null,
+        ?array $attachables = null,
+        ?Fan $fan = null,
+    ) {
+        parent::__construct(x: $x, attachables: $attachables, fan: $fan);
+    }
+
+    public function isRoot(): bool
+    {
+        return true;
+    }
+
+    public function merge(): array
+    {
+        return [PathItem::class => 'servers[]', Operation::class => 'servers[]'];
+    }
+
+    public function contained(): array
+    {
+        return [
+            Operation::class => 'servers[]',
+            PathItem::class => 'servers[]',
+        ];
+    }
+}

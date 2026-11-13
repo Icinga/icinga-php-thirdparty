@@ -1,0 +1,249 @@
+<?php declare(strict_types=1);
+
+/**
+ * @license Apache 2.0
+ */
+
+namespace OpenApi\Analysers;
+
+use OpenApi\Analysis;
+use OpenApi\Annotations as OA;
+use OpenApi\Context;
+use OpenApi\Generator;
+use OpenApi\GeneratorAwareTrait;
+use OpenApi\OpenApiException;
+use OpenApi\Utils\ClassReflector;
+use OpenApi\Utils\TokenScanner;
+
+/**
+ * OpenApi analyser using reflection.
+ *
+ * Can read either PHP <code>DocBlock</code>s or <code>Attribute</code>s.
+ *
+ * Due to the nature of reflection, this requires all related classes to be auto-loadable.
+ *
+ * @phpstan-import-type ClassDefinition from Analysis
+ * @phpstan-import-type InterfaceDefinition from Analysis
+ * @phpstan-import-type TraitDefinition from Analysis
+ * @phpstan-import-type EnumDefinition from Analysis
+ */
+class ReflectionAnalyser implements AnalyserInterface
+{
+    use GeneratorAwareTrait;
+
+    /** @var list<AnnotationFactoryInterface> */
+    protected array $annotationFactories = [];
+
+    /**
+     * @param list<AnnotationFactoryInterface> $annotationFactories
+     */
+    public function __construct(array $annotationFactories = [])
+    {
+        foreach ($annotationFactories as $annotationFactory) {
+            if ($annotationFactory->isSupported()) {
+                $this->annotationFactories[] = $annotationFactory;
+            }
+        }
+
+        if (!$this->annotationFactories) {
+            throw new OpenApiException('No suitable annotation factory found. At least one of "Doctrine Annotations" or PHP 8.1 are required');
+        }
+    }
+
+    public function setGenerator(Generator $generator): static
+    {
+        $this->generator = $generator;
+
+        foreach ($this->annotationFactories as $annotationFactory) {
+            $annotationFactory->setGenerator($generator);
+        }
+
+        return $this;
+    }
+
+    public function fromFile(string $filename, Context $context): Analysis
+    {
+        $scanner = new TokenScanner();
+        $fileDetails = $scanner->scanFile($filename);
+
+        $analysis = new Analysis([], $context);
+        foreach ($fileDetails as $fqdn => $details) {
+            $this->analyzeFqdn($fqdn, $analysis, $details);
+        }
+
+        return $analysis;
+    }
+
+    /**
+     * @param class-string $fqdn
+     */
+    public function fromFqdn(string $fqdn, Analysis $analysis): Analysis
+    {
+        /** @var class-string $fqdn ltrim() does not change that */
+        $fqdn = ltrim($fqdn, '\\');
+
+        $rc = new \ReflectionClass($fqdn);
+        if (!$filename = $rc->getFileName()) {
+            return $analysis;
+        }
+
+        if (!is_file($filename)) {
+            $analysis->context?->logger?->warning("Skipping {$fqdn}: its source file {$filename} cannot be read");
+
+            return $analysis;
+        }
+
+        $scanner = new TokenScanner();
+        $fileDetails = $scanner->scanFile($filename);
+
+        // the scanner keys a class in the global namespace with its leading backslash
+        $details = $fileDetails[$fqdn] ?? $fileDetails['\\' . $fqdn] ?? null;
+        if ($details === null) {
+            return $analysis;
+        }
+
+        $this->analyzeFqdn($fqdn, $analysis, $details);
+
+        return $analysis;
+    }
+
+    /**
+     * @param array<string, mixed> $details
+     */
+    protected function analyzeFqdn(string $fqdn, Analysis $analysis, array $details): Analysis
+    {
+        [$rc, $reason] = ClassReflector::tryReflect($fqdn);
+        if (!$rc instanceof \ReflectionClass) {
+            $analysis->context->logger->warning($reason === null
+                ? 'Skipping unknown ' . $fqdn
+                : "Skipping unloadable {$fqdn}: {$reason}");
+
+            return $analysis;
+        }
+
+        try {
+            return $this->buildDefinition($rc, $analysis, $details);
+        } catch (\Throwable $throwable) {
+            $analysis->context->logger->warning("Skipping unloadable {$fqdn}: {$throwable->getMessage()}");
+
+            return $analysis;
+        }
+    }
+
+    /**
+     * @param \ReflectionClass<object> $rc
+     * @param array<string, mixed>     $details
+     */
+    protected function buildDefinition(\ReflectionClass $rc, Analysis $analysis, array $details): Analysis
+    {
+        $contextType = $rc->isInterface()
+            ? 'interface'
+            : ($rc->isTrait() ? 'trait' : ($rc->isEnum() ? 'enum' : 'class'));
+        $context = new Context([
+            $contextType => $rc->getShortName(),
+            'namespace' => $rc->getNamespaceName() ?: null,
+            'uses' => $details['uses'],
+            'comment' => $rc->getDocComment() ?: null,
+            'filename' => $rc->getFileName() ?: null,
+            'line' => $rc->getStartLine(),
+            'annotations' => [],
+            'scanned' => $details,
+            'reflector' => $rc,
+        ], $analysis->context);
+
+        $definition = [
+            $contextType => $rc->getShortName(),
+            'extends' => null,
+            'implements' => [],
+            'traits' => [],
+            'properties' => [],
+            'methods' => [],
+            'context' => $context,
+        ];
+        $normaliseClass = static fn (string $name): string => '\\' . ltrim($name, '\\');
+        if ($parentClass = $rc->getParentClass()) {
+            $definition['extends'] = $normaliseClass($parentClass->getName());
+        }
+        $definition[$contextType === 'class' ? 'implements' : 'extends'] = array_map($normaliseClass, $details['interfaces']);
+        $definition['traits'] = array_map($normaliseClass, $details['traits']);
+
+        foreach ($this->annotationFactories as $annotationFactory) {
+            $analysis->addAnnotations($annotationFactory->build($rc, $context), $context);
+        }
+
+        foreach ($rc->getMethods() as $method) {
+            if (in_array($method->name, $details['methods'])) {
+                $definition['methods'][$method->getName()] = $ctx = new Context([
+                    'method' => $method->getName(),
+                    'comment' => $method->getDocComment() ?: null,
+                    'filename' => $method->getFileName() ?: null,
+                    'line' => $method->getStartLine(),
+                    'annotations' => [],
+                    'reflector' => $method,
+                ], $context);
+                foreach ($this->annotationFactories as $annotationFactory) {
+                    $annotations = $annotationFactory->build($method, $ctx);
+                    $analysis->addAnnotations($annotations, $ctx);
+                }
+            }
+        }
+
+        foreach ($rc->getProperties() as $property) {
+            if (in_array($property->name, $details['properties'])) {
+                $definition['properties'][$property->getName()] = $ctx = new Context([
+                    'property' => $property->getName(),
+                    'comment' => $property->getDocComment() ?: null,
+                    'annotations' => [],
+                    'reflector' => $property,
+                ], $context);
+                if ($property->isStatic()) {
+                    $ctx->static = true;
+                }
+                foreach ($this->annotationFactories as $annotationFactory) {
+                    $analysis->addAnnotations($annotationFactory->build($property, $ctx), $ctx);
+                }
+            }
+        }
+
+        foreach ($rc->getReflectionConstants() as $constant) {
+            foreach ($this->annotationFactories as $annotationFactory) {
+                $definition['constants'][$constant->getName()] = $ctx = new Context([
+                    'constant' => $constant->getName(),
+                    'comment' => $constant->getDocComment() ?: null,
+                    'annotations' => [],
+                    'reflector' => $constant,
+                ], $context);
+                foreach ($annotationFactory->build($constant, $ctx) as $annotation) {
+                    if ($annotation instanceof OA\Property) {
+                        $analysis->addAnnotation($annotation, $ctx);
+                    }
+                }
+            }
+        }
+
+        switch ($contextType) {
+            case 'interface':
+                /** @var InterfaceDefinition $interfaceDefinition */
+                $interfaceDefinition = $definition;
+                $analysis->addInterfaceDefinition($interfaceDefinition);
+                break;
+            case 'trait':
+                /** @var TraitDefinition $traitDefinition */
+                $traitDefinition = $definition;
+                $analysis->addTraitDefinition($traitDefinition);
+                break;
+            case 'enum':
+                /** @var EnumDefinition $enumDefinition */
+                $enumDefinition = $definition;
+                $analysis->addEnumDefinition($enumDefinition);
+                break;
+            default:
+                /** @var ClassDefinition $classDefinition */
+                $classDefinition = $definition;
+                $analysis->addClassDefinition($classDefinition);
+                break;
+        }
+
+        return $analysis;
+    }
+}
