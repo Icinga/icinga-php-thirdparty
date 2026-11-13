@@ -3,7 +3,7 @@
         'name' => 'icinga/icinga-php-thirdparty',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '8e48c63dbfbaf1cb61087bc1db7a3e804ae1884b',
+        'reference' => '857b02194d1b1bf940380be2d81ca791b747b87d',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -247,7 +247,7 @@
         'icinga/icinga-php-thirdparty' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '8e48c63dbfbaf1cb61087bc1db7a3e804ae1884b',
+            'reference' => '857b02194d1b1bf940380be2d81ca791b747b87d',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
