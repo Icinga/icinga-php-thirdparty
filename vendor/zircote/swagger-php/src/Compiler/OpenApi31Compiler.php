@@ -41,6 +41,8 @@ class OpenApi31Compiler implements CompilerInterface
     /**
      * Maps nested in another object, as container => [property => the member field keying it].
      * `Schema::$examples` is absent: it is the JSON Schema keyword, which takes a list.
+     *
+     * @var array<class-string<AttributeInterface>, array<string, string>>
      */
     protected const NESTED_MAPS = [
         OA\Response::class => ['headers' => 'header', 'links' => 'link'],
@@ -99,6 +101,8 @@ class OpenApi31Compiler implements CompilerInterface
 
         $this->validateOperationIds($specification);
 
+        $this->validatePathParameters($specification);
+
         $this->validateResponses($specification);
 
         $this->validateMediaTypes($specification);
@@ -123,11 +127,11 @@ class OpenApi31Compiler implements CompilerInterface
             'info' => $specification->info instanceof OA\Info ? $this->compileInfo($specification->info) : null,
             'servers' => array_map($this->compileServer(...), $specification->servers),
             'paths' => $this->compilePaths($specification->operations, $specification->pathItems),
-            'webhooks' => $this->compileWebhooks($specification->operations),
-            'tags' => array_map($this->compileTag(...), $specification->tags),
-            'security' => $this->compileSecurity($specification->openapi->security ?? []),
-            'externalDocs' => $specification->externalDocs ? $this->compileExternalDocs($specification->externalDocs[0]) : null,
             'components' => $this->compileComponents($specification),
+            'security' => $this->compileSecurity($specification->openapi->security ?? []),
+            'tags' => array_map($this->compileTag(...), $specification->tags),
+            'externalDocs' => $specification->externalDocs ? $this->compileExternalDocs($specification->externalDocs[0]) : null,
+            'webhooks' => $this->compileWebhooks($specification->operations),
         ], $specification->openapi);
     }
 
@@ -474,9 +478,11 @@ class OpenApi31Compiler implements CompilerInterface
     }
 
     /**
-     * @return array<string,mixed>
+     * A media type with nothing set is still an object: `application/json: {}`.
+     *
+     * @return array<string,mixed>|\stdClass
      */
-    protected function compileMediaType(OA\MediaType $mediaType): array
+    protected function compileMediaType(OA\MediaType $mediaType): array|\stdClass
     {
         $result = $this->filter([
             'schema' => $mediaType->schema instanceof OA\Schema ? $this->compileSchema($mediaType->schema) : null,
@@ -484,7 +490,7 @@ class OpenApi31Compiler implements CompilerInterface
             'encoding' => $this->compileKeyedMap($mediaType->encoding ?? [], 'encoding', $this->compileEncoding(...)),
         ], $mediaType);
 
-        return $this->withDefined($result, ['example' => $mediaType->example]);
+        return $this->withDefined($result, ['example' => $mediaType->example]) ?: new \stdClass();
     }
 
     /**
@@ -783,19 +789,19 @@ class OpenApi31Compiler implements CompilerInterface
     }
 
     /**
-     * Passing raw arrays is deprecated; use OA\Security\Requirement instances instead.
+     * Raw arrays are deprecated since 7.0 and removed in 8.0; use OA\Security\Requirement instances instead.
+     *
+     * A requirement naming no scheme makes authentication optional, and is still an object: `{}`.
      *
      * @param  list<OA\Security\Requirement|array<string,list<string>>> $security
-     * @return list<array<string,mixed>>
+     * @return list<array<string,mixed>|\stdClass>
      */
     protected function compileSecurity(array $security): array
     {
-        return array_map(static function (OA\Security\Requirement|array $item): array {
-            if ($item instanceof OA\Security\Requirement) {
-                return $item->toArray();
-            }
+        return array_map(static function (OA\Security\Requirement|array $item): array|\stdClass {
+            $requirement = $item instanceof OA\Security\Requirement ? $item->toArray() : SecurityRequirement::normalise($item);
 
-            return SecurityRequirement::normalise($item);
+            return $requirement ?: new \stdClass();
         }, $security);
     }
 
@@ -869,12 +875,12 @@ class OpenApi31Compiler implements CompilerInterface
     }
 
     /**
-     * Every component takes its key from one field, and a property from `property`. None can
+     * Every component takes its name from one field, and a property from `property`. None can
      * be derived from a method or a non-constructor parameter, so an attribute declared there
      * has to carry its own name — the same requirement classic enforces. `Augmenter\Names`
-     * fills the key in for anything declared on a class, so what reaches here is unnameable.
+     * fills the name in for anything declared on a class, so what reaches here is unnameable.
      *
-     * A key claimed twice is `Augmenter\Merge`'s to reduce and report, and it runs first, so a
+     * A name claimed twice is `Augmenter\Merge`'s to reduce and report, and it runs first, so a
      * repeat seen here means a `Specification` that was compiled without the pipeline.
      */
     protected function validateNames(Specification $specification): void
@@ -922,10 +928,12 @@ class OpenApi31Compiler implements CompilerInterface
      */
     protected function validateNestedNames(Specification $specification): void
     {
-        $walker = $specification->getWalker();
+        $specification->getWalker()->visit(array_keys(static::NESTED_MAPS), function (AttributeInterface $attribute): void {
+            foreach (static::NESTED_MAPS as $container => $maps) {
+                if (!$attribute instanceof $container) {
+                    continue;
+                }
 
-        foreach (static::NESTED_MAPS as $container => $maps) {
-            $walker->visit($container, function (AttributeInterface $attribute) use ($maps): void {
                 foreach ($maps as $property => $keyField) {
                     foreach ($attribute->{$property} ?? [] as $item) {
                         if (($item->{$keyField} ?? null) !== null) {
@@ -940,8 +948,8 @@ class OpenApi31Compiler implements CompilerInterface
                         ));
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
     /**
@@ -1046,10 +1054,25 @@ class OpenApi31Compiler implements CompilerInterface
     }
 
     /**
+     * `Augmenter\PathParameters` fills in what was left out, so this only fires for a
+     * `required` set by hand.
+     */
+    protected function validatePathParameters(Specification $specification): void
+    {
+        $specification->getWalker()->visit(OA\Parameter::class, function (OA\Parameter $parameter): void {
+            if ($parameter->in !== OA\ParameterIn::Path->value || $parameter->ref !== null || $parameter->required === true) {
+                return;
+            }
+
+            $this->logger->warning("Path parameter \"{$parameter->name}\" must be required in " . $parameter->getSourceLocation());
+        });
+    }
+
+    /**
      * Only responses nested in an operation are checked, because position is what gives
-     * `Response::$response` its meaning: a status code there, and a component key in the
+     * `Response::$response` its meaning: a status code there, and a component name in the
      * `responses` bucket, where `components.responses.product` is a name. `isRoot()` cannot
-     * tell them apart — it is true whenever the key is set.
+     * tell them apart — it is true whenever the field is set.
      *
      * A nested response carries no reflector of its own, so the operation is reported
      * instead, which is where the reader has to go to fix it anyway.
@@ -1098,11 +1121,7 @@ class OpenApi31Compiler implements CompilerInterface
             }
         };
 
-        $walker = $specification->getWalker();
-        $walker->visit(OA\Response::class, $check);
-        $walker->visit(OA\RequestBody::class, $check);
-        $walker->visit(OA\Parameter::class, $check);
-        $walker->visit(OA\Header::class, $check);
+        $specification->getWalker()->visit([OA\Response::class, OA\RequestBody::class, OA\Parameter::class, OA\Header::class], $check);
     }
 
     /**
@@ -1121,9 +1140,9 @@ class OpenApi31Compiler implements CompilerInterface
     /**
      * Compiles one `components` bucket, keyed the way `ComponentIndex` resolves a `$ref`.
      *
-     * A component with no key is dropped rather than given a positional one: it cannot be
+     * A component with no name is dropped rather than filed under its position: it cannot be
      * referenced, and an integer key turns the whole bucket into a JSON array where OpenAPI
-     * requires a map. A key claimed twice keeps the last. `validateNames()` reports both.
+     * requires a map. A name claimed twice keeps the last. `validateNames()` reports both.
      *
      * @param  list<AttributeInterface> $components
      * @return array<string,mixed>
@@ -1191,6 +1210,8 @@ class OpenApi31Compiler implements CompilerInterface
 
     /**
      * The reference a `$ref` holds, whether it is the string or a `Schema\Ref` around it.
+     *
+     * @deprecated since 7.1, removed in 8.0; use `RefInterface::getRefValue()`
      */
     protected function refString(string|OA\Schema\Ref|null $ref): ?string
     {

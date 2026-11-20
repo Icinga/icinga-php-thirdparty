@@ -6,22 +6,28 @@
 
 namespace OpenApi;
 
-use OpenApi\Contracts\AttributeInterface;
+use OpenApi\Contracts\KeyResolverInterface;
+use OpenApi\Contracts\RefInterface;
 use OpenApi\Contracts\ResolverInterface;
 use OpenApi\Resolver\Reflection;
-use OpenApi\Spec as OA;
 use OpenApi\Specification\ComponentIndex;
+use OpenApi\Specification\ComponentKey;
 use OpenApi\Utils\TypedList;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
 /**
- * Finds and resolves FQCNs referenced by the specification that have no corresponding schema.
+ * Finds and resolves keys referenced by the specification that have no corresponding component.
  *
  * Two sources are inspected:
- * 1. Ref values that are raw FQCNs (not yet rewritten to `#/components/...` paths)
- * 2. Property/parameter type hints on schema class reflectors
+ * 1. Ref values that are raw FQCNs (not yet rewritten to `#/components/...` paths), with the
+ *    qualifiers of a `Schema\Ref`
+ * 2. Property/parameter type hints on schema class reflectors, which are plain keys
+ *
+ * A `KeyResolverInterface` is asked about every key. A resolver implementing `ResolverInterface`
+ * alone is asked about plain keys only: it knows the class alone, and would describe the plain
+ * class for a key that means another description of it.
  */
 class Resolver implements LoggerAwareInterface
 {
@@ -60,10 +66,11 @@ class Resolver implements LoggerAwareInterface
     }
 
     /**
-     * Resolve all found unresolved FQCN in the specification assembled so far.
+     * Resolve all found unresolved keys in the specification assembled so far.
      *
-     * The first resolver to claim success will resolve the FQCN. A resolver implementing
-     * `LoggerAwareInterface` is given this resolver's logger first.
+     * The first resolver to claim success will resolve the key. A resolver implementing
+     * `LoggerAwareInterface` is given this resolver's logger first. One implementing
+     * `ResolverInterface` alone is reported as deprecated, once per run.
      */
     public function resolve(Assembler $assembler): void
     {
@@ -72,6 +79,10 @@ class Resolver implements LoggerAwareInterface
         }
 
         foreach ($this->resolvers as $resolver) {
+            if (!$resolver instanceof KeyResolverInterface) {
+                trigger_deprecation('zircote/swagger-php', '7.2', '%s implements `ResolverInterface` alone, which is deprecated and will be removed in 8.0; implement `KeyResolverInterface`', $resolver::class);
+            }
+
             if ($resolver instanceof LoggerAwareInterface && $this->logger instanceof LoggerInterface) {
                 $resolver->setLogger($this->logger);
             }
@@ -79,7 +90,7 @@ class Resolver implements LoggerAwareInterface
 
         $specification = $assembler->getSpecification();
 
-        // FQCN no resolver was able to handle; not worth another attempt in this run
+        // keys no resolver was able to handle; not worth another attempt in this run
         $attempted = [];
 
         $iterations = 0;
@@ -90,18 +101,24 @@ class Resolver implements LoggerAwareInterface
 
             $unresolved = $this->findUnresolved($specification);
             $resolved = false;
-            foreach ($unresolved as $fqcn) {
-                if (isset($attempted[$fqcn])) {
+            foreach ($unresolved as $id => $key) {
+                if (isset($attempted[$id])) {
                     continue;
                 }
 
                 foreach ($this->resolvers as $resolver) {
+                    if (!$resolver instanceof KeyResolverInterface && !$key->isPlain()) {
+                        continue;
+                    }
+
                     try {
-                        $claimed = $resolver->resolve($fqcn, $assembler);
+                        $claimed = $resolver instanceof KeyResolverInterface
+                            ? $resolver->resolveKey($key, $assembler)
+                            : $resolver->resolve($key->class, $assembler);
                     } catch (\Throwable $throwable) {
                         // as the scan does for a class it cannot load: report it, and resolve the rest
-                        $this->logger?->warning("Skipping unloadable {$fqcn}: {$throwable->getMessage()}");
-                        $attempted[$fqcn] = true;
+                        $this->logger?->warning("Skipping unloadable {$id}: {$throwable->getMessage()}");
+                        $attempted[$id] = true;
 
                         continue 2;
                     }
@@ -112,7 +129,7 @@ class Resolver implements LoggerAwareInterface
                     }
                 }
 
-                $attempted[$fqcn] = true;
+                $attempted[$id] = true;
             }
         } while ($resolved);
     }
@@ -126,7 +143,8 @@ class Resolver implements LoggerAwareInterface
     }
 
     /**
-     * @return list<string> FQCNs that are referenced but have no schema in the specification
+     * @return array<string, ComponentKey> keys that are referenced but have no component in the
+     *                                     specification, by their string
      */
     protected function findUnresolved(Specification $specification): array
     {
@@ -136,39 +154,28 @@ class Resolver implements LoggerAwareInterface
         $this->collectFromRefs($specification, $index, $unresolved);
         $this->collectFromReflectors($specification, $index, $unresolved);
 
-        return array_values(array_unique($unresolved));
+        return $unresolved;
     }
 
     /**
-     * @param list<string> $unresolved
+     * @param array<string, ComponentKey> $unresolved
      */
     protected function collectFromRefs(Specification $specification, ComponentIndex $index, array &$unresolved): void
     {
-        $specification->getWalker()->eachRef(function (AttributeInterface $attribute) use ($index, &$unresolved): void {
-            if (!property_exists($attribute, 'ref') || $attribute->ref === null) {
+        $specification->getWalker()->eachRef(function (RefInterface $attribute) use ($index, &$unresolved): void {
+            $key = $attribute->getRefKey();
+            if (!$key instanceof ComponentKey || !class_exists($key->class)) {
                 return;
             }
 
-            $ref = $attribute->ref instanceof OA\Schema\Ref
-                ? $attribute->ref->ref
-                : $attribute->ref;
-
-            if (str_starts_with($ref, '#/')) {
-                return;
-            }
-
-            if (!class_exists($ref)) {
-                return;
-            }
-
-            if (!$index->find($ref) instanceof AttributeInterface) {
-                $unresolved[] = $ref;
+            if (!$index->hasKey($key)) {
+                $unresolved[(string) $key] = $key;
             }
         });
     }
 
     /**
-     * @param list<string> $unresolved
+     * @param array<string, ComponentKey> $unresolved
      */
     protected function collectFromReflectors(Specification $specification, ComponentIndex $index, array &$unresolved): void
     {
@@ -188,8 +195,9 @@ class Resolver implements LoggerAwareInterface
                     continue;
                 }
 
-                if (!$index->find($fqcn) instanceof AttributeInterface) {
-                    $unresolved[] = $fqcn;
+                $key = new ComponentKey($fqcn);
+                if (!$index->hasKey($key)) {
+                    $unresolved[$fqcn] = $key;
                 }
             }
         }
@@ -213,7 +221,7 @@ class Resolver implements LoggerAwareInterface
             }
         }
 
-        if ($constructor = $reflector->getConstructor()) {
+        if (($constructor = $reflector->getConstructor()) instanceof \ReflectionMethod) {
             foreach ($constructor->getParameters() as $param) {
                 foreach ($this->extractNamedTypes($param->getType()) as $type) {
                     $types[] = $type;

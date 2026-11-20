@@ -8,6 +8,7 @@ namespace OpenApi\Merge\Concerns;
 
 use OpenApi\Contracts\AttributeInterface;
 use OpenApi\Spec as OA;
+use OpenApi\Specification\ComponentKey;
 use OpenApi\Specification\ComponentName;
 
 /**
@@ -22,7 +23,7 @@ trait IdentityTrait
     /**
      * What makes two attributes the same one depends on the collection they are in:
      *
-     * - anything in a `components` bucket: its component key
+     * - anything in a `components` bucket: its component name
      * - an operation: its path and method, or its webhook and method
      * - a path item outside `components`: its path
      * - a tag: its name
@@ -54,7 +55,7 @@ trait IdentityTrait
                 return 'component:' . $component;
             }
 
-            // a path item without a component key is path-bound, and keyed by its path
+            // a path item without a component name is path-bound, and keyed by its path
             return $attribute instanceof OA\PathItem && $attribute->path !== null
                 ? 'path:' . $attribute->path
                 : null;
@@ -66,18 +67,27 @@ trait IdentityTrait
     /**
      * Both are named, because either could be the one the author did not mean to write. Two
      * contributed attributes both report `unknown`, which is stated once.
+     *
+     * Two components with different keys describe different things, so the name was most likely
+     * derived twice rather than written twice, and the message says how to tell them apart.
      */
     protected function collision(AttributeInterface $earlier, AttributeInterface $later, string $outcome = 'keeping the last'): string
     {
         $earlierAt = (string) $earlier->getSourceLocation();
         $laterAt = (string) $later->getSourceLocation();
+        $earlierKey = $earlier->getComponentKey();
+        $laterKey = $later->getComponentKey();
+        $split = ComponentName::isComponentType($later)
+            && $earlierKey instanceof ComponentKey && $laterKey instanceof ComponentKey
+            && !$earlierKey->equals($laterKey);
 
         return sprintf(
-            '%s "%s" is declared more than once, %s in %s',
+            '%s "%s" is declared more than once, %s in %s%s',
             (new \ReflectionClass($later))->getShortName(),
             $this->label($later),
             $outcome,
             $earlierAt === $laterAt ? $laterAt : $laterAt . ' and ' . $earlierAt,
+            $split ? sprintf('. They describe %s and %s: give one a name of its own, or name components with `QualifiedName`', $earlierKey, $laterKey) : '',
         );
     }
 

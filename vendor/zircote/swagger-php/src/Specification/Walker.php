@@ -7,6 +7,7 @@
 namespace OpenApi\Specification;
 
 use OpenApi\Contracts\AttributeInterface;
+use OpenApi\Contracts\RefInterface;
 use OpenApi\Spec as OA;
 use OpenApi\Specification;
 use OpenApi\Utils\JsonPointer;
@@ -32,14 +33,38 @@ class Walker
     }
 
     /**
-     * Walk every ref-bearing attribute in the specification.
+     * Walk every attribute whose schema can be inferred from its reflector's PHP type: each
+     * property in a schema's `properties`, with that schema, and each parameter and request body.
+     * These are the attributes `Augmenter\Types` types.
      *
-     * @param callable(AttributeInterface): void $visitor
+     * Whether the reflector carries a type, and whether the attribute's schema leaves room for
+     * one, is the visitor's to decide.
+     *
+     * @param callable(OA\Property|OA\Parameter|OA\RequestBody, ?OA\Schema): void $visitor
+     */
+    public function eachTypedAttribute(callable $visitor): void
+    {
+        // one walk for all three kinds; each walk visits the whole document
+        $this->visit(AttributeInterface::class, static function (AttributeInterface $attribute) use ($visitor): void {
+            if ($attribute instanceof OA\Schema) {
+                foreach ($attribute->properties ?? [] as $property) {
+                    $visitor($property, $attribute);
+                }
+            } elseif ($attribute instanceof OA\Parameter || $attribute instanceof OA\RequestBody) {
+                $visitor($attribute, null);
+            }
+        });
+    }
+
+    /**
+     * Walk every attribute in the specification that has a ref.
+     *
+     * @param callable(RefInterface): void $visitor
      */
     public function eachRef(callable $visitor): void
     {
         $this->visit(AttributeInterface::class, function (AttributeInterface $attribute) use ($visitor): void {
-            if (property_exists($attribute, 'ref') && $attribute->ref !== null) {
+            if ($attribute instanceof RefInterface && $attribute->getRefValue() !== null) {
                 $visitor($attribute);
             }
 
@@ -62,12 +87,17 @@ class Walker
     }
 
     /**
+     * Walk every attribute that is an instance of `$visitee`, or of any class in it.
+     *
+     * Each call walks the whole specification, so a pass after several kinds of attribute
+     * names them all in one call. They arrive in walk order, not grouped by class.
+     *
      * @template T of AttributeInterface
      *
-     * @param class-string<T>   $visitee
-     * @param callable(T): void $visitor
+     * @param class-string<T>|list<class-string<T>> $visitee
+     * @param callable(T): void                     $visitor
      */
-    public function visit(string $visitee, callable $visitor): void
+    public function visit(string|array $visitee, callable $visitor): void
     {
         // one `$seen` for every bucket: an attribute reachable from two of them — an
         // operation held both directly and inside a path item — is still one attribute
@@ -81,12 +111,12 @@ class Walker
     /**
      * @template T of AttributeInterface
      *
-     * @param class-string<T>                       $visitee
+     * @param class-string<T>|list<class-string<T>> $visitee
      * @param callable(T): void                     $visitor
      * @param array<mixed>                          $candidates
      * @param \SplObjectStorage<object, mixed>|null $seen
      */
-    protected function walk(string $visitee, callable $visitor, array $candidates, ?\SplObjectStorage $seen = null): void
+    protected function walk(string|array $visitee, callable $visitor, array $candidates, ?\SplObjectStorage $seen = null): void
     {
         $seen ??= new \SplObjectStorage();
 
@@ -105,8 +135,11 @@ class Walker
                     }
                 }
 
-                if ($candidate instanceof $visitee) {
-                    $visitor($candidate);
+                foreach ((array) $visitee as $class) {
+                    if ($candidate instanceof $class) {
+                        $visitor($candidate);
+                        break;
+                    }
                 }
             }
         }

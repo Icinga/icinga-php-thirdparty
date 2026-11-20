@@ -6,6 +6,9 @@
 
 namespace OpenApi\Augmenter;
 
+use OpenApi\ComponentNamer;
+use OpenApi\Contracts\ComponentNamerAwareInterface;
+use OpenApi\Contracts\ComponentNamerInterface;
 use OpenApi\Spec as OA;
 use OpenApi\Specification;
 use OpenApi\Type\TypeMapper;
@@ -31,13 +34,14 @@ use Psr\Log\LoggerAwareTrait;
  *
  * @implements PipeInterface<Specification>
  */
-class Enums implements PipeInterface, LoggerAwareInterface
+class Enums implements PipeInterface, LoggerAwareInterface, ComponentNamerAwareInterface
 {
     use LoggerAwareTrait;
 
     public function __construct(
         #[Config('If set, stores enum case names in a vendor extension with this key (e.g. <code>x-enum-varnames</code>).')]
         protected ?string $enumNames = null,
+        protected ComponentNamerInterface $namer = new ComponentNamer\ShortName(),
     ) {
     }
 
@@ -52,6 +56,13 @@ class Enums implements PipeInterface, LoggerAwareInterface
     public function setEnumNames(?string $enumNames): static
     {
         $this->enumNames = $enumNames;
+
+        return $this;
+    }
+
+    public function setNamer(ComponentNamerInterface $namer): static
+    {
+        $this->namer = $namer;
 
         return $this;
     }
@@ -73,7 +84,7 @@ class Enums implements PipeInterface, LoggerAwareInterface
             $enumName = $reflector->getName();
             $reflector = new \ReflectionEnum($enumName);
 
-            $schema->component ??= $reflector->getShortName();
+            $schema->component ??= $this->namer->name($schema);
 
             $useName = $this->shouldUseName($schema, $reflector);
 
@@ -120,20 +131,20 @@ class Enums implements PipeInterface, LoggerAwareInterface
 
     protected function resolveEnumValues(Specification $specification): void
     {
-        $specification->getWalker()->visit(OA\Schema::class, function (OA\Schema $schema): void {
-            if ($schema->enum !== null) {
-                $schema->enum = $this->resolveEnumArray($schema->enum);
+        $specification->getWalker()->visit([OA\Schema::class, OA\ServerVariable::class], function (OA\Schema|OA\ServerVariable $attribute): void {
+            if ($attribute->enum === null) {
+                return;
             }
-        });
 
-        $specification->getWalker()->visit(OA\ServerVariable::class, function (OA\ServerVariable $variable): void {
-            if ($variable->enum !== null) {
+            if ($attribute instanceof OA\Schema) {
+                $attribute->enum = $this->resolveEnumArray($attribute->enum);
+            } elseif ($attribute instanceof OA\ServerVariable) {
                 // resolveEnumArray() is shared with Schema, whose enum may hold any JSON value.
                 // Only a server variable's is narrowed, and only after the cases are resolved.
-                $variable->enum = ServerVariableEnum::asStrings(
-                    $this->resolveEnumArray($variable->enum),
+                $attribute->enum = ServerVariableEnum::asStrings(
+                    $this->resolveEnumArray($attribute->enum),
                     $this->logger,
-                    $variable->serverVariable
+                    $attribute->serverVariable
                 );
             }
         });
