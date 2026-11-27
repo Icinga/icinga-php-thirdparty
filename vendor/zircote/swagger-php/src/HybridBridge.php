@@ -12,6 +12,8 @@ use OpenApi\Annotations as OA;
  * Converts classic annotations into a Specification by iterating the Analysis directly.
  *
  * All enrichment (types, refs, descriptions, hierarchy) is left to the spec augmenter chain.
+ *
+ * @deprecated since 7.0, removed in 8.0
  */
 class HybridBridge
 {
@@ -35,6 +37,7 @@ class HybridBridge
                 $annotation instanceof OA\Tag => $specification->tags[] = $this->convertTag($annotation),
                 $annotation instanceof OA\SecurityScheme && !$annotation->_context->is('nested') => $specification->securitySchemes[] = $this->convertSecurityScheme($annotation),
                 $annotation instanceof OA\PathItem && !$annotation->_context->is('nested') && !Undefined::isDefault($annotation->path) && !($annotation instanceof OA\Webhook) => $this->collectPathItem($annotation, $specification),
+                $annotation instanceof OA\Webhook && !$annotation->_context->is('nested') && !Undefined::isDefault($annotation->webhook) => $this->convertWebhook($annotation, $specification),
                 $annotation instanceof OA\Components => $this->convertComponents($annotation, $specification),
                 $annotation instanceof OA\Operation && !$annotation->_context->is('nested') => $specification->operations[] = $this->convertOperation($annotation, $this->val($annotation->path), $this->methodFromAnnotation($annotation)),
                 $annotation instanceof OA\Schema && !$this->isNestedSchemaType($annotation) && $annotation->_context->reflector instanceof \ReflectionClass && !$annotation->_context->is('nested') => $classSchemas[$annotation->_context->reflector->getName()][] = $annotation,
@@ -46,6 +49,7 @@ class HybridBridge
                 $annotation instanceof OA\Parameter && !$annotation->_context->is('nested') && ($annotation->_context->reflector instanceof \ReflectionClass || !Undefined::isDefault($annotation->parameter)) => $specification->parameters[] = $this->convertParameter($annotation),
                 $annotation instanceof OA\Header && !$annotation->_context->is('nested') && !Undefined::isDefault($annotation->header) => $specification->headers[] = $this->convertHeader($annotation),
                 $annotation instanceof OA\Link && !$annotation->_context->is('nested') => $specification->links[] = $this->convertLink($annotation),
+                $annotation instanceof OA\Examples && !$annotation->_context->is('nested') && !Undefined::isDefault($annotation->example) => $specification->examples[] = $this->convertExample($annotation),
                 $annotation instanceof OA\ExternalDocumentation && !$annotation->_context->is('nested') => $specification->externalDocs[] = $this->convertExternalDocs($annotation),
                 default => isset($held[spl_object_id($annotation)]) ? null : $this->reportStray($annotation),
             };
@@ -678,7 +682,7 @@ class HybridBridge
     {
         $result = new Spec\Header(
             header: $this->val($header->header),
-            description: $this->val($header->description),
+            description: Undefined::isDefault($header->description) ? Undefined::UNDEFINED : $header->description,
             required: $this->val($header->required),
             deprecated: $this->val($header->deprecated),
             ref: $this->val($header->ref),
@@ -1146,8 +1150,18 @@ class HybridBridge
         return is_array($annotation->x) ? $annotation->x : null;
     }
 
+    /**
+     * A property or schema takes the reflector only when its own context holds it.
+     *
+     * A nested context inherits the reflector of the member that declares its parent,
+     * and that member's docblock describes the member, not the nested property or schema.
+     */
     protected function copyReflector(OA\AbstractAnnotation $from, Spec\AbstractAttribute $to): void
     {
+        if ($from instanceof OA\Schema && !$from->_context->is('reflector')) {
+            return;
+        }
+
         if ($from->_context->reflector !== null && $from->_context->reflector instanceof \Reflector) {
             $to->setReflector($from->_context->reflector);
         }

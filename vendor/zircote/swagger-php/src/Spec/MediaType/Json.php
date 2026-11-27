@@ -6,7 +6,9 @@
 
 namespace OpenApi\Spec\MediaType;
 
+use OpenApi\Contracts\RefInterface;
 use OpenApi\Spec as OA;
+use OpenApi\Spec\Concerns\RefTrait;
 use OpenApi\Spec\Concerns\SchemaInputTrait;
 use OpenApi\Spec\Property;
 use OpenApi\Spec\Schema;
@@ -23,13 +25,17 @@ use OpenApi\Undefined;
  *
  * Allows to shorten this:
  *
- *   #[OA\Response(response: 200, content: [
- *       new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(type: 'array', items: new OA\Schema(ref: Pet::class))),
- *   ])]
+ * ```php
+ * #[OA\Response(response: 200, content: [
+ *     new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(type: 'array', items: new OA\Schema(ref: Pet::class))),
+ * ])]
+ * ```
  *
  * to this:
  *
- *   #[OA\Response(response: 200, content: [new OA\MediaType\Json(type: 'array', items: new OA\Schema(ref: Pet::class))])]
+ * ```php
+ * #[OA\Response(response: 200, content: [new OA\MediaType\Json(type: 'array', items: new OA\Schema(ref: Pet::class))])]
+ * ```
  *
  * The `Shortcuts` augmenter expands the schema properties into a nested `OA\Schema` automatically.
  *
@@ -39,8 +45,9 @@ use OpenApi\Undefined;
  * @phpstan-import-type PropertiesInput from Schema
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-class Json extends OA\MediaType
+class Json extends OA\MediaType implements RefInterface
 {
+    use RefTrait;
     use SchemaInputTrait;
 
     /** @var string|list<string>|null */
@@ -59,7 +66,7 @@ class Json extends OA\MediaType
      * @param mixed                                            $example     Example of the media type content
      * @param list<OA\Example>|null                            $examples    Examples of the media type content
      * @param list<OA\Encoding>|array<string,OA\Encoding>|null $encoding    Encoding information for specific properties
-     * @param string|null                                      $component   The key this is filed under in `components`, which makes it a reusable component
+     * @param string|null                                      $component   The name this is filed under in `components`, which makes it a reusable component
      * @param array<string,mixed>|null                         $x           Vendor extensions (x-* properties)
      * @param list<OA\Attachable>|null                         $attachables Reusable custom attachable attributes
      * @param OA\Fan|null                                      $fan         Where this attribute goes when more than one attribute could hold it

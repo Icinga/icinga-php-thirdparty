@@ -11,11 +11,11 @@ use OpenApi\Spec as OA;
 use OpenApi\Specification;
 
 /**
- * The key a component is filed under in its bucket.
+ * The name a component is filed under in its bucket.
  *
  * The compiler and `ComponentIndex` both need this, and used to answer it separately. Their
  * answers had drifted apart: a link with no `link` compiled under its `operationId` while the
- * index recorded no name at all, so the component shipped under a key no `$ref` could reach.
+ * index recorded no name at all, so the component shipped under a name no `$ref` could reach.
  * Asking one place makes "compiled as X" and "resolvable as X" the same statement.
  *
  * Each component type belongs to exactly one bucket, so the type is enough to identify the
@@ -26,19 +26,20 @@ class ComponentName
     /**
      * Every `components` bucket, named as both the `Specification` property holding it and the
      * segment a `$ref` to it carries. `pathItems` doubles as the `paths` source: a `PathItem`
-     * without a key is path-bound and is not a component.
+     * without a name is path-bound and is not a component.
      */
     public const BUCKETS = ['schemas', 'responses', 'parameters', 'requestBodies', 'headers', 'securitySchemes', 'links', 'examples', 'pathItems', 'mediaTypes'];
 
     /**
-     * The key, or null when the component has none and cannot be referenced.
+     * The name, or null when the component has none and cannot be referenced.
      *
      * One field on every type, `component`. The historic per-type spellings — `schema`,
-     * `parameter`, `request`, `securityScheme` — alias onto it in their constructors. The
+     * `parameter`, `request`, `securityScheme` — alias onto it in their constructors, and are
+     * read as a fallback for a value set after construction, which the constructor never sees. The
      * ones that are also a nesting key — `response`, `header`, `link`, `example` — cannot:
      * the object does not know at construction whether it is nested. This is only ever asked
-     * of an item in a root bucket, where it is not nested, so here the historic key *is* the
-     * component key and is read as a fallback. `normalise()` writes the same answer into
+     * of an item in a root bucket, where it is not nested, so here the historic field *is* the
+     * component name and is read as a fallback. `normalise()` writes the same answer into
      * `component` once per build, which is where the spelling is reported as deprecated.
      */
     public static function of(AttributeInterface $item): ?string
@@ -51,7 +52,7 @@ class ComponentName
     }
 
     /**
-     * The constructor field a missing key is reported against, for diagnostics.
+     * The constructor field a missing name is reported against, for diagnostics.
      */
     public static function keyField(AttributeInterface $item): ?string
     {
@@ -59,7 +60,7 @@ class ComponentName
     }
 
     /**
-     * Whether the type can carry a component key at all.
+     * Whether the type can carry a component name at all.
      */
     public static function isComponentType(AttributeInterface $item): bool
     {
@@ -76,14 +77,15 @@ class ComponentName
     }
 
     /**
-     * Fill `component` on every root component that still spells its key the historic way.
+     * Fill `component` on every root component that still spells its name the historic way.
      *
      * `response`, `header`, `link` and `example` are the nesting key when the attribute is
-     * nested and the component key when it is not, and the object cannot tell the two apart
+     * nested and the component name when it is not, and the object cannot tell the two apart
      * at construction — nesting is structural, and a nested attribute never reaches a root
-     * slot. Here it has: anything in a root bucket is a component, so its historic key is the
-     * component key and aliases across. The one inference that reads a value field —
-     * `Parameter::$name` — lives here for the same reason.
+     * slot. Here it has: anything in a root bucket is a component, so its historic field is the
+     * component name and aliases across. The one inference that reads a value field —
+     * `Parameter::$name` — lives here for the same reason. So do the constructor-aliased
+     * spellings, for a value assigned after construction.
      *
      * Runs before the resolver builds the first `ComponentIndex`, and again after the hybrid
      * bridge adds classic-derived attributes; only the first pass reports the spelling as
@@ -105,7 +107,7 @@ class ComponentName
                 }
 
                 if ($field !== null && $deprecate) {
-                    trigger_deprecation('zircote/swagger-php', '6.12', '`%s` is deprecated as the component key of %s and will be removed in 8.0; use `component`', $field, $item::class);
+                    trigger_deprecation('zircote/swagger-php', '6.12', '`%s` is deprecated as the component name of %s and will be removed in 8.0; use `component`', $field, $item::class);
                 }
 
                 $item->component = $value;
@@ -114,11 +116,12 @@ class ComponentName
     }
 
     /**
-     * What `component` falls back to: the historic spelling for the four nesting-key types,
-     * and the one inference that reads a value field — a parameter is keyed by its name. The
+     * What `component` falls back to: the historic spelling, and the one inference that reads a
+     * value field — a parameter without one is named by its `name`. The constructors alias the
+     * spellings that can only be the name, so those are only found here when assigned later. The
      * field name is reported when the spelling is deprecated, and is null for the inference,
-     * which is not. A schema used to fall back to its title; nothing relied on it, and a
-     * keyless schema is better reported than silently named.
+     * which is not. A schema used to fall back to its title; nothing relied on it, and an
+     * unnamed schema is better reported than silently named.
      *
      * @return array{string|null, string|null} [field, value]
      */
@@ -129,7 +132,10 @@ class ComponentName
             $item instanceof OA\Header => ['header', $item->header],
             $item instanceof OA\Link => ['link', $item->link],
             $item instanceof OA\Example => ['example', $item->example],
-            $item instanceof OA\Parameter => [null, $item->name],
+            $item instanceof OA\Schema => ['schema', $item->schema],
+            $item instanceof OA\RequestBody => ['request', $item->request],
+            $item instanceof OA\Security\Scheme => ['securityScheme', $item->securityScheme],
+            $item instanceof OA\Parameter => $item->parameter !== null ? ['parameter', $item->parameter] : [null, $item->name],
             default => [null, null],
         };
     }

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
+class ComposerStaticInitae2463fd5402ce734611b73a6784c2c5
 {
     public static $files = array (
         'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
@@ -1177,7 +1177,6 @@ class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
         'OpenApi\\Analysers\\DocBlockAnnotationFactory' => __DIR__ . '/..' . '/zircote/swagger-php/src/Analysers/DocBlockAnnotationFactory.php',
         'OpenApi\\Analysers\\DocBlockParser' => __DIR__ . '/..' . '/zircote/swagger-php/src/Analysers/DocBlockParser.php',
         'OpenApi\\Analysers\\ReflectionAnalyser' => __DIR__ . '/..' . '/zircote/swagger-php/src/Analysers/ReflectionAnalyser.php',
-        'OpenApi\\Analysers\\TokenScanner' => __DIR__ . '/..' . '/zircote/swagger-php/src/Analysers/TokenScanner.php',
         'OpenApi\\Analysis' => __DIR__ . '/..' . '/zircote/swagger-php/src/Analysis.php',
         'OpenApi\\Annotations\\AbstractAnnotation' => __DIR__ . '/..' . '/zircote/swagger-php/src/Annotations/AbstractAnnotation.php',
         'OpenApi\\Annotations\\AdditionalProperties' => __DIR__ . '/..' . '/zircote/swagger-php/src/Annotations/AdditionalProperties.php',
@@ -1281,6 +1280,7 @@ class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
         'OpenApi\\Augmenter\\EnumDescriptions' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/EnumDescriptions.php',
         'OpenApi\\Augmenter\\Enums' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/Enums.php',
         'OpenApi\\Augmenter\\Group' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/Group.php',
+        'OpenApi\\Augmenter\\ImpliedSchemas' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/ImpliedSchemas.php',
         'OpenApi\\Augmenter\\Inheritance' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/Inheritance.php',
         'OpenApi\\Augmenter\\Inheritance\\Operations' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/Inheritance/Operations.php',
         'OpenApi\\Augmenter\\Inheritance\\Schemas' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/Inheritance/Schemas.php',
@@ -1293,6 +1293,7 @@ class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
         'OpenApi\\Augmenter\\Parameters' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/Parameters.php',
         'OpenApi\\Augmenter\\PathFilter' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/PathFilter.php',
         'OpenApi\\Augmenter\\PathItems' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/PathItems.php',
+        'OpenApi\\Augmenter\\PathParameters' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/PathParameters.php',
         'OpenApi\\Augmenter\\Properties' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/Properties.php',
         'OpenApi\\Augmenter\\Refs' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/Refs.php',
         'OpenApi\\Augmenter\\SecurityRequirements' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/SecurityRequirements.php',
@@ -1301,20 +1302,30 @@ class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
         'OpenApi\\Augmenter\\TypeAliases' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/TypeAliases.php',
         'OpenApi\\Augmenter\\Types' => __DIR__ . '/..' . '/zircote/swagger-php/src/Augmenter/Types.php',
         'OpenApi\\Builder' => __DIR__ . '/..' . '/zircote/swagger-php/src/Builder.php',
+        'OpenApi\\Builder\\Hooks' => __DIR__ . '/..' . '/zircote/swagger-php/src/Builder/Hooks.php',
         'OpenApi\\Builder\\Mode' => __DIR__ . '/..' . '/zircote/swagger-php/src/Builder/Mode.php',
         'OpenApi\\Builder\\Result' => __DIR__ . '/..' . '/zircote/swagger-php/src/Builder/Result.php',
         'OpenApi\\Compiler\\OpenApi30Compiler' => __DIR__ . '/..' . '/zircote/swagger-php/src/Compiler/OpenApi30Compiler.php',
         'OpenApi\\Compiler\\OpenApi31Compiler' => __DIR__ . '/..' . '/zircote/swagger-php/src/Compiler/OpenApi31Compiler.php',
         'OpenApi\\Compiler\\OpenApi32Compiler' => __DIR__ . '/..' . '/zircote/swagger-php/src/Compiler/OpenApi32Compiler.php',
+        'OpenApi\\ComponentNamer\\QualifiedName' => __DIR__ . '/..' . '/zircote/swagger-php/src/ComponentNamer/QualifiedName.php',
+        'OpenApi\\ComponentNamer\\ShortName' => __DIR__ . '/..' . '/zircote/swagger-php/src/ComponentNamer/ShortName.php',
         'OpenApi\\Console\\GenerateCommand' => __DIR__ . '/..' . '/zircote/swagger-php/src/Console/GenerateCommand.php',
         'OpenApi\\Console\\GenerateFormat' => __DIR__ . '/..' . '/zircote/swagger-php/src/Console/GenerateFormat.php',
         'OpenApi\\Console\\GenerateInput' => __DIR__ . '/..' . '/zircote/swagger-php/src/Console/GenerateInput.php',
         'OpenApi\\Context' => __DIR__ . '/..' . '/zircote/swagger-php/src/Context.php',
+        'OpenApi\\Contracts\\AttributeFactoryAwareInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/AttributeFactoryAwareInterface.php',
         'OpenApi\\Contracts\\AttributeInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/AttributeInterface.php',
         'OpenApi\\Contracts\\AttributeTranslatorInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/AttributeTranslatorInterface.php',
         'OpenApi\\Contracts\\CompilerInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/CompilerInterface.php',
+        'OpenApi\\Contracts\\ComponentNamerAwareInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/ComponentNamerAwareInterface.php',
+        'OpenApi\\Contracts\\ComponentNamerInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/ComponentNamerInterface.php',
+        'OpenApi\\Contracts\\KeyResolverInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/KeyResolverInterface.php',
         'OpenApi\\Contracts\\MergerInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/MergerInterface.php',
+        'OpenApi\\Contracts\\PluginInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/PluginInterface.php',
+        'OpenApi\\Contracts\\RefInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/RefInterface.php',
         'OpenApi\\Contracts\\ResolverInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/ResolverInterface.php',
+        'OpenApi\\Contracts\\TypeResolverAwareInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/Contracts/TypeResolverAwareInterface.php',
         'OpenApi\\Generator' => __DIR__ . '/..' . '/zircote/swagger-php/src/Generator.php',
         'OpenApi\\GeneratorAwareInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/GeneratorAwareInterface.php',
         'OpenApi\\GeneratorAwareTrait' => __DIR__ . '/..' . '/zircote/swagger-php/src/GeneratorAwareTrait.php',
@@ -1329,7 +1340,6 @@ class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
         'OpenApi\\Merge\\Operations' => __DIR__ . '/..' . '/zircote/swagger-php/src/Merge/Operations.php',
         'OpenApi\\Merge\\Tags' => __DIR__ . '/..' . '/zircote/swagger-php/src/Merge/Tags.php',
         'OpenApi\\OpenApiException' => __DIR__ . '/..' . '/zircote/swagger-php/src/OpenApiException.php',
-        'OpenApi\\Pipeline' => __DIR__ . '/..' . '/zircote/swagger-php/src/Pipeline.php',
         'OpenApi\\Processors\\AugmentDiscriminators' => __DIR__ . '/..' . '/zircote/swagger-php/src/Processors/AugmentDiscriminators.php',
         'OpenApi\\Processors\\AugmentItems' => __DIR__ . '/..' . '/zircote/swagger-php/src/Processors/AugmentItems.php',
         'OpenApi\\Processors\\AugmentMediaType' => __DIR__ . '/..' . '/zircote/swagger-php/src/Processors/AugmentMediaType.php',
@@ -1359,20 +1369,25 @@ class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
         'OpenApi\\Processors\\PathFilter' => __DIR__ . '/..' . '/zircote/swagger-php/src/Processors/PathFilter.php',
         'OpenApi\\Rector\\AliasSpecImportsRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/AliasSpecImportsRector.php',
         'OpenApi\\Rector\\ComponentsHolderRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/ComponentsHolderRector.php',
+        'OpenApi\\Rector\\DropParameterArgumentsRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/DropParameterArgumentsRector.php',
+        'OpenApi\\Rector\\EncodedPropertyRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/EncodedPropertyRector.php',
+        'OpenApi\\Rector\\EncodingKeyRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/EncodingKeyRector.php',
         'OpenApi\\Rector\\MoveSchemaKeywordsRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/MoveSchemaKeywordsRector.php',
         'OpenApi\\Rector\\NamePositionalArgumentsRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/NamePositionalArgumentsRector.php',
+        'OpenApi\\Rector\\ParameterStyleRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/ParameterStyleRector.php',
         'OpenApi\\Rector\\SecurityToRequirementRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/SecurityToRequirementRector.php',
         'OpenApi\\Rector\\TypeAliasesRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/TypeAliasesRector.php',
         'OpenApi\\Rector\\TypeClassStringToRefRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/TypeClassStringToRefRector.php',
         'OpenApi\\Rector\\UnnestOpenApiRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/UnnestOpenApiRector.php',
         'OpenApi\\Rector\\WrapEnumClassStringRector' => __DIR__ . '/..' . '/zircote/swagger-php/rector/src/WrapEnumClassStringRector.php',
         'OpenApi\\Resolver' => __DIR__ . '/..' . '/zircote/swagger-php/src/Resolver.php',
+        'OpenApi\\Resolver\\Concerns\\KeyResolverTrait' => __DIR__ . '/..' . '/zircote/swagger-php/src/Resolver/Concerns/KeyResolverTrait.php',
         'OpenApi\\Resolver\\Reflection' => __DIR__ . '/..' . '/zircote/swagger-php/src/Resolver/Reflection.php',
         'OpenApi\\Serializer' => __DIR__ . '/..' . '/zircote/swagger-php/src/Serializer.php',
-        'OpenApi\\SourceFinder' => __DIR__ . '/..' . '/zircote/swagger-php/src/SourceFinder.php',
         'OpenApi\\Spec\\AbstractAttribute' => __DIR__ . '/..' . '/zircote/swagger-php/src/Spec/AbstractAttribute.php',
         'OpenApi\\Spec\\Attachable' => __DIR__ . '/..' . '/zircote/swagger-php/src/Spec/Attachable.php',
         'OpenApi\\Spec\\Components' => __DIR__ . '/..' . '/zircote/swagger-php/src/Spec/Components.php',
+        'OpenApi\\Spec\\Concerns\\RefTrait' => __DIR__ . '/..' . '/zircote/swagger-php/src/Spec/Concerns/RefTrait.php',
         'OpenApi\\Spec\\Concerns\\SchemaInputTrait' => __DIR__ . '/..' . '/zircote/swagger-php/src/Spec/Concerns/SchemaInputTrait.php',
         'OpenApi\\Spec\\Contact' => __DIR__ . '/..' . '/zircote/swagger-php/src/Spec/Contact.php',
         'OpenApi\\Spec\\Discriminator' => __DIR__ . '/..' . '/zircote/swagger-php/src/Spec/Discriminator.php',
@@ -1437,12 +1452,12 @@ class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
         'OpenApi\\Spec\\Xml' => __DIR__ . '/..' . '/zircote/swagger-php/src/Spec/Xml.php',
         'OpenApi\\Specification' => __DIR__ . '/..' . '/zircote/swagger-php/src/Specification.php',
         'OpenApi\\Specification\\ComponentIndex' => __DIR__ . '/..' . '/zircote/swagger-php/src/Specification/ComponentIndex.php',
+        'OpenApi\\Specification\\ComponentKey' => __DIR__ . '/..' . '/zircote/swagger-php/src/Specification/ComponentKey.php',
         'OpenApi\\Specification\\ComponentName' => __DIR__ . '/..' . '/zircote/swagger-php/src/Specification/ComponentName.php',
         'OpenApi\\Specification\\PathItemHierarchy' => __DIR__ . '/..' . '/zircote/swagger-php/src/Specification/PathItemHierarchy.php',
         'OpenApi\\Specification\\Walker' => __DIR__ . '/..' . '/zircote/swagger-php/src/Specification/Walker.php',
         'OpenApi\\TypeResolverInterface' => __DIR__ . '/..' . '/zircote/swagger-php/src/TypeResolverInterface.php',
         'OpenApi\\Type\\AbstractTypeResolver' => __DIR__ . '/..' . '/zircote/swagger-php/src/Type/AbstractTypeResolver.php',
-        'OpenApi\\Type\\LegacyTypeResolver' => __DIR__ . '/..' . '/zircote/swagger-php/src/Type/LegacyTypeResolver.php',
         'OpenApi\\Type\\SchemaType' => __DIR__ . '/..' . '/zircote/swagger-php/src/Type/SchemaType.php',
         'OpenApi\\Type\\TypeInfoTypeResolver' => __DIR__ . '/..' . '/zircote/swagger-php/src/Type/TypeInfoTypeResolver.php',
         'OpenApi\\Type\\TypeMapper' => __DIR__ . '/..' . '/zircote/swagger-php/src/Type/TypeMapper.php',
@@ -1461,7 +1476,6 @@ class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
         'OpenApi\\Utils\\SourceLocation' => __DIR__ . '/..' . '/zircote/swagger-php/src/Utils/SourceLocation.php',
         'OpenApi\\Utils\\SourceScanner' => __DIR__ . '/..' . '/zircote/swagger-php/src/Utils/SourceScanner.php',
         'OpenApi\\Utils\\TokenScanner' => __DIR__ . '/..' . '/zircote/swagger-php/src/Utils/TokenScanner.php',
-        'OpenApi\\Utils\\TypeMapper' => __DIR__ . '/..' . '/zircote/swagger-php/src/Utils/TypeMapper.php',
         'OpenApi\\Utils\\TypedList' => __DIR__ . '/..' . '/zircote/swagger-php/src/Utils/TypedList.php',
         'Override' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/Override.php',
         'PHPStan\\PhpDocParser\\Ast\\AbstractNodeVisitor' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/AbstractNodeVisitor.php',
@@ -1533,14 +1547,18 @@ class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
         'PHPStan\\PhpDocParser\\Ast\\Type\\ConditionalTypeForParameterNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/ConditionalTypeForParameterNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\ConditionalTypeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/ConditionalTypeNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\ConstTypeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/ConstTypeNode.php',
+        'PHPStan\\PhpDocParser\\Ast\\Type\\FullyQualifiedNameNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/FullyQualifiedNameNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\GenericTypeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/GenericTypeNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\IdentifierTypeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/IdentifierTypeNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\IntersectionTypeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/IntersectionTypeNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\InvalidTypeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/InvalidTypeNode.php',
+        'PHPStan\\PhpDocParser\\Ast\\Type\\NameNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/NameNode.php',
+        'PHPStan\\PhpDocParser\\Ast\\Type\\NameNodeTrait' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/NameNodeTrait.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\NullableTypeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/NullableTypeNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\ObjectShapeItemNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/ObjectShapeItemNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\ObjectShapeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/ObjectShapeNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\OffsetAccessTypeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/OffsetAccessTypeNode.php',
+        'PHPStan\\PhpDocParser\\Ast\\Type\\RelativeNameNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/RelativeNameNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\ThisTypeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/ThisTypeNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\TypeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/TypeNode.php',
         'PHPStan\\PhpDocParser\\Ast\\Type\\UnionTypeNode' => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src/Ast/Type/UnionTypeNode.php',
@@ -3355,6 +3373,7 @@ class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
         'Symfony\\Contracts\\Service\\ServiceProviderInterface' => __DIR__ . '/..' . '/symfony/service-contracts/ServiceProviderInterface.php',
         'Symfony\\Contracts\\Service\\ServiceSubscriberInterface' => __DIR__ . '/..' . '/symfony/service-contracts/ServiceSubscriberInterface.php',
         'Symfony\\Contracts\\Service\\ServiceSubscriberTrait' => __DIR__ . '/..' . '/symfony/service-contracts/ServiceSubscriberTrait.php',
+        'Symfony\\Contracts\\Service\\ShutdownInterface' => __DIR__ . '/..' . '/symfony/service-contracts/ShutdownInterface.php',
         'Symfony\\Polyfill\\Ctype\\Ctype' => __DIR__ . '/..' . '/symfony/polyfill-ctype/Ctype.php',
         'Symfony\\Polyfill\\Intl\\Grapheme\\Grapheme' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/Grapheme.php',
         'Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Normalizer.php',
@@ -3945,10 +3964,10 @@ class ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit4cd6e9c658eebdd98ae08e4ef88e37b6::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitae2463fd5402ce734611b73a6784c2c5::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitae2463fd5402ce734611b73a6784c2c5::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitae2463fd5402ce734611b73a6784c2c5::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitae2463fd5402ce734611b73a6784c2c5::$classMap;
 
         }, null, ClassLoader::class);
     }

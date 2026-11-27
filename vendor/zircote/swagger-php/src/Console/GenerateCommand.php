@@ -8,11 +8,14 @@ namespace OpenApi\Console;
 
 use OpenApi\Builder;
 use OpenApi\Builder\Result;
+use OpenApi\Contracts\ComponentNamerInterface;
+use OpenApi\Contracts\PluginInterface;
 use OpenApi\Generator;
 use OpenApi\Utils\Pipeline;
 use OpenApi\Utils\SourceFinder;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -43,10 +46,12 @@ class GenerateCommand extends Command
             ->addOption('exclude', 'e', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Exclude path(s) (e.g. -e vendor -e library/Zend)')
             ->addOption('pattern', 'n', InputOption::VALUE_REQUIRED, 'Pattern of files to scan (e.g. -n "/\.(phps|php)$/")', '*.php')
             ->addOption('bootstrap', 'b', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Bootstrap php file(s) for defining constants, etc. (e.g. -b config/constants.php)')
-            ->addOption('add-processor', 'a', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Register an additional processor')
-            ->addOption('remove-processor', 'r', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Remove an existing processor')
+            ->addOption('add-processor', 'a', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Register an additional processor (deprecated, removed in 8.0)')
+            ->addOption('remove-processor', 'r', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Remove an existing processor (deprecated, removed in 8.0)')
             ->addOption('version', null, InputOption::VALUE_REQUIRED, 'The OpenAPI version')
-            ->addOption('mode', 'm', InputOption::VALUE_REQUIRED, 'Set mode classic, hybrid or spec', Builder\Mode::CLASSIC->value)
+            ->addOption('plugin', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Add this plugin class, built without settings (e.g. --plugin "Vendor\\Package\\Plugin")')
+            ->addOption('component-namer', null, InputOption::VALUE_REQUIRED, "Name components with this class, a built-in namer's class name or a FQCN (e.g. --component-namer QualifiedName)")
+            ->addOption('mode', 'm', InputOption::VALUE_REQUIRED, 'Set mode classic, hybrid or spec (deprecated, removed in 8.0 - leave it out for hybrid)', Builder\Mode::HYBRID->value)
             ->addOption('debug', 'd', InputOption::VALUE_NONE, 'Show additional error information');
     }
 
@@ -141,13 +146,17 @@ class GenerateCommand extends Command
 
     protected function generate(GenerateInput $input): Result
     {
-        $builder = (new Builder())
+        $builder = (new Builder($this->logger))
             ->addSource(new SourceFinder($input->paths, $input->exclude, $input->pattern))
             ->setMode($input->mode)
-            ->setLogger($this->logger);
+            ->withPlugins(array_map($this->checkPlugin(...), $input->plugins));
 
         if ($input->version !== null) {
             $builder->setVersion($input->version);
+        }
+
+        if ($input->componentNamer !== null) {
+            $builder->setComponentNamer($this->createComponentNamer($input->componentNamer));
         }
 
         [$generatorConfig, $augmenterConfig] = $this->splitConfig($input);
@@ -191,5 +200,39 @@ class GenerateCommand extends Command
         }
 
         return $builder->build();
+    }
+
+    /**
+     * Refuses a mistyped `--plugin` up front; the builder would only skip it, and build without it.
+     */
+    protected function checkPlugin(string $class): string
+    {
+        if (!class_exists($class) || !is_a($class, PluginInterface::class, true)) {
+            throw new InvalidOptionException(sprintf(
+                'The value "%s" is not valid for the "plugin" option. Expected a class implementing %s.',
+                $class,
+                PluginInterface::class,
+            ));
+        }
+
+        return $class;
+    }
+
+    /**
+     * A built-in namer by its short name, or any class by its FQCN; built without arguments.
+     */
+    protected function createComponentNamer(string $name): ComponentNamerInterface
+    {
+        $class = class_exists($name) ? $name : 'OpenApi\\ComponentNamer\\' . $name;
+
+        if (!is_a($class, ComponentNamerInterface::class, true)) {
+            throw new InvalidOptionException(sprintf(
+                'The value "%s" is not valid for the "component-namer" option. Expected a class implementing %s.',
+                $name,
+                ComponentNamerInterface::class,
+            ));
+        }
+
+        return new $class();
     }
 }

@@ -7,6 +7,7 @@
 namespace OpenApi\Augmenter;
 
 use OpenApi\Contracts\AttributeInterface;
+use OpenApi\Contracts\RefInterface;
 use OpenApi\Spec as OA;
 use OpenApi\Specification;
 use OpenApi\Specification\ComponentName;
@@ -22,8 +23,12 @@ use Psr\Log\LoggerAwareTrait;
  * Iterates multiple times to catch nested dependencies (a schema only
  * referenced by another unused schema should also be removed).
  *
+ * A component whose meta value under the configured `metaKey` is `false` is kept, referenced or
+ * not, and so is what it references. Setting the value back to `true`
+ * makes it a candidate for removal again.
+ *
  * Removal is reported once per run, as a notice with the count and the switch that turns it
- * off; the components themselves are listed at debug level. A response component keyed by a
+ * off; the components themselves are listed at debug level. A response component named by a
  * status code is also reported on its own, as a warning, because it is a response that was
  * meant to nest into an operation.
  *
@@ -41,6 +46,8 @@ class Cleanup implements PipeInterface, LoggerAwareInterface
     public function __construct(
         #[Config('Enables/disables removal of unreferenced components.')]
         protected bool $enabled = true,
+        #[Config('The meta key that keeps a component: one whose meta value under it is <code>false</code> is not removed.')]
+        protected string $metaKey = self::class,
     ) {
     }
 
@@ -75,6 +82,13 @@ class Cleanup implements PipeInterface, LoggerAwareInterface
         return $this;
     }
 
+    public function setMetaKey(string $metaKey): static
+    {
+        $this->metaKey = $metaKey;
+
+        return $this;
+    }
+
     public function group(): string|\BackedEnum
     {
         return Group::Reduce;
@@ -84,9 +98,10 @@ class Cleanup implements PipeInterface, LoggerAwareInterface
     {
         $usedRefs = [];
 
-        $specification->getWalker()->eachRef(static function (AttributeInterface $attribute) use (&$usedRefs): void {
-            if (property_exists($attribute, 'ref') && $attribute->ref !== null) {
-                $usedRefs[$attribute->ref] = true;
+        $specification->getWalker()->eachRef(static function (RefInterface $attribute) use (&$usedRefs): void {
+            $ref = $attribute->getRefValue();
+            if ($ref !== null) {
+                $usedRefs[$ref] = true;
             }
         });
 
@@ -101,8 +116,9 @@ class Cleanup implements PipeInterface, LoggerAwareInterface
     }
 
     /**
-     * A component with no key is left alone: nothing can reference it, so "unreferenced"
-     * says nothing about whether it is wanted. The compiler reports it instead.
+     * A component with no name is left alone: nothing can reference it, so "unreferenced"
+     * says nothing about whether it is wanted. The compiler reports it instead. A component
+     * marked to be kept is left alone too.
      *
      * @param array<string, true> $usedRefs
      */
@@ -112,7 +128,7 @@ class Cleanup implements PipeInterface, LoggerAwareInterface
         foreach ($specification->{$bucket} as $index => $item) {
             $name = ComponentName::of($item);
             $ref = $name !== null ? JsonPointer::ref('components', $bucket, $name) : null;
-            if ($ref !== null && !isset($usedRefs[$ref])) {
+            if ($ref !== null && !isset($usedRefs[$ref]) && $item->getMeta($this->metaKey) !== false) {
                 $this->reportStatusCodeKey($item, $name);
                 $this->removed[] = $ref;
                 unset($specification->{$bucket}[$index]);
@@ -148,7 +164,7 @@ class Cleanup implements PipeInterface, LoggerAwareInterface
     /**
      * `Response::$response` is the status code when the response is nested in an operation
      * and the component name when it is not, and `isRoot()` cannot tell the two apart — it
-     * is true whenever the key is set. So a response that fails to nest becomes a component
+     * is true whenever the field is set. So a response that fails to nest becomes a component
      * named after its status code, which nothing references and this then removes.
      *
      * Removing it is right, and silence is not: the response the author wrote disappears

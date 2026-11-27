@@ -6,14 +6,9 @@
 
 namespace OpenApi\Type;
 
-use PHPStan\PhpDocParser\Ast\AbstractNodeVisitor;
-use PHPStan\PhpDocParser\Ast\Node;
-use PHPStan\PhpDocParser\Ast\NodeTraverser;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\VarTagValueNode;
-use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
-use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
@@ -25,6 +20,7 @@ use Psr\Log\LoggerAwareTrait;
 use Radebatz\TypeInfoExtras\Type\ExplicitType;
 use Radebatz\TypeInfoExtras\Type\IntRangeType;
 use Radebatz\TypeInfoExtras\TypeResolver\StringTypeResolver;
+use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ArrayShapeType;
@@ -36,10 +32,10 @@ use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
-use Symfony\Component\TypeInfo\TypeContext\TypeContext;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\TypeInfo\TypeResolver\ReflectionTypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver as SymfonyStringTypeResolver;
 
 /**
  * Resolves a PHP reflector to a SchemaType value object.
@@ -51,68 +47,39 @@ class TypeResolver implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /**
-     * Docblock keywords PHP reserves. No class can have one of these names, in any letter case.
-     */
-    protected const RESERVED_KEYWORDS = [
-        'array', 'bool', 'callable', 'false', 'float', 'int', 'iterable', 'mixed', 'never', 'null',
-        'object', 'parent', 'self', 'static', 'string', 'true', 'void',
-    ];
-
-    /**
-     * Docblock keywords that are also valid class names. Each is a keyword only where no class of that name exists.
-     */
-    protected const ALIAS_KEYWORDS = [
-        'boolean', 'double', 'integer', 'list', 'number', 'numeric', 'resource', 'scalar',
-    ];
-
     protected TypeMapper $typeMapper;
+
+    /** @var \WeakMap<\Reflector, array{?SchemaType}> what each reflector resolved to, so a docblock is read and reported once */
+    protected \WeakMap $resolved;
 
     public function __construct()
     {
         $this->typeMapper = new TypeMapper();
+        $this->resolved = new \WeakMap();
     }
 
     /**
      * Resolve the PHP type of a reflector into a SchemaType.
      *
+     * A reflector is resolved once. Asking again gives a copy of the first answer, which the
+     * caller can change freely.
+     *
      * @param \ReflectionProperty|\ReflectionParameter|\ReflectionMethod|\ReflectionClassConstant $reflector
      */
     public function resolve(\Reflector $reflector): ?SchemaType
     {
-        $docblockType = $this->getDocblockType($reflector);
-        $reflectionType = $this->getReflectionType($reflector);
+        // wrapped, as the map reads a null value as missing
+        $this->resolved[$reflector] ??= [$this->doResolve($reflector)];
+        [$resolved] = $this->resolved[$reflector];
 
-        if (!$docblockType && !$reflectionType) {
-            return null;
-        }
-
-        $nullable = null;
-        if (($docblockType instanceof Type && $docblockType->isNullable()) || ($reflectionType instanceof Type && $reflectionType->isNullable())) {
-            $nullable = true;
-        }
-
-        $docblockType = $docblockType instanceof NullableType ? $docblockType->getWrappedType() : $docblockType;
-        $reflectionType = $reflectionType instanceof NullableType ? $reflectionType->getWrappedType() : $reflectionType;
-
-        $effectiveType = $docblockType ?? $reflectionType;
-        if (!$effectiveType instanceof Type) {
-            return $nullable !== null ? new SchemaType(nullable: $nullable) : null;
-        }
-
-        $result = $this->mapType($effectiveType);
-        $result->nullable = $nullable;
-
-        $this->applyNativeTypeMapping($result);
-
-        return $result;
+        return $resolved instanceof SchemaType ? clone $resolved : null;
     }
 
     public function getDocblockType(\Reflector $reflector): ?Type
     {
         $docComment = match (true) {
             $reflector instanceof \ReflectionProperty => $reflector->isPromoted()
-                && $reflector->getDeclaringClass() instanceof \ReflectionClass && $reflector->getDeclaringClass()->getConstructor() instanceof \ReflectionMethod
+                && $reflector->getDeclaringClass()->getConstructor() instanceof \ReflectionMethod
                     ? $reflector->getDeclaringClass()->getConstructor()->getDocComment()
                     : $reflector->getDocComment(),
             $reflector instanceof \ReflectionParameter => $reflector->getDeclaringFunction()->getDocComment(),
@@ -124,7 +91,7 @@ class TypeResolver implements LoggerAwareInterface
             return null;
         }
 
-        $typeContext = (new TypeContextFactory())->createFromReflection($reflector);
+        $typeContext = (new TypeContextFactory(new SymfonyStringTypeResolver()))->createFromReflection($reflector);
 
         $tagName = match (true) {
             $reflector instanceof \ReflectionProperty => $reflector->isPromoted()
@@ -159,11 +126,9 @@ class TypeResolver implements LoggerAwareInterface
                 || ($tagValue instanceof ParamTagValueNode && '$' . $reflector->getName() === $tagValue->parameterName)
                 || $tagValue instanceof ReturnTagValueNode
             ) {
-                $this->lowercaseKeywords($tagValue->type, $typeContext);
-
                 try {
                     return (new StringTypeResolver())->resolve((string) $tagValue, $typeContext);
-                } catch (UnsupportedException) {
+                } catch (UnsupportedException|InvalidArgumentException) {
                     $this->logger?->warning(sprintf('Unsupported docblock type "%s" on %s', $tagValue->type, $this->describe($reflector)));
                 }
             }
@@ -187,35 +152,36 @@ class TypeResolver implements LoggerAwareInterface
     }
 
     /**
-     * PHPDoc does not enforce case on keywords, so `@var String` means `string`.
+     * @param \ReflectionProperty|\ReflectionParameter|\ReflectionMethod|\ReflectionClassConstant $reflector
      */
-    protected function lowercaseKeywords(TypeNode $type, TypeContext $typeContext): void
+    protected function doResolve(\Reflector $reflector): ?SchemaType
     {
-        $keyword = static function (string $name) use ($typeContext): ?string {
-            $lowercase = strtolower($name);
+        $docblockType = $this->getDocblockType($reflector);
+        $reflectionType = $this->getReflectionType($reflector);
 
-            return in_array($lowercase, self::RESERVED_KEYWORDS, true)
-                || (in_array($lowercase, self::ALIAS_KEYWORDS, true) && !class_exists($typeContext->normalize($name)))
-                ? $lowercase
-                : null;
-        };
+        if (!$docblockType && !$reflectionType) {
+            return null;
+        }
 
-        $visitor = new class ($keyword) extends AbstractNodeVisitor {
-            public function __construct(protected \Closure $keyword)
-            {
-            }
+        $nullable = null;
+        if (($docblockType instanceof Type && $docblockType->isNullable()) || ($reflectionType instanceof Type && $reflectionType->isNullable())) {
+            $nullable = true;
+        }
 
-            public function enterNode(Node $node): ?Node
-            {
-                if ($node instanceof IdentifierTypeNode) {
-                    $node->name = ($this->keyword)($node->name) ?? $node->name;
-                }
+        $docblockType = $docblockType instanceof NullableType ? $docblockType->getWrappedType() : $docblockType;
+        $reflectionType = $reflectionType instanceof NullableType ? $reflectionType->getWrappedType() : $reflectionType;
 
-                return null;
-            }
-        };
+        $effectiveType = $docblockType ?? $reflectionType;
+        if (!$effectiveType instanceof Type) {
+            return $nullable !== null ? new SchemaType(nullable: $nullable) : null;
+        }
 
-        (new NodeTraverser([$visitor]))->traverse([$type]);
+        $result = $this->mapType($effectiveType);
+        $result->nullable = $nullable;
+
+        $this->applyNativeTypeMapping($result);
+
+        return $result;
     }
 
     protected function mapType(Type $type): SchemaType
@@ -247,10 +213,11 @@ class TypeResolver implements LoggerAwareInterface
         }
 
         if ($type instanceof IntRangeType) {
+            // an open end comes as `PHP_INT_MIN`/`PHP_INT_MAX`, which is no bound of the API
             return new SchemaType(
                 type: $type->getTypeIdentifier()->value,
-                minimum: $type->getFrom(),
-                maximum: $type->getTo(),
+                minimum: \PHP_INT_MIN === $type->getFrom() ? null : $type->getFrom(),
+                maximum: \PHP_INT_MAX === $type->getTo() ? null : $type->getTo(),
             );
         }
 

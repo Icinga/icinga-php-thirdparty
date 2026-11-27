@@ -24,10 +24,12 @@ use OpenApi\Utils\PipeInterface;
  * A default is taken where it is a value the document can hold: a scalar, an enum case or an array
  * of them. An enum case gives the value its schema lists: a backed case's value, a unit case's
  * name. `null` is not taken, since the nullable type already says it, and neither is a value the
- * schema's type does not admit.
+ * schema's type does not admit. An empty array becomes an empty object where the schema admits
+ * objects but not arrays.
  *
  * What the attribute sets wins: an explicit `required` list is kept as written, and so is an
- * explicit `default`, `null` included. Schemas converted from classic annotations are left alone.
+ * explicit `default`, `null` included. Schemas converted from classic attributes and docblock
+ * annotations are left alone.
  *
  * Runs after `Augmenter\Types`, which names each property and gives it the type its default is
  * checked against.
@@ -55,7 +57,7 @@ class Properties implements PipeInterface
 
                 $default = $this->defaultOf($reflector);
 
-                if ($default === Undefined::UNDEFINED && $reflector->getType() !== null && !$reflector->getType()->allowsNull()) {
+                if ($default === Undefined::UNDEFINED && $reflector->getType() instanceof \ReflectionType && !$reflector->getType()->allowsNull()) {
                     $required[] = $property->property;
                 }
 
@@ -107,6 +109,11 @@ class Properties implements PipeInterface
         $schema = $property->schema ?? new OA\Schema();
         if (!Undefined::isDefault($schema->default) || !$this->admits($schema, $value, $default instanceof \UnitEnum)) {
             return;
+        }
+
+        $types = (array) $schema->type;
+        if ($value === [] && in_array('object', $types, true) && !in_array('array', $types, true)) {
+            $value = new \stdClass();
         }
 
         $schema->default = $value;

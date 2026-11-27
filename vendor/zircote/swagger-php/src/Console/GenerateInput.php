@@ -33,15 +33,31 @@ class GenerateInput
     /** @var list<string> */
     public array $bootstrap = [];
 
-    /** @var list<string> */
+    /**
+     * @deprecated since 7.0, removed in 8.0
+     *
+     * @var list<string>
+     */
     public array $addProcessor = [];
 
-    /** @var list<string> */
+    /**
+     * @deprecated since 7.0, removed in 8.0
+     *
+     * @var list<string>
+     */
     public array $removeProcessor = [];
 
     public ?string $version = null;
 
-    public Mode $mode = Mode::CLASSIC;
+    public ?string $componentNamer = null;
+
+    /** @var list<string> */
+    public array $plugins = [];
+
+    /**
+     * @deprecated since 7.0, removed in 8.0
+     */
+    public Mode $mode = Mode::HYBRID;
 
     public bool $debug = false;
 
@@ -66,6 +82,8 @@ class GenerateInput
         $generateInput->addProcessor = $input->getOption('add-processor');
         $generateInput->removeProcessor = $input->getOption('remove-processor');
         $generateInput->version = $input->getOption('version');
+        $generateInput->componentNamer = $input->getOption('component-namer');
+        $generateInput->plugins = $input->getOption('plugin');
         $generateInput->mode = self::enum(Mode::class, 'mode', $input->getOption('mode'));
         $generateInput->debug = (bool) $input->getOption('debug');
 
